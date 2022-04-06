@@ -216,8 +216,9 @@ async function startMyBot() {
             else if (reason === DisconnectReason.timedOut) { log("Connection TimedOut, Reconnecting..."); startMyBot(); }
             else myBot.end(`Unknown DisconnectReason: ${reason}|${connection}`)
         }
-        log(color.hex('#d2e307')('Connected...', update)
+        log(color.hex('#d2e307')('Connected...', update))
         //log(pint.hex('#800080')('[ DRKBBOT ]'), pint.green('YA ESTAS CONENTADO..'));
+    })
 
     myBot.ev.on('creds.update', saveState)
 
@@ -527,19 +528,19 @@ async function startMyBot() {
         filename = path.join(__filename, '../src/' + new Date * 1 + '.' + type.ext)
         if (data && save) fs.promises.writeFile(filename, data)
         return {
-            res,
-            filename,
-	    size: await getSizeMedia(data),
-            ...type,
-            data
+          res,
+          filename,
+          size: await getSizeMedia(data),
+          ...type,
+          data
         }
-
     }
-
     return myBot
 }
 
 startMyBot()
+
+
 
 
 let file = require.resolve(__filename)
