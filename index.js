@@ -234,18 +234,18 @@ async function startMyBot() {
      * @returns
      */
     myBot.send5ButImg = async (jid , text = '' , footer = '', img, but = [], options = {}) =>{
-        let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
-        var template = generateWAMessageFromContent(m.chat, proto.Message.fromObject({
+      let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
+      var template = generateWAMessageFromContent(m.chat, proto.Message.fromObject({
         templateMessage: {
-        hydratedTemplate: {
-        imageMessage: message.imageMessage,
-               "hydratedContentText": text,
-               "hydratedFooterText": footer,
-               "hydratedButtons": but
-            }
-            }
-            }), options)
-            myBot.relayMessage(jid, template.message, { messageId: template.key.id })
+          hydratedTemplate: {
+            imageMessage: message.imageMessage,
+            "hydratedContentText": text,
+            "hydratedFooterText": footer,
+            "hydratedButtons": but
+          }
+        }
+      }), options)
+      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
     }
 
     /**
