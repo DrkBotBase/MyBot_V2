@@ -260,6 +260,60 @@ case 'math': {
 		}
 	}
 	break
+  case 'yts': case 'ytsearch': {
+    if (!text) throw `Que deseas busacar?\nEjemplo: ${prefix + command} Blinding Live`
+    let yts = require("yt-search")
+    let search = await yts(text)
+    let teks = 'YouTube Search\n\nResultado de '+text+'\n\n'
+    //let no = 1
+    search.all.map((video) => {
+      teks += '*' + video.title + '* - ' + video.url + '\n'
+    });
+    /*
+    for (let i of search.all) {
+      teks += `⭔ #: ${no++}\n⭔ Type : ${i.type}\n⭔ Video ID : ${i.videoId}\n⭔ Title : ${i.title}\n⭔ Views : ${i.views}\n⭔ Duration : ${i.timestamp}\n⭔ Upload At : ${i.ago}\n⭔ Author : ${i.author.name}\n⭔ Url : ${i.url}\n\n─────────────────\n\n`
+    }
+    */
+    myBot.sendMessage(m.chat, { image: { url: search.all[0].thumbnail },  caption: teks }, { quoted: m })
+  }
+  break
+  case 'song': {
+    let { yta } = require('./lib/y2mate')
+    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/83RUhxsfLWs 128kbps`
+    let quality = args[1] ? args[1] : '128kbps'
+    let media = await yta(text, quality)
+    if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
+    myBot.sendImage(m.chat, media.thumb, `⭔ Título : ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP3\n⭔ Resolución: ${args[1] || '128kbps'}`, m)
+    myBot.sendMessage(m.chat, { audio: { url: media.dl_link }, mimetype: 'audio/mpeg', fileName: `${media.title}.mp3` }, { quoted: m })
+  }
+  break
+  case 'video': {
+    let { ytv } = require('./lib/y2mate')
+    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/KRaWnd3LJfs 360p`
+    let quality = args[1] ? args[1] : '360p'
+    let media = await ytv(text, quality)
+    if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
+    myBot.sendMessage(m.chat, { video: { url: media.dl_link }, mimetype: 'video/mp4', fileName: `${media.title}.mp4`, caption: `⭔ Título: ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP3\n⭔ Resolución: ${args[1] || '360p'}` }, { quoted: m })
+  }
+  break
+  case 'wallpaper': {
+    if (!text) throw 'Que deseas buscar?'
+    let { wallpaper } = require('./lib/scraper')
+    anu = await wallpaper(text)
+    result = anu[Math.floor(Math.random() * anu.length)]
+    let buttons = [
+      {buttonId: `wallpaper ${text}`, buttonText: {displayText: 'Siguiente'}, type: 1}
+    ]
+    let buttonMessage = {
+      image: { url: result.image[0] },
+      caption: `⭔ Título: ${result.title}\n⭔ Categoría: ${result.type}\n⭔ Detalle: ${result.source}\n⭔ Url: ${result.image[2] || result.image[1] || result.image[0]}`,
+      footer: myBot.user.name,
+      buttons: buttons,
+      headerType: 4
+    }
+    myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+  }
+  break
 /* ########## COMMANDS ##########*/
 
 /* ########## FOR GROUPS ##########*/
@@ -345,13 +399,18 @@ case 'math': {
     if (!m.isGroup) throw mess.group
     if (!isBotAdmins) throw mess.botAdmin
     if (!isAdmins) throw mess.admin
-let teks = `══✪〘 *👥 Tag All* 〙✪══
+
+    const ini = "╔══✪〘 *REPORTENSE* 〙✪══\n"
+    const end = "╚══✪〘 *DrkBot* 〙✪══"
+
+    let mesaj = `╔══✪〘 *REPORTENSE* 〙✪══
  
  ➲ *Mensaje : ${q ? q : ''}*\n\n`
     for (let mem of participants) {
-      teks += `${global.sp} @${mem.id.split('@')[0]}\n`
+      mesaj += `${global.sp} @${mem.id.split('@')[0]}\n`
+      tga = `${ini}${mesaj}${end}`
     }
-    myBot.sendMessage(m.chat, { text: teks, mentions: participants.map(a => a.id) }, { quoted: m })
+    myBot.sendMessage(m.chat, { text: tga, mentions: participants.map(a => a.id) }, { quoted: m })
   }
   break
   case 'hidetag': {
@@ -561,6 +620,86 @@ Ver lista de mensajes con ${prefix}listmsg`)
 		await myBot.updateBlockStatus(users, 'unblock').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
+  case 'bc': case 'broadcast': case 'bcall': {
+    if (!isCreator) throw mess.owner
+    if (!text) throw `Que quieres enviar?\n\nEjemplo: ${prefix + command} text`
+    let anu = await store.chats.all().map(v => v.id)
+    m.reply(`Enviar difusión a ${anu.length} chat.\nTiempo de envio ${anu.length * 1.5} segundos.`)
+    for (let yoi of anu) {
+      await sleep(1500)
+      let btn = [{
+        urlButton: {
+          displayText: 'Source Code',
+          url: 'https://github.com/ianvanh'
+        }
+      }, {
+        callButton: {
+          displayText: 'Number Phone Owner',
+          phoneNumber: '+57 350-877-0421'
+        }
+      }, {
+        quickReplyButton: {
+          displayText: 'Menu',
+          id: 'menu'
+        }
+      }, {
+        quickReplyButton: {
+          displayText: 'Contact Owner',
+          id: 'owner'
+        }  
+      }, {
+        quickReplyButton: {
+          displayText: 'GitHub',
+          id: 'sc'
+        }
+      }]
+      let txt = `「 Difusor Bot 」\n\n${text}`
+      myBot.send5ButImg(yoi, txt, myBot.user.name, global.thumb, btn)
+    }
+    m.reply('Difusion Enviada')
+  }
+  break
+  case 'bcgc': case 'bcgroup': {
+    if (!isCreator) throw mess.owner
+    if (!text) throw `Que quieres enviar?\n\nEjemplo: ${prefix + command} text`
+    let getGroups = await myBot.groupFetchAllParticipating()
+    let groups = Object.entries(getGroups).slice(0).map(entry => entry[1])
+    let anu = groups.map(v => v.id)
+    m.reply(`Enviar difusión a ${anu.length} grupos.\nTiempo de envio ${anu.length * 1.5} segundos.`)
+    for (let i of anu) {
+      await sleep(1500)
+      let btn = [{
+        urlButton: {
+          displayText: 'Source Code',
+          url: 'https://github.com/ianvanh'
+        }
+      }, {
+        callButton: {
+          displayText: 'Number Phone Owner',
+          phoneNumber: '+57 350-877-0421'
+        }
+      }, {
+        quickReplyButton: {
+          displayText: 'Menu',
+          id: 'menu'
+        }
+      }, {
+        quickReplyButton: {
+          displayText: 'Contact Owner',
+          id: 'owner'
+        }  
+      }, {
+        quickReplyButton: {
+          displayText: 'GitHub',
+          id: 'sc'
+        }
+      }]
+      let txt = `「 Difusor Bot 」\n\n${text}`
+      myBot.send5ButImg(i, txt, myBot.user.name, global.thumb, btn)
+    }
+    m.reply('Difusion Enviada')
+  }
+  break
   case 'ping': case 'botstatus': {
 		if (!isCreator) throw mess.owner
     const used = process.memoryUsage()
