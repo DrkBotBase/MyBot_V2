@@ -1,8 +1,7 @@
-/*
-  Copyright (C) 2022
-  DrkBot-MD - Ian VanH
-  Licensed MIT
-  you may not use this file except in compliance with the License.
+/**
+   * Create By Dika Ardnt.
+   * Contact Me on wa.me/6288292024190
+   * Follow https://github.com/DikaArdnt
 */
 
 require('./config')
@@ -17,7 +16,7 @@ const path = require('path')
 const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
 const { smsg, isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('./lib/myfunc')
-const log = console.log;
+const log = console.log
 // #### chalk ####
 const color = require('chalk');
 const warn = color.bold.red;
@@ -50,6 +49,7 @@ global.db.data = {
     game: {},
     settings: {},
     others: {},
+    sticker: {},
     ...(global.db.data || {})
 }
 
@@ -58,7 +58,7 @@ if (global.db) setInterval(async () => {
     if (global.db.data) await global.db.write()
   }, 30 * 1000)
 
-async function startMyBot() {
+async function startMybot() {
     const myBot = myBotConnect({
         logger: pino({ level: 'silent' }),
         printQRInTerminal: true,
@@ -69,15 +69,15 @@ async function startMyBot() {
     store.bind(myBot.ev)
     
     // anticall auto block
-  myBot.ws.on('CB:call', async (json) => {
-    const callerId = json.content[0].attrs['call-creator']
-    if (json.content[0].tag == 'offer') {
-      let owIan = await myBot.sendContact(callerId, global.owner)
-      myBot.sendMessage(callerId, { text: `Sistema de bloqueo por llamadas!\nSi quieres ser desbloqueado contacta a mi creador!`}, { quoted : owIan })
-      await sleep(8000)
-      await myBot.updateBlockStatus(callerId, "block")
-    }
-  })
+    myBot.ws.on('CB:call', async (json) => {
+      const callerId = json.content[0].attrs['call-creator']
+      if (json.content[0].tag == 'offer') {
+        let owIan = await myBot.sendContact(callerId, global.owner)
+        myBot.sendMessage(callerId, { text: `Sistema de bloqueo por llamadas!\nSi quieres ser desbloqueado contacta a mi creador!`}, { quoted : owIan })
+        await sleep(8000)
+        await myBot.updateBlockStatus(callerId, "block")
+      }
+    })
 
     myBot.ev.on('messages.upsert', async chatUpdate => {
         //log(JSON.stringify(chatUpdate, undefined, 2))
@@ -96,7 +96,6 @@ async function startMyBot() {
     })
 
     myBot.ev.on('group-participants.update', async (anu) => {
-        log(anu)
         try {
             let metadata = await myBot.groupMetadata(anu.id)
             let participants = anu.participants
@@ -167,7 +166,7 @@ async function startMyBot() {
 	for (let i of kon) {
 	    list.push({
 	    	displayName: await myBot.getName(i + '@s.whatsapp.net'),
-	    	vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${await myBot.getName(i + '@s.whatsapp.net')}\nFN:${await myBot.getName(i + '@s.whatsapp.net')}\nitem1.TEL;waid=${i}:${i}\nitem1.X-ABLabel:Ponsel\nitem2.EMAIL;type=INTERNET:drkbot@gmail.com\nitem2.X-ABLabel:Email\nitem3.URL:https://instagram.com/iand_tv\nitem3.X-ABLabel:Instagram\nitem4.ADR:;;Colombia;;;;\nitem4.X-ABLabel:Region\nEND:VCARD`
+	    	vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${await myBot.getName(i + '@s.whatsapp.net')}\nFN:${await myBot.getName(i + '@s.whatsapp.net')}\nitem1.TEL;waid=${i}:${i}\nitem1.X-ABLabel:Ponsel\nitem2.EMAIL;type=INTERNET:okeae2410@gmail.com\nitem2.X-ABLabel:Email\nitem3.URL:https://instagram.com/cak_haho\nitem3.X-ABLabel:Instagram\nitem4.ADR:;;Indonesia;;;;\nitem4.X-ABLabel:Region\nEND:VCARD`
 	    })
 	}
 	myBot.sendMessage(jid, { contacts: { displayName: `${list.length} Kontak`, contacts: list }, ...opts }, { quoted })
@@ -190,7 +189,7 @@ async function startMyBot() {
         return status
     }
 	
-    myBot.public = false
+    myBot.public = true
     let wtMyBot = myBot.public == true ? ' Publico' : ' Privado'
     log(color.green('🤖 DrkBot Modo' + wtMyBot));
     log(color.hex('#d30092')(
@@ -200,24 +199,22 @@ async function startMyBot() {
       'Wats 573508770421\n\n'
       ));
 
-
     myBot.serializeM = (m) => smsg(myBot, m, store)
 
     myBot.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update	    
         if (connection === 'close') {
         let reason = new Boom(lastDisconnect?.error)?.output.statusCode
-            if (reason === DisconnectReason.badSession) { log(`Bad Session File, Please Delete Session and Scan Again`); myBot.logout(); }
-            else if (reason === DisconnectReason.connectionClosed) { log("Connection closed, reconnecting...."); startMyBot(); }
-            else if (reason === DisconnectReason.connectionLost) { log("Connection Lost from Server, reconnecting..."); startMyBot(); }
-            else if (reason === DisconnectReason.connectionReplaced) { log("Connection Replaced, Another New Session Opened, Please Close Current Session First"); myBot.logout(); }
-            else if (reason === DisconnectReason.loggedOut) { log(`Device Logged Out, Please Scan Again And Run.`); myBot.logout(); }
-            else if (reason === DisconnectReason.restartRequired) { log("Restart Required, Restarting..."); startMyBot(); }
-            else if (reason === DisconnectReason.timedOut) { log("Connection TimedOut, Reconnecting..."); startMyBot(); }
+            if (reason === DisconnectReason.badSession) { log(`Archivo de sesión corrupto, elimine la sesión y vuelva a escanear.`); myBot.logout(); }
+            else if (reason === DisconnectReason.connectionClosed) { log("Conexión cerrada, reconectando...."); startMybot(); }
+            else if (reason === DisconnectReason.connectionLost) { log("Conexión perdida del servidor, reconectando..."); startMybot(); }
+            else if (reason === DisconnectReason.connectionReplaced) { log("Conexión reemplazada, otra nueva sesión abierta, cierre la sesión actual primero."); myBot.logout(); }
+            else if (reason === DisconnectReason.loggedOut) { log(`Dispositivo cerrado, escanee nuevamente y ejecute.`); myBot.logout(); }
+            else if (reason === DisconnectReason.restartRequired) { log("Reinicio requerido, reiniciando..."); startMybot(); }
+            else if (reason === DisconnectReason.timedOut) { log("Se agotó el tiempo de espera de la conexión, reconectando..."); startMybot(); }
             else myBot.end(`Unknown DisconnectReason: ${reason}|${connection}`)
         }
-        log(color.hex('#d2e307')('Connected...', update))
-        //log(pint.hex('#800080')('[ DRKBBOT ]'), pint.green('YA ESTAS CONENTADO..'));
+        log('Connected...', update)
     })
 
     myBot.ev.on('creds.update', saveState)
@@ -234,18 +231,18 @@ async function startMyBot() {
      * @returns
      */
     myBot.send5ButImg = async (jid , text = '' , footer = '', img, but = [], options = {}) =>{
-      let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
-      var template = generateWAMessageFromContent(m.chat, proto.Message.fromObject({
+        let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
+        var template = generateWAMessageFromContent(m.chat, proto.Message.fromObject({
         templateMessage: {
-          hydratedTemplate: {
-            imageMessage: message.imageMessage,
-            "hydratedContentText": text,
-            "hydratedFooterText": footer,
-            "hydratedButtons": but
-          }
-        }
-      }), options)
-      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
+        hydratedTemplate: {
+        imageMessage: message.imageMessage,
+               "hydratedContentText": text,
+               "hydratedFooterText": footer,
+               "hydratedButtons": but
+            }
+            }
+            }), options)
+            myBot.relayMessage(jid, template.message, { messageId: template.key.id })
     }
 
     /**
@@ -528,19 +525,19 @@ async function startMyBot() {
         filename = path.join(__filename, '../src/' + new Date * 1 + '.' + type.ext)
         if (data && save) fs.promises.writeFile(filename, data)
         return {
-          res,
-          filename,
-          size: await getSizeMedia(data),
-          ...type,
-          data
+            res,
+            filename,
+	    size: await getSizeMedia(data),
+            ...type,
+            data
         }
+
     }
+
     return myBot
 }
 
-startMyBot()
-
-
+startMybot()
 
 
 let file = require.resolve(__filename)
