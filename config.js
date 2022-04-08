@@ -28,13 +28,13 @@ global.prefa = ['.']
 global.sp = '╠❖'
 global.mess = {
     success: '✓ Éxito',
-    admin: 'Funciones especiales de administrador de grupo!',
+    admin: 'Funciones solo para administradores del grupo!',
     botAdmin: 'El bot debe ser administrador!',
     owner: 'Funciones especiales del propietario del bot',
-    group: 'Funciones utilizadas solo para grupos!',
-    private: 'Funciones utilizadas solo para chat privado!',
-    bot: 'Funciones especiales del usuario del número de bot',
-    wait: 'Cargando...',
+    group: 'Funciones solo para grupos!',
+    private: 'Funciones solo para chat privado!',
+    bot: 'Funciones solo para el usuario del número del bot',
+    wait: 'Un momento...',
     endLimit: 'Su límite diario ha expirado, el límite se restablecerá cada 12 horas',
 }
 global.limitawal = {
@@ -42,6 +42,7 @@ global.limitawal = {
     free: 100
 }
 global.thumb = fs.readFileSync('./lib/bot.jpg')
+global.nothing = fs.readFileSync('./lib/nsp.webp')
 
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {

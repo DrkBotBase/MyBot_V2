@@ -214,10 +214,13 @@ switch(command) {
   }
   break
   case 'sc': {
-    m.reply('Script : https://github.com/ianvanh\n\n Dont Forget Give Star\n\nDonate : 573508770421\nPaypal : https://www.paypal.me/\n\n Dont Forget Donate')
+    let media = await global.nothing
+    let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: global.packname, author: global.author })
+    await fs.unlinkSync(encmedia)
+   // m.reply('Script : https://github.com/ianvanh\n\nDont Forget Give Star\n\nDonate: 573508770421\nPaypal : https://www.paypal.me/\n\nDont Forget Donate')
   }
   break
-case 'math': {
+/*case 'math': {
     if (kuismath.hasOwnProperty(m.sender.split('@')[0])) throw "¡Todavía hay sesiones sin terminar!"
     let { genMath, modes } = require('./src/math')
     if (!text) throw `Mode: ${Object.keys(modes).join(' | ')}\nEjemplo: ${prefix}math medium`
@@ -232,7 +235,7 @@ case 'math': {
       delete kuismath[m.sender.split('@')[0]]
     }
   }
-  break
+  break*/
   case 'sticker': case 's': {
     if (!quoted) throw `Responder video/imagen ${prefix + command}`
     m.reply(mess.wait)
@@ -260,11 +263,11 @@ case 'math': {
 		}
 	}
 	break
-  case 'yts': case 'ytsearch': {
+  case 'yt': {
     if (!text) throw `Que deseas busacar?\nEjemplo: ${prefix + command} Blinding Live`
     let yts = require("yt-search")
     let search = await yts(text)
-    let teks = 'YouTube Search\n\nResultado de '+text+'\n\n'
+    let teks = 'YouTube Search\n\nResultado de: *'+text+'*\n\n'
     //let no = 1
     search.all.map((video) => {
       teks += '*' + video.title + '* - ' + video.url + '\n'
@@ -279,7 +282,7 @@ case 'math': {
   break
   case 'song': {
     let { yta } = require('./lib/y2mate')
-    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/83RUhxsfLWs 128kbps`
+    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/83RUhxsfLWs`
     let quality = args[1] ? args[1] : '128kbps'
     let media = await yta(text, quality)
     if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
@@ -289,7 +292,7 @@ case 'math': {
   break
   case 'video': {
     let { ytv } = require('./lib/y2mate')
-    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/KRaWnd3LJfs 360p`
+    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/KRaWnd3LJfs`
     let quality = args[1] ? args[1] : '360p'
     let media = await ytv(text, quality)
     if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
@@ -314,16 +317,33 @@ case 'math': {
     myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
   }
   break
+  case 'ebinary': {
+    if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
+    let { eBinary } = require('./lib/binary')
+    let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
+    let eb = await eBinary(teks)
+    m.reply(eb)
+  }
+  break
+  case 'dbinary': {
+    if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
+    let { dBinary } = require('./lib/binary')
+    let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
+    let db = await dBinary(teks)
+    m.reply(db)
+  }
+  break
 /* ########## COMMANDS ##########*/
 
 /* ########## FOR GROUPS ##########*/
+/*
   case 'chat': {
-    if (!isCreator) throw mess.owner
-    if (!q) throw 'Option : 1. mute\n2. unmute\n3. archive\n4. unarchive\n5. read\n6. unread\n7. delete'
+ //   if (!isCreator) throw mess.owner
+    if (!q) throw 'Option:\n1. mute\n2. unmute\n3. archive\n4. unarchive\n5. read\n6. unread\n7. delete'
     if (args[0] === 'mute') {
-      myBot.chatModify({ mute: 'Infinity' }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
+      myBot.groupSettingUpdate(m.chat, 'announcement')
     } else if (args[0] === 'unmute') {
-      myBot.chatModify({ mute: null }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
+      myBot.groupSettingUpdate(m.chat, 'not_announcement')
     } else if (args[0] === 'archive') {
       myBot.chatModify({  archive: true }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
     } else if (args[0] === 'unarchive') {
@@ -336,7 +356,7 @@ case 'math': {
       myBot.chatModify({ clear: { message: { id: m.quoted.id, fromMe: true }} }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
     }
   }
-  break
+  break*/
   case 'pareja': {
     if (!m.isGroup) throw mess.group
     let member = participants.map(u => u.id)
@@ -363,6 +383,25 @@ case 'math': {
     await myBot.sendButtonText(m.chat, buttons, jawab, myBot.user.name, m, {mentions: menst})
   }
   break
+  case 'mute': {
+    if (!m.isGroup) throw mess.group
+    if (!isBotAdmins) throw mess.botAdmin
+    if (!isAdmins) throw mess.admin
+    if (args[0] === "on") {
+      myBot.groupSettingUpdate(m.chat, 'announcement')
+      m.reply(`El Admin *${pushname}* ha silenciado este grupo!\nAhora sólo los administradores pueden envíar mensajes.`)
+    } else if (args[0] === "off") {
+      myBot.groupSettingUpdate(m.chat, 'not_announcement')
+      m.reply(`El Admin *${pushname}* ha abierto este grupo!\nAhora todos pueden envíar mensajes.`)
+    } else {
+      let buttons = [
+        { buttonId: 'mute on', buttonText: { displayText: 'On' }, type: 1 },
+        { buttonId: 'mute off', buttonText: { displayText: 'Off' }, type: 1 }
+      ]
+      await myBot.sendButtonText(m.chat, buttons, `DrkBot`, myBot.user.name, m)
+    }
+  }
+  break
   case 'kick': {
 		if (!m.isGroup) throw mess.group
     if (!isBotAdmins) throw mess.botAdmin
@@ -384,7 +423,7 @@ case 'math': {
     if (!isBotAdmins) throw mess.botAdmin
     if (!isAdmins) throw mess.admin
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
-		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
+		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote')/*.then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))*/
 	}
 	break
 	case 'demote': {
@@ -392,7 +431,7 @@ case 'math': {
     if (!isBotAdmins) throw mess.botAdmin
     if (!isAdmins) throw mess.admin
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
-		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
+		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote')/*.then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))*/
 	}
 	break
   case 'tagall': {
@@ -403,9 +442,7 @@ case 'math': {
     const ini = "╔══✪〘 *REPORTENSE* 〙✪══\n"
     const end = "╚══✪〘 *DrkBot* 〙✪══"
 
-    let mesaj = `╔══✪〘 *REPORTENSE* 〙✪══
- 
- ➲ *Mensaje : ${q ? q : ''}*\n\n`
+    let mesaj = `➲ *Mensaje:* ${q ? q : ''}\n\n`
     for (let mem of participants) {
       mesaj += `${global.sp} @${mem.id.split('@')[0]}\n`
       tga = `${ini}${mesaj}${end}`
@@ -422,8 +459,11 @@ case 'math': {
   break
   case 'linkgroup': {
     if (!m.isGroup) throw mess.group
-    let response = await myBot.groupInviteCode(m.chat)
-    myBot.sendText(m.chat, `https://chat.whatsapp.com/${response}\n\nLink del grupo: ${groupMetadata.subject}`, m, { detectLink: true })
+    const inviteCode = await myBot.groupInviteCode(m.chat)
+    const { subject } = await myBot.groupMetadata(m.chat)
+    const caption = `*Nombre del Grupo:* *${subject}*\n\n*Link del grupo:* https://chat.whatsapp.com/${inviteCode}`
+    try { pic = await myBot.profilePictureUrl(m.chat, 'image') } catch (e) { pic = global.thumb }
+    myBot.sendImage(m.chat, pic, caption, m)
   }
   break
 /* ########## END GROUPS ##########*/
@@ -514,6 +554,7 @@ case 'math': {
     }
   break
   case 'setcmd': {
+    if (!isCreator) throw mess.owner
     if (!m.quoted) throw 'Responde un mensaje!'
     if (!m.quoted.fileSha256) throw 'SHA256 falta el hash'
     if (!text) throw `Que comando?`
@@ -531,6 +572,7 @@ case 'math': {
   }
   break
   case 'delcmd': {
+    if (!isCreator) throw mess.owner
     let hash = m.quoted.fileSha256.toString('base64')
     if (!hash) throw `Falta el hash`
     if (global.db.data.sticker[hash] && global.db.data.sticker[hash].locked) throw 'You have no permission to delete this sticker command'              
@@ -539,6 +581,7 @@ case 'math': {
   }
   break
   case 'listcmd': {
+    if (!isCreator) throw mess.owner
     let teks = `
 *Lista de Hash*
 Info: *bold* hash is Locked
@@ -558,6 +601,7 @@ ${Object.entries(global.db.data.sticker).map(([key, value], index) => `${index +
   }
   break
   case 'addmsg': {
+    if (!isCreator) throw mess.owner
     if (!m.quoted) throw 'Responda el mensaje que quiere guardar en la base de datos'
     if (!text) throw `Ejemolo: ${prefix + command} nombre`
     let msgs = global.db.data.database
@@ -571,6 +615,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'getmsg': {
+    if (!isCreator) throw mess.owner
     if (!text) throw `Ejemplo: ${prefix + command} nombre\n\nVer lista de mensajes con: ${prefix}listmsg`
     let msgs = global.db.data.database
     if (!(text.toLowerCase() in msgs)) throw `'${text}' no aparece en la lista de mensajes`
@@ -578,6 +623,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'listmsg': {
+    if (!isCreator) throw mess.owner
     let msgs = JSON.parse(fs.readFileSync('./src/database.json'))
 	  let seplit = Object.entries(global.db.data.database).map(([nama, isi]) => { return { nama, ...isi } })
 		let teks = '「 LIST DATABASE 」\n\n'
@@ -588,6 +634,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
 	}
 	break
   case 'delmsg': case 'deletemsg': {
+    if (!isCreator) throw mess.owner
     let msgs = global.db.data.database
     if (!(text.toLowerCase() in msgs)) return m.reply(`'${text}' no aparece en la lista de mensajes`)
 		delete msgs[text.toLowerCase()]
@@ -608,6 +655,23 @@ Ver lista de mensajes con ${prefix}listmsg`)
     m.reply('Sukses Change To Self Usage')
   }
   break
+  /*case 'speedtest': {
+    m.reply('Prueba de velocidad...')
+    let cp = require('child_process')
+    let { promisify } = require('util')
+    let exec = promisify(cp.exec).bind(cp)
+    let o
+    try {
+      o = await exec('python speed.py')
+    } catch (e) {
+      o = e
+    } finally {
+    let { stdout, stderr } = o
+    if (stdout.trim()) m.reply(stdout)
+    if (stderr.trim()) m.reply(stderr)
+    }
+  }
+  break*/
   case 'block': {
 		if (!isCreator) throw mess.owner
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
@@ -630,7 +694,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
       let btn = [{
         urlButton: {
           displayText: 'Source Code',
-          url: 'https://github.com/ianvanh'
+          url: 'https://github.com'
         }
       }, {
         callButton: {
@@ -701,7 +765,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'ping': case 'botstatus': {
-		if (!isCreator) throw mess.owner
+	//	if (!isCreator) throw mess.owner
     const used = process.memoryUsage()
     const cpus = os.cpus().map(cpu => {
       cpu.total = Object.keys(cpu.times).reduce((last, type) => last + cpu.times[type], 0)
@@ -732,12 +796,18 @@ Ver lista de mensajes con ${prefix}listmsg`)
     neww = performance.now()
     oldd = performance.now()
     respon = `
-Kecepatan Respon ${latensi.toFixed(4)} _Second_ \n ${oldd - neww} _miliseconds_\n\nRuntime : ${runtime(process.uptime())}
+*VELOCIDAD DE RESPUESTA*
+_Segundos:_ ${latensi.toFixed(4)}
+_Milisegundos:_ ${oldd - neww}
 
-💻 Info Server
-RAM: ${formatp(os.totalmem() - os.freemem())} / ${formatp(os.totalmem())}
+*TIEMPO DE EJECUCIÓN*
+${runtime(process.uptime())}
 
-_NodeJS Memory Usaage_
+💻 *INFO SERVER*
+_RAM:_ ${formatp(os.totalmem() - os.freemem())} / ${formatp(os.totalmem())}
+
+_MEMORIA NodeJS_
+
 ${Object.keys(used).map((key, _, arr) => `${key.padEnd(Math.max(...arr.map(v=>v.length)),' ')}: ${formatp(used[key])}`).join('\n')}
 
 ${cpus[0] ? `_Total CPU Usage_
@@ -756,7 +826,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
     let btn = [{
       urlButton: {
         displayText: 'Source Code',
-        url: 'https://github.com/ianvanh'
+        url: 'https://github.com'
       }
     }, {
       callButton: {

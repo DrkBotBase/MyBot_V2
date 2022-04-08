@@ -14,17 +14,33 @@ const menu = (prefix, pushname) => {
 
 Hola ${pushname} ${saludo}
 
-*🪀 Owner* : @${global.owner}
+*🪀 Owner* : ${global.owner}
 *🖊️ Prefix* : ${global.prefa}
 
 ╔══✪〘 *MENU* 〙✪══
 ${p} ${prefix}alive
 ${p} ${prefix}menu
-${p} ${prefix}update
-${p} ${prefix}info
-${p} ${prefix}owner
 ${p} ${prefix}donar
-${p} ${prefix}limit
+╠══✪〘 *GRUPOS* 〙✪══
+${p} ${prefix}promote
+${p} ${prefix}demote
+${p} ${prefix}add
+${p} ${prefix}kick
+${p} ${prefix}mute
+${p} ${prefix}unmute
+${p} ${prefix}linkgroup
+${p} ${prefix}pareja
+${p} ${prefix}tagall
+${p} ${prefix}hidetag
+╠══✪〘 *UTILIDADES* 〙✪══
+${p} ${prefix}yt
+${p} ${prefix}song
+${p} ${prefix}video
+${p} ${prefix}sticker
+${p} ${prefix}emojimix
+${p} ${prefix}wallpaper
+${p} ${prefix}ebinary
+${p} ${prefix}dbinary
 ╚══✪〘 *DrkBot* 〙✪══`
 }
 
