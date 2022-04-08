@@ -214,13 +214,10 @@ switch(command) {
   }
   break
   case 'sc': {
-    let media = await global.nothing
-    let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: global.packname, author: global.author })
-    await fs.unlinkSync(encmedia)
-   // m.reply('Script : https://github.com/ianvanh\n\nDont Forget Give Star\n\nDonate: 573508770421\nPaypal : https://www.paypal.me/\n\nDont Forget Donate')
+    m.reply('*No olvides dar estrellas*\n\n*Script:* https://github.com\n*Paypal:* https://www.paypal.me')
   }
-  break
-/*case 'math': {
+  break/*
+  case 'math': {
     if (kuismath.hasOwnProperty(m.sender.split('@')[0])) throw "¡Todavía hay sesiones sin terminar!"
     let { genMath, modes } = require('./src/math')
     if (!text) throw `Mode: ${Object.keys(modes).join(' | ')}\nEjemplo: ${prefix}math medium`
@@ -423,7 +420,7 @@ switch(command) {
     if (!isBotAdmins) throw mess.botAdmin
     if (!isAdmins) throw mess.admin
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
-		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote')/*.then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))*/
+		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
 	case 'demote': {
@@ -431,7 +428,7 @@ switch(command) {
     if (!isBotAdmins) throw mess.botAdmin
     if (!isAdmins) throw mess.admin
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
-		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote')/*.then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))*/
+		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
   case 'tagall': {
@@ -694,7 +691,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
       let btn = [{
         urlButton: {
           displayText: 'Source Code',
-          url: 'https://github.com'
+          url: 'https://github.com/ianvanh'
         }
       }, {
         callButton: {
@@ -765,7 +762,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'ping': case 'botstatus': {
-	//	if (!isCreator) throw mess.owner
+		if (!isCreator) throw mess.owner
     const used = process.memoryUsage()
     const cpus = os.cpus().map(cpu => {
       cpu.total = Object.keys(cpu.times).reduce((last, type) => last + cpu.times[type], 0)
