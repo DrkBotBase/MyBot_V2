@@ -18,6 +18,10 @@ global.APIKeys = {
 	'https://zenzapi.xyz': 'Your Key',
 }
 
+// Read msg & Push Message To Console
+global.read = ''
+global.pushMsgConsole = ''
+
 // Other
 global.owner = ['573508770421']
 global.premium = []

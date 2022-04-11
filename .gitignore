@@ -1,5 +1,5 @@
 node_modules
-src/database json
+src/database.json
 clear.sh
 minibot.json
 package-lock.json

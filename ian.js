@@ -80,31 +80,38 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
                 mute: false,
                 antilink: false,
             }
-		
-	    let setting = global.db.data.settings[botNumber]
-            if (typeof setting !== 'object') global.db.data.settings[botNumber] = {}
-	    if (setting) {
-		if (!isNumber(setting.status)) setting.status = 0
-		if (!('autobio' in setting)) setting.autobio = false
-	    } else global.db.data.settings[botNumber] = {
-		status: 0,
-		autobio: false,
-	    }
-	    
-        } catch (err) {
-            console.error(err)
-        }
-	    
+      let setting = global.db.data.settings[botNumber]
+      if (typeof setting !== 'object') global.db.data.settings[botNumber] = {}
+      if (setting) {
+        if (!isNumber(setting.status)) setting.status = 0
+        if (!('autobio' in setting)) setting.autobio = false
+      } else global.db.data.settings[botNumber] = {
+        status: 0,
+        autobio: false,
+      }
+	} catch (err) {
+	  console.error(err)
+  }
+
         // Public & Self
         if (!myBot.public) {
             if (!m.key.fromMe) return
         }
 
-        /* Push Message To Console && Auto Read
+       //  Push Message To Console && Auto Read
         if (m.message) {
+          if (global.read === 'on') {
             myBot.sendReadReceipt(m.chat, m.sender, [m.key.id])
-            log(chalk.black(chalk.bgWhite('[ PESAN ]')), chalk.black(chalk.bgGreen(new Date)), chalk.black(chalk.bgBlue(budy || m.mtype)) + '\n' + chalk.magenta('=> Dari'), chalk.green(pushname), chalk.yellow(m.sender) + '\n' + chalk.blueBright('=> Di'), chalk.green(m.isGroup ? pushname : 'Private Chat', m.chat))
-        }*/
+          } else {}
+          if (global.pushMsgConsole === 'on') {
+            log(chalk.black.bold(chalk.bgWhite('[ NUEVO MENSAJE ]\n')),
+              chalk.black(chalk.bgGreen(new Date)) + '\n',
+              chalk.black(chalk.bgBlue(budy || m.mtype)) + '\n',
+              chalk.magenta('=> Sender:'), chalk.green(pushname), chalk.yellow(m.sender) + '\n',
+              chalk.blueBright('=> To:'), chalk.green(m.isGroup ? pushname : 'Chat Privado', m.chat) + '\n\n'
+            )
+          } else {}
+        }
 	
 	// reset limit every 12 hours
         let cron = require('node-cron')
@@ -115,7 +122,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
             log('Reseted Limit')
         }, {
             scheduled: true,
-            timezone: "Asia/Jakarta"
+            timezone: "America/Bogota"
         })
         
 	// auto set bio
@@ -131,7 +138,6 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
 	  // Anti Link
     if (db.data.chats[m.chat].antilink) {
       if (budy.match(`chat.whatsapp.com`)) {
-        m.reply(`「 ANTI LINK 」\n\n😧 te he detectado enviando un enlace de grupo, lo sentimos, serás expulsado!`)
         if (!isBotAdmins) return m.reply(`Lo siento no soy Admin T_T`)
         let gclink = (`https://chat.whatsapp.com/`+await myBot.groupInviteCode(m.chat))
         let isLinkThisGc = new RegExp(gclink, 'i')
@@ -139,6 +145,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         if (isgclink) return m.reply(`Link de éste grupo detectado.`)
         if (isAdmins) return m.reply(`Te he detectado enviando enlaces, pero como eres Admin pos no hay problema 😅`)
         if (isCreator) return m.reply(`Mi señor creador, pará usted no hay restricciones.`)
+        m.reply(`「 ANTI LINK 」\n\n😧 te he detectado enviando un enlace de grupo, lo sentimos, serás expulsado!`)
         myBot.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
       }
     }
@@ -494,6 +501,27 @@ switch(command) {
         { buttonId: 'mute off', buttonText: { displayText: 'Off' }, type: 1 }
       ]
       await myBot.sendButtonText(m.chat, buttons, `DrkBot`, myBot.user.name, m)
+    }
+  }
+  break
+  case 'antilink': {
+    if (!m.isGroup) throw mess.group
+    if (!isBotAdmins) throw mess.botAdmin
+    if (!isAdmins) throw mess.admin
+    if (args[0] === "on") {
+      if (db.data.chats[m.chat].antilink) return m.reply(`Anteriormente activo`)
+      db.data.chats[m.chat].antilink = true
+      m.reply('*Antilink Activado*')
+    } else if (args[0] === "off") {
+      if (!db.data.chats[m.chat].antilink) return m.reply(`Anteriormente inactivo`)
+      db.data.chats[m.chat].antilink = false
+      m.reply('*Antilink Desactivado*')
+    } else {
+      let buttons = [
+        { buttonId: 'antilink on', buttonText: { displayText: 'ON' }, type: 1 },
+        { buttonId: 'antilink off', buttonText: { displayText: 'OFF' }, type: 1 }
+      ]
+      await myBot.sendButtonText(m.chat, buttons, `MOD ANTILINK`, myBot.user.name, m)
     }
   }
   break
