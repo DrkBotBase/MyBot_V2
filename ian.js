@@ -32,7 +32,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     try {
         var body = (m.mtype === 'conversation') ? m.message.conversation : (m.mtype == 'imageMessage') ? m.message.imageMessage.caption : (m.mtype == 'videoMessage') ? m.message.videoMessage.caption : (m.mtype == 'extendedTextMessage') ? m.message.extendedTextMessage.text : (m.mtype == 'buttonsResponseMessage') ? m.message.buttonsResponseMessage.selectedButtonId : (m.mtype == 'listResponseMessage') ? m.message.listResponseMessage.singleSelectReply.selectedRowId : (m.mtype == 'templateButtonReplyMessage') ? m.message.templateButtonReplyMessage.selectedId : (m.mtype === 'messageContextInfo') ? (m.message.buttonsResponseMessage?.selectedButtonId || m.message.listResponseMessage?.singleSelectReply.selectedRowId || m.text) : ''
         var budy = (typeof m.text == 'string' ? m.text : '')
-        var prefix = prefa ? /^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi.test(body) ? body.match(/^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi)[0] : "" : prefa ?? global.prefix
+        var prefix = global.prefa
         const isCmd = body.startsWith(prefix)
         const command = body.replace(prefix, '').trim().split(/ +/).shift().toLowerCase()
         const args = body.trim().split(/ +/).slice(1)
@@ -250,8 +250,55 @@ switch(command) {
     }
   }
   break
+  case 'toaudio': {
+    if (!quoted) throw '*Responde un video*'
+    if (!/video/.test(mime) && !/audio/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
+    m.reply(mess.wait)
+    let media = await quoted.download()
+    let { toAudio } = require('./lib/converter')
+    let audio = await toAudio(media, 'mp4')
+    myBot.sendMessage(m.chat, {audio: audio, mimetype: 'audio/mpeg'}, { quoted : m })
+  }
+  break
+  case 'tomp4': {
+    if (!quoted) throw '*Responder Sticker*'
+    if (!/webp/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
+    m.reply(mess.wait)
+		let { webp2mp4File } = require('./lib/uploader')
+    let media = await myBot.downloadAndSaveMediaMessage(quoted)
+    let webpToMp4 = await webp2mp4File(media)
+    await myBot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: 'Convert Webp To Video' } }, { quoted: m })
+    await fs.unlinkSync(media)
+  }
+  break
+  case 'toimg': {
+    if (!quoted) throw '*Responde Un Sticker*'
+    if (!/webp/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
+    m.reply(mess.wait)
+    let media = await myBot.downloadAndSaveMediaMessage(quoted)
+    let ran = await getRandom('.png')
+    exec(`ffmpeg -i ${media} ${ran}`, (err) => {
+      fs.unlinkSync(media)
+      if (err) throw err
+      let buffer = fs.readFileSync(ran)
+      myBot.sendMessage(m.chat, { image: buffer }, { quoted: m })
+      fs.unlinkSync(ran)
+    })
+  }
+  break
+  case 'togif': {
+    if (!quoted) throw '*Responder Video o Sticker*'
+    if (!/webp/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
+    m.reply(mess.wait)
+		let { webp2mp4File } = require('./lib/uploader')
+    let media = await myBot.downloadAndSaveMediaMessage(quoted)
+    let webpToMp4 = await webp2mp4File(media)
+    await myBot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: 'Convert To Video' }, gifPlayback: true }, { quoted: m })
+    await fs.unlinkSync(media)
+  }
+  break
   case 'emojimix': {
-    if (!text) throw `Ejemplo: ${prefix + command} 😅+🤔`
+    if (!text) throw `*Ejemplo:* ${prefix + command} 😅+🤔`
     let [emoji1, emoji2] = text.split`+`
     let anu = await fetchJson(`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=proactive&collection=emoji_kitchen_v5&q=${encodeURIComponent(emoji1)}_${encodeURIComponent(emoji2)}`)
     for (let res of anu.results) {
@@ -261,59 +308,90 @@ switch(command) {
 	}
 	break
   case 'yt': {
-    if (!text) throw `Que deseas busacar?\nEjemplo: ${prefix + command} Blinding Live`
-    let yts = require("yt-search")
-    let search = await yts(text)
-    let teks = 'YouTube Search\n\nResultado de: *'+text+'*\n\n'
-    //let no = 1
-    search.all.map((video) => {
-      teks += '*' + video.title + '* - ' + video.url + '\n'
-    });
-    /*
-    for (let i of search.all) {
-      teks += `⭔ #: ${no++}\n⭔ Type : ${i.type}\n⭔ Video ID : ${i.videoId}\n⭔ Title : ${i.title}\n⭔ Views : ${i.views}\n⭔ Duration : ${i.timestamp}\n⭔ Upload At : ${i.ago}\n⭔ Author : ${i.author.name}\n⭔ Url : ${i.url}\n\n─────────────────\n\n`
-    }
-    */
-    myBot.sendMessage(m.chat, { image: { url: search.all[0].thumbnail },  caption: teks }, { quoted: m })
+    if (!text) throw `Que deseas busacar?\n*Ejemplo:* ${prefix + command} Blinding Live`
+    try {
+      let yts = require("yt-search")
+      let search = await yts(text)
+      let teks = 'YouTube Search\n\nResultado de: *'+text+'*\n\n'
+      search.all.map((video) => {
+        teks += '*' + video.title + '* - ' + video.url + '\n'
+      });
+      myBot.sendMessage(m.chat, { image: { url: search.all[0].thumbnail },  caption: teks }, { quoted: m })
+    } catch (e) { log(e) }
   }
   break
   case 'song': {
-    let { yta } = require('./lib/y2mate')
-    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/83RUhxsfLWs`
-    let quality = args[1] ? args[1] : '128kbps'
-    let media = await yta(text, quality)
-    if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
-    myBot.sendImage(m.chat, media.thumb, `⭔ Título : ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP3\n⭔ Resolución: ${args[1] || '128kbps'}`, m)
-    myBot.sendMessage(m.chat, { audio: { url: media.dl_link }, mimetype: 'audio/mpeg', fileName: `${media.title}.mp3` }, { quoted: m })
+    if (!text) throw 'Que deseas buscar?'
+    try {
+      m.reply(mess.wait)
+      let { yta } = require('./lib/y2mate')
+      if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/83RUhxsfLWs`
+      let quality = args[1] ? args[1] : '128kbps'
+      let media = await yta(text, quality)
+      if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
+      myBot.sendImage(m.chat, media.thumb, `⭔ Título : ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP3\n⭔ Resolución: ${args[1] || '128kbps'}`, m)
+      myBot.sendMessage(m.chat, { audio: { url: media.dl_link }, mimetype: 'audio/mpeg', fileName: `${media.title}.mp3` }, { quoted: m })
+    } catch (e) { log(e) }
   }
   break
   case 'video': {
-    let { ytv } = require('./lib/y2mate')
-    if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/KRaWnd3LJfs`
-    let quality = args[1] ? args[1] : '360p'
-    let media = await ytv(text, quality)
-    if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
-    myBot.sendMessage(m.chat, { video: { url: media.dl_link }, mimetype: 'video/mp4', fileName: `${media.title}.mp4`, caption: `⭔ Título: ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP3\n⭔ Resolución: ${args[1] || '360p'}` }, { quoted: m })
+    if (!text) throw 'Que deseas buscar?'
+    try {
+      m.reply(mess.wait)
+      let { ytv } = require('./lib/y2mate')
+      if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/KRaWnd3LJfs`
+      let quality = args[1] ? args[1] : '360p'
+      let media = await ytv(text, quality)
+      if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
+      myBot.sendMessage(m.chat, { video: { url: media.dl_link }, mimetype: 'video/mp4', fileName: `${media.title}.mp4`, caption: `⭔ Título: ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP4\n⭔ Resolución: ${args[1] || '360p'}` }, { quoted: m })
+    } catch (e) { log(e) }
   }
   break
   case 'wallpaper': {
     if (!text) throw 'Que deseas buscar?'
-    let { wallpaper } = require('./lib/scraper')
-    anu = await wallpaper(text)
-    result = anu[Math.floor(Math.random() * anu.length)]
-    let buttons = [
-      {buttonId: `wallpaper ${text}`, buttonText: {displayText: 'Siguiente'}, type: 1}
-    ]
-    let buttonMessage = {
-      image: { url: result.image[0] },
-      caption: `⭔ Título: ${result.title}\n⭔ Categoría: ${result.type}\n⭔ Detalle: ${result.source}\n⭔ Url: ${result.image[2] || result.image[1] || result.image[0]}`,
-      footer: myBot.user.name,
-      buttons: buttons,
-      headerType: 4
-    }
-    myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+    try {
+      let { wallpaper } = require('./lib/scraper')
+      anu = await wallpaper(text)
+      result = anu[Math.floor(Math.random() * anu.length)]
+      let buttons = [
+        {buttonId: `wallpaper ${text}`, buttonText: {displayText: 'Siguiente'}, type: 1}
+      ]
+      let buttonMessage = {
+        image: { url: result.image[0] },
+        caption: `⭔ Título: ${result.title}\n⭔ Categoría: ${result.type}\n⭔ Detalle: ${result.source}\n⭔ Url: ${result.image[2] || result.image[1] || result.image[0]}`,
+        footer: myBot.user.name,
+        buttons: buttons,
+        headerType: 4
+      }
+      myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+    } catch (e) { log(e) }
   }
   break
+  case 'img': {
+    if (!text) throw `*Ejemplo:* ${prefix + command} Mia Khalifa`
+    let gis = require('g-i-s')
+    res = gis(`${text}`, google)
+    async function google(error, result){
+      if (error){
+        await m.reply('🤖 Parece que tenemos un error.');
+      } else {
+        var gugWp = result
+        var randomWp =  gugWp[Math.floor(Math.random() * gugWp.length)].url
+        let buttons = [
+          {buttonId: `img ${text}`, buttonText: {displayText: 'Siguiente'}, type: 1}
+        ]
+        let buttonMessage = {
+          image: { url: randomWp },
+          caption: '*-----「 DrkBot 」-----*',
+          footer: myBot.user.name,
+          buttons: buttons,
+          headerType: 4
+        }
+        await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+      }
+    }
+   }
+   break
   case 'ebinary': {
     if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
     let { eBinary } = require('./lib/binary')
@@ -328,6 +406,26 @@ switch(command) {
     let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
     let db = await dBinary(teks)
     m.reply(db)
+  }
+  break
+  case 'nsfw': {
+    log('nada')
+  }
+  break
+  case 'bot': {
+    if (!text) throw "🤖 *Si aquí estoy*"
+   await axios.get(`http://api.simsimi.net/v2/?text=${text}&lc=es&cf=true`).then((response) => {
+    try{
+      const { text } = response.data.messages[0]
+      if (text ==='Roberto' || text === 'maite' || text === 'Luis Mario.' || text === 'Ricardo milos\n') {
+        m.reply('🤖 ' + 'mi nombre es DrkBot')
+      }	else {
+        m.reply('🤖 ' + text)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+    })
   }
   break
 /* ########## COMMANDS ##########*/
@@ -485,7 +583,7 @@ switch(command) {
     }
     myBot.sendMessage(m.chat, reactionMessage)
   }
-  break  
+  break/*
   case 'join': {
     if (!isCreator) throw mess.owner
     if (!text) throw 'Necesito el enlace de invitación!'
@@ -497,7 +595,7 @@ switch(command) {
       m.reply(jsonformat(res))
     }).catch((err) => m.reply(jsonformat(err)))
   }
-  break
+  break*/
 /*
 	case 'juzamma': {
 		if (args[0] === 'pdf') {
@@ -652,6 +750,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
     m.reply('Sukses Change To Self Usage')
   }
   break
+
   /*case 'speedtest': {
     m.reply('Prueba de velocidad...')
     let cp = require('child_process')
@@ -851,23 +950,12 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
   break
   case 'menu': {
     anu = menu(prefix, pushname)
-    let btn = [{
-      quickReplyButton: {
-        displayText: 'Menu',
-        id: 'menu'
-      }
-    }, {
-      quickReplyButton: {
-        displayText: 'Contact Owner',
-        id: 'owner'
-      }  
-    }, {
-      quickReplyButton: {
-        displayText: 'GitHub',
-        id: 'sc'
-      }
-    }]
-    myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, btn)
+    let buttons = [
+      { buttonId: 'menu', buttonText: { displayText: 'MENU' }, type: 1 },
+      { buttonId: 'owner', buttonText: { displayText: 'OWNER' }, type: 1 },
+      { buttonId: 'sc', buttonText: { displayText: 'GITHUB' }, type: 1 }
+    ]
+    myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
   }
 
 

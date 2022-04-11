@@ -24,7 +24,7 @@ global.premium = []
 global.packname = 'DrkBot'
 global.author = 'Ian'
 global.sessionName = 'minibot'
-global.prefa = ['.']
+global.prefa = ['/']
 global.sp = '╠❖'
 global.mess = {
     success: '✓ Éxito',

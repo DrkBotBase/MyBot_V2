@@ -38,6 +38,7 @@ ${p} ${prefix}song
 ${p} ${prefix}video
 ${p} ${prefix}sticker
 ${p} ${prefix}emojimix
+${p} ${prefix}img
 ${p} ${prefix}wallpaper
 ${p} ${prefix}ebinary
 ${p} ${prefix}dbinary

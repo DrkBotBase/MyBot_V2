@@ -1,7 +1,8 @@
-/**
-   * Create By Dika Ardnt.
-   * Contact Me on wa.me/6288292024190
-   * Follow https://github.com/DikaArdnt
+/*
+  Copyright (C) 2022
+  DrkBot-MD - Ian VanH
+  Licensed MIT
+  you may not use this file except in compliance with the License.
 */
 
 require('./config')
@@ -166,10 +167,10 @@ async function startMybot() {
 	for (let i of kon) {
 	    list.push({
 	    	displayName: await myBot.getName(i + '@s.whatsapp.net'),
-	    	vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${await myBot.getName(i + '@s.whatsapp.net')}\nFN:${await myBot.getName(i + '@s.whatsapp.net')}\nitem1.TEL;waid=${i}:${i}\nitem1.X-ABLabel:Ponsel\nitem2.EMAIL;type=INTERNET:drkbot@gmail.com\nitem2.X-ABLabel:Email\nitem3.URL:https://instagram.com/iand_tv\nitem3.X-ABLabel:Instagram\nitem4.ADR:;;Colombia;;;;\nitem4.X-ABLabel:Region\nEND:VCARD`
+	    	vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${await myBot.getName(i + '@s.whatsapp.net')}\nFN:${await myBot.getName(i + '@s.whatsapp.net')}\nitem1.TEL;waid=${i}:${i}\nitem1.X-ABLabel:Tel\nitem2.EMAIL;type=INTERNET:drkbot@gmail.com\nitem2.X-ABLabel:Email\nitem3.URL:https://instagram.com/iand_tv\nitem3.X-ABLabel:Instagram\nitem4.ADR:;;Colombia;;;;\nitem4.X-ABLabel:Region\nEND:VCARD`
 	    })
 	}
-	myBot.sendMessage(jid, { contacts: { displayName: `${list.length} Kontak`, contacts: list }, ...opts }, { quoted })
+	myBot.sendMessage(jid, { contacts: { displayName: `${list.length} Contact`, contacts: list }, ...opts }, { quoted })
     }
     
     myBot.setStatus = (status) => {
@@ -268,6 +269,26 @@ async function startMybot() {
     /**
      * 
      * @param {*} jid 
+     * @param {*} path 
+     * @param {*} buttons 
+     * @param {*} options 
+     * @returns 
+     */
+    myBot.sendButImage = async (jid, path, text = '', foot = '', but = [], quoted = '', options = {}) => {
+      let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
+      let buttonMessage = {
+        image: buffer,
+        caption: text,
+        footer: foot,
+        buttons: but,
+        headerType: 4
+      }
+        return await myBot.sendMessage(jid, buttonMessage, { quoted, ...options })
+    }
+    
+    /**
+     * 
+     * @param {*} jid 
      * @param {*} text 
      * @param {*} quoted 
      * @param {*} options 
@@ -285,8 +306,8 @@ async function startMybot() {
      * @returns 
      */
     myBot.sendImage = async (jid, path, caption = '', quoted = '', options) => {
-	let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-        return await myBot.sendMessage(jid, { image: buffer, caption: caption, ...options }, { quoted })
+	    let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
+      return await myBot.sendMessage(jid, { image: buffer, caption: caption, ...options }, { quoted })
     }
 
     /**
