@@ -1,7 +1,7 @@
 node_modules
 src/database.json
 clear.sh
-minibot.json
+#minibot.json
 package-lock.json
 test.js
 yarn.lock
