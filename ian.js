@@ -21,6 +21,7 @@ const { performance } = require('perf_hooks')
 const { Primbon } = require('scrape-primbon')
 const primbon = new Primbon()
 const { smsg, formatp, tanggal, formatDate, getTime, isUrl, sleep, clockString, runtime, fetchJson, getBuffer, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
+const { yta, ytv } = require('./lib/newdown')
 const { menu } = require('./src/assets/menu')
 const log = console.log;
 
@@ -208,6 +209,51 @@ switch(command) {
      m.reply(`${m.pushName} Telah Afk${text ? ': ' + text : ''}`)
   }
   break
+  case 'owner': {
+    myBot.sendContact(m.chat, global.owner, m)
+  }
+  break
+  case 'alive': {
+    anu = '✪〘 *FUNCIONANDO* 〙✪'
+    let btn = [{
+      urlButton: {
+        displayText: 'Source Code',
+        url: 'https://github.com'
+      }
+    }, {
+      callButton: {
+        displayText: 'Number Phone Owner',
+        phoneNumber: '+57 350-877-0421'
+      }
+    }, {
+      quickReplyButton: {
+        displayText: 'Menu',
+        id: 'menu'
+      }
+    }, {
+      quickReplyButton: {
+        displayText: 'Contact Owner',
+        id: 'owner'
+      }  
+    }, {
+      quickReplyButton: {
+        displayText: 'GitHub',
+        id: 'sc'
+      }
+    }]
+    myBot.send5ButImg(m.chat, anu, 'DrkBot', global.thumb, btn)
+  }
+  break
+  case 'menu': {
+    anu = menu(prefix, pushname)
+    let buttons = [
+      { buttonId: 'menu', buttonText: { displayText: 'MENU' }, type: 1 },
+      { buttonId: 'owner', buttonText: { displayText: 'OWNER' }, type: 1 },
+      { buttonId: 'sc', buttonText: { displayText: 'GITHUB' }, type: 1 }
+    ]
+    myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
+  }
+  break
   case 'donar':{
     txtt = `Hola *${pushname}*\nVEO QUE QUIERES DONAR\nPuedes hacerlo por medio de las siguientes formas disponibles`
     ftext = 'Tu donasión será muy valiosa'
@@ -223,24 +269,9 @@ switch(command) {
   case 'sc': {
     m.reply('*No olvides dar estrellas*\n\n*Script:* https://github.com\n*Paypal:* https://www.paypal.me')
   }
-  break/*
-  case 'math': {
-    if (kuismath.hasOwnProperty(m.sender.split('@')[0])) throw "¡Todavía hay sesiones sin terminar!"
-    let { genMath, modes } = require('./src/math')
-    if (!text) throw `Mode: ${Object.keys(modes).join(' | ')}\nEjemplo: ${prefix}math medium`
-    let result = await genMath(text.toLowerCase())
-    myBot.sendText(m.chat, `*¿Cuál es el resultado de: ${result.soal.toLowerCase()}*?\n\nHora: ${(result.waktu / 1000).toFixed(2)} segundo`, m).then(() => {
-      kuismath[m.sender.split('@')[0]] = result.jawaban
-    })
-    await sleep(result.waktu)
-    if (kuismath.hasOwnProperty(m.sender.split('@')[0])) {
-      log("Responder: " + result.jawaban)
-      m.reply("El tiempo se ha acabado\nRespuesta: " + kuismath[m.sender.split('@')[0]])
-      delete kuismath[m.sender.split('@')[0]]
-    }
-  }
-  break*/
-  case 'sticker': case 's': {
+  break
+/* CONVERTER */
+  case 'sticker': {
     if (!quoted) throw `Responder video/imagen ${prefix + command}`
     m.reply(mess.wait)
     if (/image/.test(mime)) {
@@ -314,6 +345,38 @@ switch(command) {
 		}
 	}
 	break
+  case 'bass': case 'blown': case 'deep': case 'earrape': case 'fast': case 'fat': case 'nightcore': case 'reverse': case 'robot': case 'slow': case 'smooth': case 'tupai':
+    try {
+      let set
+      if (/bass/.test(command)) set = '-af equalizer=f=54:width_type=o:width=2:g=20'
+      if (/blown/.test(command)) set = '-af acrusher=.1:1:64:0:log'
+      if (/deep/.test(command)) set = '-af atempo=4/4,asetrate=44500*2/3'
+      if (/earrape/.test(command)) set = '-af volume=12'
+      if (/fast/.test(command)) set = '-filter:a "atempo=1.63,asetrate=44100"'
+      if (/fat/.test(command)) set = '-filter:a "atempo=1.6,asetrate=22100"'
+      if (/nightcore/.test(command)) set = '-filter:a atempo=1.06,asetrate=44100*1.25'
+      if (/reverse/.test(command)) set = '-filter_complex "areverse"'
+      if (/robot/.test(command)) set = '-filter_complex "afftfilt=real=\'hypot(re,im)*sin(0)\':imag=\'hypot(re,im)*cos(0)\':win_size=512:overlap=0.75"'
+      if (/slow/.test(command)) set = '-filter:a "atempo=0.7,asetrate=44100"'
+      if (/smooth/.test(command)) set = '-filter:v "minterpolate=\'mi_mode=mci:mc_mode=aobmc:vsbmc=1:fps=120\'"'
+      if (/tupai/.test(command)) set = '-filter:a "atempo=0.5,asetrate=65100"'
+      if (/audio/.test(mime)) {
+        m.reply(mess.wait)
+        let media = await myBot.downloadAndSaveMediaMessage(quoted)
+        let ran = getRandom('.mp3')
+        exec(`ffmpeg -i ${media} ${set} ${ran}`, (err, stderr, stdout) => {
+          fs.unlinkSync(media)
+          if (err) return m.reply(err)
+          let buff = fs.readFileSync(ran)
+          myBot.sendMessage(m.chat, { audio: buff, mimetype: 'audio/mpeg' }, { quoted : m })
+          fs.unlinkSync(ran)
+        })
+      } else m.reply(`Responda al audio que desea modificar *${prefix + command}*`)
+    } catch (e) {
+      m.reply(e)
+    }
+  break
+/* DOWNLOADS */
   case 'yt': {
     if (!text) throw `Que deseas busacar?\n*Ejemplo:* ${prefix + command} Blinding Live`
     try {
@@ -328,30 +391,44 @@ switch(command) {
   }
   break
   case 'song': {
-    if (!text) throw 'Que deseas buscar?'
+    if(!text) throw `*Necesito el link.*\nEjemplo: ${prefix}song https://youtu.be/Z6L4u2i97Rw`
     try {
       m.reply(mess.wait)
-      let { yta } = require('./lib/y2mate')
-      if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/83RUhxsfLWs`
-      let quality = args[1] ? args[1] : '128kbps'
-      let media = await yta(text, quality)
-      if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
-      myBot.sendImage(m.chat, media.thumb, `⭔ Título : ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP3\n⭔ Resolución: ${args[1] || '128kbps'}`, m)
-      myBot.sendMessage(m.chat, { audio: { url: media.dl_link }, mimetype: 'audio/mpeg', fileName: `${media.title}.mp3` }, { quoted: m })
-    } catch (e) { log(e) }
+      ytm = await yta(text)
+      if(Number(ytm.size.split(' MB')[0]) >= 99.00) return myBot.sendImage(m.chat, ytm.thumb, `*Link* : ${ytm.link}\n\n🤖 Descarga no permitida por whatsapp.\nDescargalo manual.`, m)
+      myBot.sendImage(m.chat, ytm.thumb, `⭔ Título: ${ytm.title}\n⭔ Tamaño: ${ytm.size}\n⭔ Ext: ${ytm.tipe}`, m)
+      myBot.sendMessage(m.chat, { audio: { url: ytm.link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
+    } catch {
+      m.reply('🤖 Parece que tenemos un error.')
+    }
   }
   break
   case 'video': {
-    if (!text) throw 'Que deseas buscar?'
+    const ytdl = require('ytdl-core');
+    if(!text) throw `*Necesito el link.*\nEjemplo: ${prefix}video https://youtu.be/KRaWnd3LJfs`
+/*
+      await myBot.sendMessage(m.chat, { video: { url: ytm.link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: `⭔ Título: ${ytm.title}` }, { quoted: m })
+*/
+    var VID = '';
+    ytm = await ytv(text)
+    if(Number(ytm.size.split(' MB')[0]) >= 99.00) return myBot.sendImage(m.chat, ytm.thumb, `🤖 Video excede el limite permitido por whatsapp.\nDescargalo manual.\n\n*Link:* ${ytm.link}`, m)
     try {
+      if (text.includes('watch')) {
+        var xa = text.replace('watch?v=', '')
+        var name = xa.split('/')[3]
+        VID = name
+      } else {
+        VID = text.split('/')[3]
+      }
+    } catch {
+      m.reply('🤖 Parece que tenemos un error.')
+    }
       m.reply(mess.wait)
-      let { ytv } = require('./lib/y2mate')
-      if (!text) throw `Ejemplo: ${prefix + command} https://youtu.be/KRaWnd3LJfs`
-      let quality = args[1] ? args[1] : '360p'
-      let media = await ytv(text, quality)
-      if (media.filesize >= 100000) return m.reply('Archivo demasiado grande '+util.format(media))
-      myBot.sendMessage(m.chat, { video: { url: media.dl_link }, mimetype: 'video/mp4', fileName: `${media.title}.mp4`, caption: `⭔ Título: ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${isUrl(text)}\n⭔ Ext: MP4\n⭔ Resolución: ${args[1] || '360p'}` }, { quoted: m })
-    } catch (e) { log(e) }
+      var yt = ytdl(VID, {filter: format => format.container === 'mp4' && ['720p', '480p', '360p', '240p', '144p'].map(() => true)});
+          yt.pipe(fs.createWriteStream('./' + VID + '.mp4'));
+      yt.on('end', async () => {
+        await myBot.sendMessage(m.chat, { video: { url: `./${VID}.mp4` }, mimetype: 'video/mp4', fileName: `${VID}.mp4`, caption: `*Titulo:*\n${ytm.title}\n\nHecho por *DrkBot*` }, { quoted: m })
+      });
   }
   break
   case 'wallpaper': {
@@ -397,8 +474,13 @@ switch(command) {
         await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
       }
     }
-   }
-   break
+  }
+  break
+  case 'nsfw': {
+    log('nada')
+  }
+  break
+/* TOOLS */
   case 'ebinary': {
     if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
     let { eBinary } = require('./lib/binary')
@@ -413,10 +495,6 @@ switch(command) {
     let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
     let db = await dBinary(teks)
     m.reply(db)
-  }
-  break
-  case 'nsfw': {
-    log('nada')
   }
   break
   case 'bot': {
@@ -438,27 +516,6 @@ switch(command) {
 /* ########## COMMANDS ##########*/
 
 /* ########## FOR GROUPS ##########*/
-/*
-  case 'chat': {
- //   if (!isCreator) throw mess.owner
-    if (!q) throw 'Option:\n1. mute\n2. unmute\n3. archive\n4. unarchive\n5. read\n6. unread\n7. delete'
-    if (args[0] === 'mute') {
-      myBot.groupSettingUpdate(m.chat, 'announcement')
-    } else if (args[0] === 'unmute') {
-      myBot.groupSettingUpdate(m.chat, 'not_announcement')
-    } else if (args[0] === 'archive') {
-      myBot.chatModify({  archive: true }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-    } else if (args[0] === 'unarchive') {
-      myBot.chatModify({ archive: false }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-    } else if (args[0] === 'read') {
-      myBot.chatModify({ markRead: true }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-    } else if (args[0] === 'unread') {
-      myBot.chatModify({ markRead: false }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-    } else if (args[0] === 'delete') {
-      myBot.chatModify({ clear: { message: { id: m.quoted.id, fromMe: true }} }, m.chat, []).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-    }
-  }
-  break*/
   case 'pareja': {
     if (!m.isGroup) throw mess.group
     let member = participants.map(u => u.id)
@@ -611,19 +668,23 @@ switch(command) {
     }
     myBot.sendMessage(m.chat, reactionMessage)
   }
-  break/*
+  break
   case 'join': {
     if (!isCreator) throw mess.owner
     if (!text) throw 'Necesito el enlace de invitación!'
     if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) throw 'Link Invalido!'
     m.reply(mess.wait)
     let result = args[0].split('https://chat.whatsapp.com/')[1]
+    await myBot.groupAcceptInvite(result).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
+  }
+    /*
+    let result = args[0].split('https://chat.whatsapp.com/')[1]
     await myBot.groupAcceptInvite(result).then((res) => {
-      myBot.sendMessage(res.gid, `Hola soy *${myBot.user.name}*\n\n_🛡️ Fui invitado por @${m.sender.split("@")[0]} para unirme al grupo_\n\nEscriban ${prefix}alive para empezar.`)
+      myBot.sendMessage(res.chat, `Hola soy *${myBot.user.name}*\n\n_🛡️ Fui invitado por @${m.sender.split("@")[0]} para unirme al grupo_\n\nEscriban ${prefix}alive para empezar.`)
       m.reply(jsonformat(res))
     }).catch((err) => m.reply(jsonformat(err)))
-  }
-  break*/
+  }*/
+  break
 /*
 	case 'juzamma': {
 		if (args[0] === 'pdf') {
@@ -645,37 +706,6 @@ switch(command) {
 	}
 	break
 */
-  case 'bass': case 'blown': case 'deep': case 'earrape': case 'fast': case 'fat': case 'nightcore': case 'reverse': case 'robot': case 'slow': case 'smooth': case 'tupai':
-    try {
-      let set
-      if (/bass/.test(command)) set = '-af equalizer=f=54:width_type=o:width=2:g=20'
-      if (/blown/.test(command)) set = '-af acrusher=.1:1:64:0:log'
-      if (/deep/.test(command)) set = '-af atempo=4/4,asetrate=44500*2/3'
-      if (/earrape/.test(command)) set = '-af volume=12'
-      if (/fast/.test(command)) set = '-filter:a "atempo=1.63,asetrate=44100"'
-      if (/fat/.test(command)) set = '-filter:a "atempo=1.6,asetrate=22100"'
-      if (/nightcore/.test(command)) set = '-filter:a atempo=1.06,asetrate=44100*1.25'
-      if (/reverse/.test(command)) set = '-filter_complex "areverse"'
-      if (/robot/.test(command)) set = '-filter_complex "afftfilt=real=\'hypot(re,im)*sin(0)\':imag=\'hypot(re,im)*cos(0)\':win_size=512:overlap=0.75"'
-      if (/slow/.test(command)) set = '-filter:a "atempo=0.7,asetrate=44100"'
-      if (/smooth/.test(command)) set = '-filter:v "minterpolate=\'mi_mode=mci:mc_mode=aobmc:vsbmc=1:fps=120\'"'
-      if (/tupai/.test(command)) set = '-filter:a "atempo=0.5,asetrate=65100"'
-      if (/audio/.test(mime)) {
-        m.reply(mess.wait)
-        let media = await myBot.downloadAndSaveMediaMessage(quoted)
-        let ran = getRandom('.mp3')
-        exec(`ffmpeg -i ${media} ${set} ${ran}`, (err, stderr, stdout) => {
-          fs.unlinkSync(media)
-          if (err) return m.reply(err)
-          let buff = fs.readFileSync(ran)
-          myBot.sendMessage(m.chat, { audio: buff, mimetype: 'audio/mpeg' }, { quoted : m })
-          fs.unlinkSync(ran)
-        })
-      } else m.reply(`Responda al audio que desea modificar *${prefix + command}*`)
-    } catch (e) {
-      m.reply(e)
-    }
-  break
   case 'setcmd': {
     if (!isCreator) throw mess.owner
     if (!m.quoted) throw 'Responde un mensaje!'
@@ -778,7 +808,6 @@ Ver lista de mensajes con ${prefix}listmsg`)
     m.reply('Sukses Change To Self Usage')
   }
   break
-
   /*case 'speedtest': {
     m.reply('Prueba de velocidad...')
     let cp = require('child_process')
@@ -941,50 +970,6 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
     m.reply(respon)
   }
   break
-  case 'owner': {
-    myBot.sendContact(m.chat, global.owner, m)
-  }
-  break
-  case 'alive': {
-    anu = '✪〘 *FUNCIONANDO* 〙✪'
-    let btn = [{
-      urlButton: {
-        displayText: 'Source Code',
-        url: 'https://github.com'
-      }
-    }, {
-      callButton: {
-        displayText: 'Number Phone Owner',
-        phoneNumber: '+57 350-877-0421'
-      }
-    }, {
-      quickReplyButton: {
-        displayText: 'Menu',
-        id: 'menu'
-      }
-    }, {
-      quickReplyButton: {
-        displayText: 'Contact Owner',
-        id: 'owner'
-      }  
-    }, {
-      quickReplyButton: {
-        displayText: 'GitHub',
-        id: 'sc'
-      }
-    }]
-    myBot.send5ButImg(m.chat, anu, 'DrkBot', global.thumb, btn)
-  }
-  break
-  case 'menu': {
-    anu = menu(prefix, pushname)
-    let buttons = [
-      { buttonId: 'menu', buttonText: { displayText: 'MENU' }, type: 1 },
-      { buttonId: 'owner', buttonText: { displayText: 'OWNER' }, type: 1 },
-      { buttonId: 'sc', buttonText: { displayText: 'GITHUB' }, type: 1 }
-    ]
-    myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
-  }
 
 
   default:
