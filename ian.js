@@ -814,10 +814,10 @@ Ver lista de mensajes con ${prefix}listmsg`)
     if (!isCreator) throw mess.owner
     git.pull((async (err, update) => {
       if(update && update.summary.changes) ''
-        await myBot.sendMessage(m.chat, { tect: '*Actualización Exitosa*");
+        await myBot.sendMessage(m.chat, { text: '*Actualización Exitosa*' });
         exec('npm install').stderr.pipe(process.stderr);
       } else if (err) {
-        await myBot.sendMessage(m.chat, { text: '*Error* ```' + err + '```');
+        await myBot.sendMessage(m.chat, { text: '*Error* ```' + err + '```' });
       }
     }));
   }break
