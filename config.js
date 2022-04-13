@@ -19,7 +19,7 @@ global.APIKeys = {
 }
 
 // Read msg & Push Message To Console
-global.read = ''
+global.read = 'on'
 global.pushMsgConsole = ''
 
 // Other
