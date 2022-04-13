@@ -495,7 +495,7 @@ switch(command) {
     if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
     let { dBinary } = require('./lib/binary')
     let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
-    let db = await dBinary(teks)
+    let db = await dBinary(teks) be 7
     m.reply(db)
   }
   break
@@ -813,11 +813,11 @@ Ver lista de mensajes con ${prefix}listmsg`)
   case 'update': {
     if (!isCreator) throw mess.owner
     git.pull((async (err, update) => {
-      if(update && update.summary.changes) {
-        await myBot.sendMessage(m.chat, "*Actualización Exitosa*");
+      if(update && update.summary.changes) ''
+        await myBot.sendMessage(m.chat, { tect: '*Actualización Exitosa*");
         exec('npm install').stderr.pipe(process.stderr);
       } else if (err) {
-        await myBot.sendMessage(m.chat, '*Error* ```' + err + '```');
+        await myBot.sendMessage(m.chat, { text: '*Error* ```' + err + '```');
       }
     }));
   }break
