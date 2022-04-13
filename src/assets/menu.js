@@ -15,7 +15,7 @@ const menu = (prefix, pushname) => {
 Hola ${pushname} ${saludo}
 
 *🪀 Owner* : ${global.owner}
-*🖊️ Prefix* : ${global.prefa}
+*🖊️ Prefix* :〘 *${global.prefa}* 〙
 
 ╔══✪〘 *MENU* 〙✪══
 ${p} ${prefix}alive
