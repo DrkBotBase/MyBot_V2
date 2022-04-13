@@ -811,6 +811,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'update': {
+    if (!isCreator) throw mess.owner
     git.pull((async (err, update) => {
       if(update && update.summary.changes) {
         await myBot.sendMessage(m.chat, "*Actualización Exitosa*");
