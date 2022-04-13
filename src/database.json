@@ -1,5 +1,15 @@
 {
   "users": {
+    "5492644802324@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "573046793853@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": "Infinity"
+    },
     "573508770421@s.whatsapp.net": {
       "afkTime": -1,
       "afkReason": "",
@@ -7,6 +17,10 @@
     }
   },
   "chats": {
+    "5492644802324@s.whatsapp.net": {
+      "mute": false,
+      "antilink": false
+    },
     "573508770421@s.whatsapp.net": {
       "mute": false,
       "antilink": false

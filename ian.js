@@ -20,8 +20,8 @@ const speed = require('performance-now')
 const { performance } = require('perf_hooks')
 const { Primbon } = require('scrape-primbon')
 const primbon = new Primbon()
-const simpleGit = require('simple-git');
-const git = simpleGit();
+const simpleGit = require('simple-git')
+const git = simpleGit()
 const { smsg, formatp, tanggal, formatDate, getTime, isUrl, sleep, clockString, runtime, fetchJson, getBuffer, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
 const { yta, ytv } = require('./lib/newdown')
 const { menu } = require('./src/assets/menu')
@@ -495,7 +495,7 @@ switch(command) {
     if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
     let { dBinary } = require('./lib/binary')
     let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
-    let db = await dBinary(teks) be 7
+    let db = await dBinary(teks)
     m.reply(db)
   }
   break
@@ -814,12 +814,12 @@ Ver lista de mensajes con ${prefix}listmsg`)
     if (!isCreator) throw mess.owner
     git.pull((async (err, update) => {
       if(update && update.summary.changes) {
-        await myBot.sendMessage(m.chat, { text: '*Actualización Exitosa*' });
-        exec('npm install').stderr.pipe(process.stderr);
+        myBot.sendMessage(m.chat, { text: '*Actualización Exitosa*' })
+        exec('npm install').stderr.pipe(process.stderr)
       } else if (err) {
-        await myBot.sendMessage(m.chat, { text: '*Error* ```' + err + '```' });
+        myBot.sendMessage(m.chat, { text: `*Error* ${err}`});
       }
-    }));
+    }))
   }break
   /*case 'speedtest': {
     m.reply('Prueba de velocidad...')
