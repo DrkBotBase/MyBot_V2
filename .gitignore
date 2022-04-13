@@ -4,3 +4,4 @@ clear.sh
 package-lock.json
 test.js
 yarn.lock
+yarn-error.log

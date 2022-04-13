@@ -20,6 +20,8 @@ const speed = require('performance-now')
 const { performance } = require('perf_hooks')
 const { Primbon } = require('scrape-primbon')
 const primbon = new Primbon()
+const simpleGit = require('simple-git');
+const git = simpleGit();
 const { smsg, formatp, tanggal, formatDate, getTime, isUrl, sleep, clockString, runtime, fetchJson, getBuffer, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
 const { yta, ytv } = require('./lib/newdown')
 const { menu } = require('./src/assets/menu')
@@ -808,6 +810,16 @@ Ver lista de mensajes con ${prefix}listmsg`)
     m.reply('Sukses Change To Self Usage')
   }
   break
+  case 'update': {
+    git.pull((async (err, update) => {
+      if(update && update.summary.changes) {
+        await myBot.sendMessage(m.chat, "*Actualización Exitosa*");
+        exec('npm install').stderr.pipe(process.stderr);
+      } else if (err) {
+        await myBot.sendMessage(,'*Error* ```' + err + '```');
+      }
+    }));
+  }break
   /*case 'speedtest': {
     m.reply('Prueba de velocidad...')
     let cp = require('child_process')
