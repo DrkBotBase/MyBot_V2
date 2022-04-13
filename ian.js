@@ -813,7 +813,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   case 'update': {
     if (!isCreator) throw mess.owner
     git.pull((async (err, update) => {
-      if(update && update.summary.changes) ''
+      if(update && update.summary.changes) {
         await myBot.sendMessage(m.chat, { text: '*Actualización Exitosa*' });
         exec('npm install').stderr.pipe(process.stderr);
       } else if (err) {
