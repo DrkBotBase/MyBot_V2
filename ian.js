@@ -817,7 +817,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
         await myBot.sendMessage(m.chat, "*Actualización Exitosa*");
         exec('npm install').stderr.pipe(process.stderr);
       } else if (err) {
-        await myBot.sendMessage(,'*Error* ```' + err + '```');
+        await myBot.sendMessage(m.chat, '*Error* ```' + err + '```');
       }
     }));
   }break
