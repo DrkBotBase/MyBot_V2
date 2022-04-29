@@ -1,5 +1,7 @@
 FROM node:lts-buster
 
+RUN git clone https://github.com/DrkBotBase/MyBot_V2
+
 RUN apt-get update && \
   apt-get install -y \
   ffmpeg \

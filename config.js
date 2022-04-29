@@ -6,8 +6,7 @@
 */
 
 const fs = require('fs')
-const chalk = require('chalk')
-
+const { pint } = require('./lib/colores');
 // Website Api
 global.APIs = {
 	zenz: 'https://zenzapi.xyz',
@@ -51,7 +50,7 @@ global.nothing = fs.readFileSync('./lib/nsp.webp')
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {
 	fs.unwatchFile(file)
-	console.log(chalk.redBright(`Update'${__filename}'`))
+	log(pint(`Update ${__filename}`, 'orange.'))
 	delete require.cache[file]
 	require(file)
 })

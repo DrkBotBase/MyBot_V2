@@ -9,7 +9,6 @@ require('./config')
 const { BufferJSON, WA_DEFAULT_EPHEMERAL, generateWAMessageFromContent, proto, generateWAMessageContent, generateWAMessage, prepareWAMessageMedia, areJidsSameUser, getContentType } = require('@adiwajshing/baileys')
 const fs = require('fs')
 const util = require('util')
-const chalk = require('chalk')
 const { exec, spawn, execSync } = require("child_process")
 const axios = require('axios')
 const path = require('path')
@@ -18,14 +17,15 @@ const moment = require('moment-timezone')
 const { JSDOM } = require('jsdom')
 const speed = require('performance-now')
 const { performance } = require('perf_hooks')
+const gis = require('g-i-s')
 const { Primbon } = require('scrape-primbon')
 const primbon = new Primbon()
 const simpleGit = require('simple-git')
 const git = simpleGit()
 const { smsg, formatp, tanggal, formatDate, getTime, isUrl, sleep, clockString, runtime, fetchJson, getBuffer, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
 const { yta, ytv } = require('./lib/newdown')
+const { log, pint, bgPint } = require('./lib/colores');
 const { menu } = require('./src/assets/menu')
-const log = console.log;
 
 // read database
 let kuismath = db.data.game.math = []
@@ -93,7 +93,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         autobio: false,
       }
 	} catch (err) {
-	  console.error(err)
+	  log(pint(err, 'red.')
   }
 
         // Public & Self
@@ -107,11 +107,12 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
             myBot.sendReadReceipt(m.chat, m.sender, [m.key.id])
           } else {}
           if (global.pushMsgConsole === 'on') {
-            log(chalk.black.bold(chalk.bgWhite('[ NUEVO MENSAJE ]\n')),
-              chalk.black(chalk.bgGreen(new Date)) + '\n',
-              chalk.black(chalk.bgBlue(budy || m.mtype)) + '\n',
-              chalk.magenta('=> Sender:'), chalk.green(pushname), chalk.yellow(m.sender) + '\n',
-              chalk.blueBright('=> To:'), chalk.green(m.isGroup ? pushname : 'Chat Privado', m.chat) + '\n\n'
+            log(
+              pint(bgPint((new Date), 'white'), 'black.') + '\n' +
+              pint(bgPint('[ NUEVO MENSAJE ]', 'white'), 'black.') + '\n' +
+              pint(bgPint(budy, 'blue'), 'white.') + '\n' +
+              pint('=> Sender: ', 'magenta') + pint(pushname) + ' ' + pint(m.sender, 'yellow') + '\n' +
+              pint('=> To: ', 'blue') + ' ' + pint(m.isGroup ? pushname : 'Chat Privado') + ' ' + pint(m.chat) + '\n\n'
             )
           } else {}
         }
@@ -122,7 +123,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
             let user = Object.keys(global.db.data.users)
             let limitUser = isPremium ? global.limitawal.premium : global.limitawal.free
             for (let jid of user) global.db.data.users[jid].limit = limitUser
-            log('Reseted Limit')
+            log(pint('Reseted Limit', 'yellow.'))
         }, {
             scheduled: true,
             timezone: "America/Bogota"
@@ -177,15 +178,15 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         }
         myBot.ev.emit('messages.upsert', msg)
         }
-	    
-	    let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])]
-	    for (let jid of mentionUser) {
-            let user = global.db.data.users[jid]
-            if (!user) continue
-            let afkTime = user.afkTime
-            if (!afkTime || afkTime < 0) continue
-            let reason = user.afkReason || ''
-            m.reply(`
+        
+        let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])]
+        for (let jid of mentionUser) {
+          let user = global.db.data.users[jid]
+          if (!user) continue
+          let afkTime = user.afkTime
+          if (!afkTime || afkTime < 0) continue
+          let reason = user.afkReason || ''
+          m.reply(`
 Jangan tag dia!
 Dia sedang AFK ${reason ? 'dengan alasan ' + reason : 'tanpa alasan'}
 Selama ${clockString(new Date - afkTime)}
@@ -389,7 +390,7 @@ switch(command) {
         teks += '*' + video.title + '* - ' + video.url + '\n'
       });
       myBot.sendMessage(m.chat, { image: { url: search.all[0].thumbnail },  caption: teks }, { quoted: m })
-    } catch (e) { log(e) }
+    } catch (e) { log(pint(e, 'pink')) }
   }
   break
   case 'song': {
@@ -406,31 +407,16 @@ switch(command) {
   }
   break
   case 'video': {
-    const ytdl = require('ytdl-core');
+    //const ytdl = require('ytdl-core');
     if(!text) throw `*Necesito el link.*\nEjemplo: ${prefix}video https://youtu.be/KRaWnd3LJfs`
-/*
-      await myBot.sendMessage(m.chat, { video: { url: ytm.link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: `⭔ Título: ${ytm.title}` }, { quoted: m })
-*/
-    var VID = '';
-    ytm = await ytv(text)
-    if(Number(ytm.size.split(' MB')[0]) >= 99.00) return myBot.sendImage(m.chat, ytm.thumb, `🤖 Video excede el limite permitido por whatsapp.\nDescargalo manual.\n\n*Link:* ${ytm.link}`, m)
     try {
-      if (text.includes('watch')) {
-        var xa = text.replace('watch?v=', '')
-        var name = xa.split('/')[3]
-        VID = name
-      } else {
-        VID = text.split('/')[3]
-      }
+      m.reply(mess.wait)
+      ytm = await ytv(text)
+      if(Number(ytm.size.split(' MB')[0]) >= 99.00) return myBot.sendImage(m.chat, ytm.thumb, `*Link* : ${ytm.link}\n\n🤖 Descarga no permitida por whatsapp.\nDescargalo manual.`, m)
+      await myBot.sendMessage(m.chat, { video: { url: ytm.link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: `⭔ Título: ${ytm.title}` }, { quoted: m })
     } catch {
       m.reply('🤖 Parece que tenemos un error.')
     }
-      m.reply(mess.wait)
-      var yt = ytdl(VID, {filter: format => format.container === 'mp4' && ['720p', '480p', '360p', '240p', '144p'].map(() => true)});
-          yt.pipe(fs.createWriteStream('./' + VID + '.mp4'));
-      yt.on('end', async () => {
-        await myBot.sendMessage(m.chat, { video: { url: `./${VID}.mp4` }, mimetype: 'video/mp4', fileName: `${VID}.mp4`, caption: `*Titulo:*\n${ytm.title}\n\nHecho por *DrkBot*` }, { quoted: m })
-      });
   }
   break
   case 'wallpaper': {
@@ -450,12 +436,11 @@ switch(command) {
         headerType: 4
       }
       myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
-    } catch (e) { log(e) }
+    } catch (e) { log(pint(e, 'pink')) }
   }
   break
   case 'img': {
     if (!text) throw `*Ejemplo:* ${prefix + command} Mia Khalifa`
-    let gis = require('g-i-s')
     res = gis(`${text}`, google)
     async function google(error, result){
       if (error){
@@ -478,8 +463,28 @@ switch(command) {
     }
   }
   break
-  case 'nsfw': {
-    log('nada')
+  case 'sfw': case 'nsfw': {
+    if (!text){
+      txtt = `Hola *${pushname}*`
+      foot = 'Tu donasión será muy valiosa'
+  
+      let buttons = [
+        { buttonId: `${prefix} waifu`, buttonText: { displayText: '' }, type: 1 },
+        { buttonId: `${prefix} neko`, buttonText: { displayText: '' }, type: 1 }
+      ]
+      await myBot.sendButtonText(m.chat, buttons, txtt, foot, m)
+    }
+    try{
+      if (command == 'sfw' && text == 'waifu'){
+        await axios.get(`https://api.waifu.pics/sfw/waifu`)
+          .then(async (response) => {
+            const { url } = response.data
+            const amin = await axios.get(url, { responseType: 'arraybuffer' })
+            
+          })
+      }
+    } catch{
+    }
   }
   break
 /* TOOLS */
@@ -510,7 +515,7 @@ switch(command) {
         m.reply('🤖 ' + text)
       }
     } catch (err) {
-      console.log(err)
+      log(pint(err, 'red.'))
     }
     })
   }
@@ -662,12 +667,12 @@ switch(command) {
  
   case 'react': {
     if (!isCreator) throw mess.owner
-    reactionMessage = {
-      react: {
-        text: args[0],
-        key: { remoteJid: m.chat, fromMe: true, id: quoted.id }
+      reactionMessage = {
+        react: {
+          text: args[0],
+          key: { remoteJid: m.chat, fromMe: true, id: quoted.id }
+        }
       }
-    }
     myBot.sendMessage(m.chat, reactionMessage)
   }
   break
@@ -798,6 +803,17 @@ Ver lista de mensajes con ${prefix}listmsg`)
 	break
 
 /* ########## FOR OWNER ##########*/
+  case 'react': {
+    if (!isCreator) throw mess.owner
+      reactionMessage = {
+        react: {
+          text: args[0],
+          key: { remoteJid: m.chat, fromMe: true, id: quoted.id }
+        }
+      }
+      myBot.sendMessage(m.chat, reactionMessage)
+  }
+  break  
 	case 'public': {
     if (!isCreator) throw mess.owner
     myBot.public = true
@@ -810,18 +826,21 @@ Ver lista de mensajes con ${prefix}listmsg`)
     m.reply('Sukses Change To Self Usage')
   }
   break
-  case 'update': {
-    if (!isCreator) throw mess.owner
-    git.pull((async (err, update) => {
-      if(update && update.summary.changes) {
-        myBot.sendMessage(m.chat, { text: '*Actualización Exitosa*' })
-        exec('npm install').stderr.pipe(process.stderr)
-      } else if (err) {
-        myBot.sendMessage(m.chat, { text: `*Error* ${err}`});
-      }
-    }))
-  }break
-  /*case 'speedtest': {
+ case 'py': {
+    if (!text) throw 'a quien voy a saludar?'
+    const pythonProcess = await spawn('python', ['saludo.py'])
+    let pythonResponse = ''
+
+    pythonProcess.stdout.on('data', function(data) {
+    	pythonResponse += data.toString()
+    })
+    pythonProcess.stdout.on('end', function() {
+    	m.reply(pythonResponse)
+    })
+    pythonProcess.stdin.write(text)
+    pythonProcess.stdin.end()
+ }break
+  case 'speedtest': {
     m.reply('Prueba de velocidad...')
     let cp = require('child_process')
     let { promisify } = require('util')
@@ -837,7 +856,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
     if (stderr.trim()) m.reply(stderr)
     }
   }
-  break*/
+  break
   case 'block': {
 		if (!isCreator) throw mess.owner
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
@@ -1058,7 +1077,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {
 	fs.unwatchFile(file)
-	log(chalk.redBright(`Update ${__filename}`))
+	log(pint(`Update ${__filename}`, 'orange.'))
 	delete require.cache[file]
 	require(file)
 })

@@ -7,7 +7,7 @@
 
 require('./config')
 const { default: myBotConnect, useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
-const { state, saveState } = useSingleFileAuthState(`./lib/${sessionName}.json`)
+const { state, saveState } = useSingleFileAuthState(`./lib/ini.json`)
 const pino = require('pino')
 const { Boom } = require('@hapi/boom')
 const fs = require('fs')
@@ -17,10 +17,7 @@ const path = require('path')
 const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
 const { smsg, isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('./lib/myfunc')
-const log = console.log
-// #### chalk ####
-const color = require('chalk');
-const warn = color.bold.red;
+const { log, pint, bgPint } = require('./lib/colores');
 
 var low
 try {
@@ -38,26 +35,25 @@ const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
 global.db = new Low(
-  /https?:\/\//.test(opts['db'] || '') ?
-    new cloudDBAdapter(opts['db']) : /mongodb/.test(opts['db']) ?
-      new mongoDB(opts['db']) :
-      new JSONFile(`src/database.json`)
+  /https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) 
+  : /mongodb/.test(opts['db']) ? new mongoDB(opts['db'])
+  : new JSONFile(`src/database.json`)
 )
 global.db.data = {
-    users: {},
-    chats: {},
-    database: {},
-    game: {},
-    settings: {},
-    others: {},
-    sticker: {},
-    ...(global.db.data || {})
+  users: {},
+  chats: {},
+  database: {},
+  game: {},
+  settings: {},
+  others: {},
+  sticker: {},
+  ...(global.db.data || {})
 }
 
-// save database every 30seconds
+// save database every 10 minutes
 if (global.db) setInterval(async () => {
     if (global.db.data) await global.db.write()
-  }, 30 * 1000)
+}, 300 * 2000)
 
 async function startMybot() {
     const myBot = myBotConnect({
@@ -83,16 +79,16 @@ async function startMybot() {
     myBot.ev.on('messages.upsert', async chatUpdate => {
         //log(JSON.stringify(chatUpdate, undefined, 2))
         try {
-        mek = chatUpdate.messages[0]
-        if (!mek.message) return
-        mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-        if (mek.key && mek.key.remoteJid === 'status@broadcast') return
-        if (!myBot.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
-        if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
-        m = smsg(myBot, mek, store)
-        require("./ian")(myBot, m, chatUpdate, store)
+          mek = chatUpdate.messages[0]
+          if (!mek.message) return
+          mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+          if (mek.key && mek.key.remoteJid === 'status@broadcast') return
+          if (!myBot.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
+          if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
+          m = smsg(myBot, mek, store)
+          require("./ian")(myBot, m, chatUpdate, store)
         } catch (err) {
-            log(warn(err))
+          log(pint(err, 'red.'))
         }
     })
 
@@ -107,7 +103,6 @@ async function startMybot() {
                 } catch {
                     ppuser = 'https://i.ibb.co/PZNv21q/Profile-FG98.jpg'
                 }
-
                 // Get Profile Picture Group
                 try {
                     ppgroup = await myBot.profilePictureUrl(anu.id, 'image')
@@ -124,7 +119,7 @@ async function startMybot() {
                 }
             }
         } catch (err) {
-            log(warn(err))
+            log(pint(err, 'red.'))
         }
     })
 	
@@ -192,12 +187,12 @@ async function startMybot() {
 	
     myBot.public = true
     let wtMyBot = myBot.public == true ? ' Publico' : ' Privado'
-    log(color.green('🤖 DrkBot Modo' + wtMyBot));
-    log(color.hex('#d30092')(
+    log(pint('🤖 DrkBot Modo' + wtMyBot, '.'));
+    log(pint(
       '[copyright By: Ian]\n' + 
       'Prohibida su venta\n' +
       'Chatea con ©Ian\n' +
-      'Wats 573508770421\n\n'
+      'Wats 573508770421\n\n', '#d30092'
       ));
 
     myBot.serializeM = (m) => smsg(myBot, m, store)
@@ -564,7 +559,7 @@ startMybot()
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {
 	fs.unwatchFile(file)
-	log(color.redBright(`Update ${__filename}`))
+	log(pint(`Update ${__filename}`, 'orange.'))
 	delete require.cache[file]
 	require(file)
 })
