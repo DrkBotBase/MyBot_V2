@@ -463,7 +463,7 @@ switch(command) {
     }
   }
   break
-  case 'sfw': case 'nsfw': {
+  /*case 'sfw': case 'nsfw': {
     if (!text){
       txtt = `Hola *${pushname}*`
       foot = 'Tu donasión será muy valiosa'
@@ -486,7 +486,7 @@ switch(command) {
     } catch{
     }
   }
-  break
+  break*/
 /* TOOLS */
   case 'ebinary': {
     if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
