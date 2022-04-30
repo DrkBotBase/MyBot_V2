@@ -1,4 +1,5 @@
 node_modules
+lib/ini.json
 src/database.json
 clear.sh
 package-lock.json

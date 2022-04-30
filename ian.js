@@ -861,14 +861,14 @@ Ver lista de mensajes con ${prefix}listmsg`)
     } else {
       git.pull((async (err, update) => {
         if(update && update.summary.changes) {
-          myBot.sendMessage(m.chat ,updater.UPDATED_LOCAL);
+          myBot.sendMessage(m.chat , { text: updater.UPDATED_LOCAL });
               exec('npm install').stderr.pipe(process.stderr);
         } else if (err) {
           myBot.sendMessage(m.chat, { text: '*Error:*\n```' + err + '```' })
         }
       }));
     }
-  }
+  }break
   case 'block': {
 		if (!isCreator) throw mess.owner
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
