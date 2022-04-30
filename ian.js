@@ -93,7 +93,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         autobio: false,
       }
 	} catch (err) {
-	  log(pint(err, 'red.')
+	  log(pint(err, 'red.'))
   }
 
         // Public & Self
@@ -641,7 +641,7 @@ switch(command) {
     if (!m.isGroup) throw mess.group
     if (!isBotAdmins) throw mess.botAdmin
     if (!isAdmins) throw mess.admin
-    myBot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
+    myBot.sendMessage(m.chat, { text: q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
   }
   break
   case 'linkgroup': {
@@ -664,18 +664,6 @@ switch(command) {
   break
 */
 // ===== =====
- 
-  case 'react': {
-    if (!isCreator) throw mess.owner
-      reactionMessage = {
-        react: {
-          text: args[0],
-          key: { remoteJid: m.chat, fromMe: true, id: quoted.id }
-        }
-      }
-    myBot.sendMessage(m.chat, reactionMessage)
-  }
-  break
   case 'join': {
     if (!isCreator) throw mess.owner
     if (!text) throw 'Necesito el enlace de invitación!'
@@ -684,13 +672,6 @@ switch(command) {
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     await myBot.groupAcceptInvite(result).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
   }
-    /*
-    let result = args[0].split('https://chat.whatsapp.com/')[1]
-    await myBot.groupAcceptInvite(result).then((res) => {
-      myBot.sendMessage(res.chat, `Hola soy *${myBot.user.name}*\n\n_🛡️ Fui invitado por @${m.sender.split("@")[0]} para unirme al grupo_\n\nEscriban ${prefix}alive para empezar.`)
-      m.reply(jsonformat(res))
-    }).catch((err) => m.reply(jsonformat(err)))
-  }*/
   break
 /*
 	case 'juzamma': {
@@ -857,6 +838,21 @@ Ver lista de mensajes con ${prefix}listmsg`)
     }
   }
   break
+  case 'update': {
+    await git.fetch();
+    var commits = await git.log([updater.BRANCH + '..origin/' + updater.BRANCH]);
+    if (commits.total === 0) {
+      myBot.sendMessage(m.chat, { text: updater.UPDATE })
+    } else {
+      var degisiklikler = updater.NEW_UPDATE;
+      commits['all'].map(
+        (commit) => {
+          degisiklikler += '🔹 [' + commit.date.substring(0, 10) + ']: ' + commit.message + ' <' + commit.author_name + '>\n';
+        }
+      );
+      myBot.sendMessage(m.chat, { text: degisiklikler + '```' })
+    }
+  }break
   case 'block': {
 		if (!isCreator) throw mess.owner
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
@@ -1068,9 +1064,9 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
       myBot.copyNForward(m.chat, msgs[budy.toLowerCase()], true)
 		}
 }
-} catch (err) {
-  m.reply(util.format(err))
-}
+    } catch (err) {
+      m.reply(util.format(err))
+    }
 }
 
 

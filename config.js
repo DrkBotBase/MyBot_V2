@@ -38,7 +38,12 @@ global.mess = {
     private: 'Funciones solo para chat privado!',
     bot: 'Funciones solo para el usuario del número del bot',
     wait: 'Un momento...',
-    endLimit: 'Su límite diario ha expirado, el límite se restablecerá cada 12 horas',
+    endLimit: 'Su límite diario ha expirado, el límite se restablecerá cada 12 horas'
+}
+global.updater = {
+  BRANCH: 'master',
+  UPDATE: '*¡Tu bot está completamente actualizado!*',
+  NEW_UPDATE: '*¡Hay una nueva actualización disponible para el bot!*\n\nCambios:\n```'
 }
 global.limitawal = {
     premium: "Infinity",
