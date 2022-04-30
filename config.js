@@ -42,8 +42,9 @@ global.mess = {
 }
 global.updater = {
   BRANCH: 'master',
-  UPDATE: '*¡Tu bot está completamente actualizado!*',
-  NEW_UPDATE: '*¡Hay una nueva actualización disponible para el bot!*\n\nCambios:\n```'
+  UPDATE: '*Tu bot está completamente actualizado!*',
+  NEW_UPDATE: '*Hay una nueva actualización disponible para el bot!*\n\nCambios:\n```',
+  UPDATED_LOCAL: '*La actualización fue exitosa!*'
 }
 global.limitawal = {
     premium: "Infinity",

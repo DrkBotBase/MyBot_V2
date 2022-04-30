@@ -853,6 +853,22 @@ Ver lista de mensajes con ${prefix}listmsg`)
       myBot.sendMessage(m.chat, { text: degisiklikler + '```' })
     }
   }break
+  case 'update now': {
+    await git.fetch();
+    var commits = await git.log([updater.BRANCH + '..origin/' + updater.BRANCH]);
+    if (commits.total === 0) {
+      myBot.sendMessage(m.chat, { text: updater.UPDATE })
+    } else {
+      git.pull((async (err, update) => {
+        if(update && update.summary.changes) {
+          myBot.sendMessage(m.chat ,Lang.UPDATED_LOCAL);
+              exec('npm install').stderr.pipe(process.stderr);
+        } else if (err) {
+          myBot.sendMessage(m.chat, { text: '*Error:*\n```' + err + '```' })
+                }
+            }));
+    }
+  }
   case 'block': {
 		if (!isCreator) throw mess.owner
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
