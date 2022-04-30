@@ -853,7 +853,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
       myBot.sendMessage(m.chat, { text: degisiklikler + '```' })
     }
   }break
-  case 'update now': {
+  case 'actualizar': {
     await git.fetch();
     var commits = await git.log([updater.BRANCH + '..origin/' + updater.BRANCH]);
     if (commits.total === 0) {
@@ -861,12 +861,12 @@ Ver lista de mensajes con ${prefix}listmsg`)
     } else {
       git.pull((async (err, update) => {
         if(update && update.summary.changes) {
-          myBot.sendMessage(m.chat ,Lang.UPDATED_LOCAL);
+          myBot.sendMessage(m.chat ,updater.UPDATED_LOCAL);
               exec('npm install').stderr.pipe(process.stderr);
         } else if (err) {
           myBot.sendMessage(m.chat, { text: '*Error:*\n```' + err + '```' })
-                }
-            }));
+        }
+      }));
     }
   }
   case 'block': {
