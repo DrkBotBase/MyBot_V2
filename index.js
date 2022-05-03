@@ -18,6 +18,7 @@ const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
 const { smsg, isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('./lib/myfunc')
 const { log, pint, bgPint } = require('./lib/colores');
+const Config = require('./config');
 
 var low
 try {
@@ -184,8 +185,11 @@ async function startMybot() {
         })
         return status
     }
-	
+	if (Config.WORKTYPE === 'private'){
+    myBot.public = false
+	} else if (Config.WORKTYPE === 'public'){
     myBot.public = true
+	}
     let wtMyBot = myBot.public == true ? ' Publico' : ' Privado'
     log(pint('🤖 DrkBot Modo' + wtMyBot, '.'));
     log(pint(

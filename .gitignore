@@ -1,7 +1,7 @@
 node_modules
 lib/ini.json
-src/database.json
 clear.sh
+config.env
 package-lock.json
 test.js
 yarn.lock

@@ -6,7 +6,9 @@
 */
 
 const fs = require('fs')
+if (fs.existsSync('config.env')) require('dotenv').config({ path: './config.env' });
 const { pint } = require('./lib/colores');
+
 // Website Api
 global.APIs = {
 	zenz: 'https://zenzapi.xyz',
@@ -17,41 +19,39 @@ global.APIKeys = {
 	'https://zenzapi.xyz': 'Your Key',
 }
 
-// Read msg & Push Message To Console
-global.read = 'on'
-global.pushMsgConsole = ''
-
 // Other
 global.owner = ['573508770421']
 global.premium = []
 global.packname = 'DrkBot'
 global.author = 'Ian'
 global.sessionName = 'ini'
-global.prefa = ['/']
 global.sp = '╠❖'
-global.mess = {
-    success: '✓ Éxito',
-    admin: 'Funciones solo para administradores del grupo!',
-    botAdmin: 'El bot debe ser administrador!',
-    owner: 'Funciones especiales del propietario del bot',
-    group: 'Funciones solo para grupos!',
-    private: 'Funciones solo para chat privado!',
-    bot: 'Funciones solo para el usuario del número del bot',
-    wait: 'Un momento...',
-    endLimit: 'Su límite diario ha expirado, el límite se restablecerá cada 12 horas'
-}
-global.updater = {
-  BRANCH: 'master',
-  UPDATE: '*Tu bot está completamente actualizado!*',
-  NEW_UPDATE: '*Hay una nueva actualización disponible para el bot!*\n\nCambios:\n```',
-  UPDATED_LOCAL: '*La actualización fue exitosa!*'
-}
+
 global.limitawal = {
     premium: "Infinity",
     free: 100
 }
+
 global.thumb = fs.readFileSync('./lib/bot.jpg')
 global.nothing = fs.readFileSync('./lib/nsp.webp')
+
+function convertToBool(text, fault = 'true') {
+    return text === fault ? true : false;
+}
+
+// env ## not modify ##
+module.exports = {
+  BOT_NAME: process.env.BOT_NAME === undefined ? 'DrkBot' : process.env.BOT_NAME,
+  BRANCH: process.env.BRANCH === undefined ? 'master' : process.env.BRANCH,
+  HANDLER: process.env.HANDLER === undefined ? '^[/]' : process.env.HANDLER,
+  LANG: process.env.LANGUAGE === undefined ? 'ES' : process.env.LANGUAGE.toUpperCase(),
+  LOG: process.env.LOG_ERR === undefined ? 'true' : process.env.LOG_ERR,
+  MSG_CONSOLE: process.env.MSG_CONSOLE === undefined ? '' : process.env.MSG_CONSOLE,
+  READ: process.env.SEND_READ === undefined ? '' : process.env.SEND_READ,
+  VERSION: process.env.VERSION === undefined ? 'V1-MD' : process.env.VERSION,
+  WORKTYPE: process.env.WORKTYPE === undefined ? 'private' : process.env.WORKTYPE
+};
+// end env
 
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {

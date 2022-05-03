@@ -1,7 +1,40 @@
 {
 	"name": "MyBot_V2",
 	"description": "DarkBot project - Makes it easy and fun to use Whatsapp..",
-    "logo": "https://raw.githubusercontent.com/DrkBotBase/MyBot_V1/master/media/gif/PicsArt_07-18-06.46.26.jpg",
-    "repository": "https://github.com/DrkBotBase",
-    "keywords": ["whatsapp", "userbot", "DrkBox-MD", "bot", "api", "ai"]
+  "logo": "https://raw.githubusercontent.com/DrkBotBase/MyBot_V1/master/media/gif/PicsArt_07-18-06.46.26.jpg",
+  "repository": "https://github.com/DrkBotBase",
+  "keywords": ["whatsapp", "userbot", "DrkBox-MD", "bot", "api", "ai"],
+  "stack": "container",
+  "env": {
+    "VERSION": {
+      "description": "Version Global By: Ian",
+      "required": true,
+      "value": "V1-MD"
+    },
+    "BRANCH": {
+      "description": "Rama en la que se encuentra el codigo, NO cambiar.",
+      "required": false,
+      "value": "master"
+    },
+    "SEND_READ": {
+      "description": "Parte de lectura de mensaje, ponga true o false si quiere que el mensaje salga leido o no.",
+      "required": true,
+      "value": "false"
+    },
+    "WORKTYPE": {
+      "description": "Forma de usar el BOT. Si usa public los demas pueden usar el BOT, si usa private solo usted podra usarlo",
+      "required": true,
+      "value": "private"
+    },
+    "HANDLER": {
+      "description": "Indicativo para activar los comandos.",
+      "required": true,
+      "value": "^[/]"
+    },
+    "LANGUAGE": {
+      "description": "Bot language.  Español => ES, English => en",
+      "required": true,
+      "value": "ES"
+    }
+  }
 }

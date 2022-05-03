@@ -1,0 +1,28 @@
+{
+  "__JSON__": true,
+  "LANGUAGE": "Español",
+  "LANGCODE": "en",
+  "AUTHOR": "Ian VanH",
+  "STRINGS": {
+    "updater": {
+      "UPDATE": "*Your bot is completely updated!*",
+      "NEW_UPDATE": "*There is a new update available for the bot!*\n\n*Changes:*\n```",
+      "UPDATED_LOCAL": "*The update was successful!*"
+    },
+    "global": {
+      "by": "Made by: *DrkBot*",
+      "success": "✓ Exit",
+      "admin": "Features for group admins only!",
+      "botAdmin": "The bot must be an administrator!",
+      "owner": "Special functions of the bot owner.",
+      "group": "Features for groups only!",
+      "private": "Features for private chat only!",
+      "bot": "Functions only for the bot number user",
+      "wait": "Just a moment...",
+      "endLimit": "Your daily limit has expired, the limit will reset every 12 hours"
+    },
+    "err": {
+      "msgReport": "REPORT ERROR"
+    }
+  }
+}

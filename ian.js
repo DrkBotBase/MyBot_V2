@@ -26,6 +26,13 @@ const { smsg, formatp, tanggal, formatDate, getTime, isUrl, sleep, clockString, 
 const { yta, ytv } = require('./lib/newdown')
 const { log, pint, bgPint } = require('./lib/colores');
 const { menu } = require('./src/assets/menu')
+const Config = require('./config');
+
+// Language
+const Language = require('./language');
+const LangU = Language.getString('updater');
+const LangG = Language.getString('global');
+const LangErr = Language.getString('err');
 
 // read database
 let kuismath = db.data.game.math = []
@@ -35,7 +42,8 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     try {
         var body = (m.mtype === 'conversation') ? m.message.conversation : (m.mtype == 'imageMessage') ? m.message.imageMessage.caption : (m.mtype == 'videoMessage') ? m.message.videoMessage.caption : (m.mtype == 'extendedTextMessage') ? m.message.extendedTextMessage.text : (m.mtype == 'buttonsResponseMessage') ? m.message.buttonsResponseMessage.selectedButtonId : (m.mtype == 'listResponseMessage') ? m.message.listResponseMessage.singleSelectReply.selectedRowId : (m.mtype == 'templateButtonReplyMessage') ? m.message.templateButtonReplyMessage.selectedId : (m.mtype === 'messageContextInfo') ? (m.message.buttonsResponseMessage?.selectedButtonId || m.message.listResponseMessage?.singleSelectReply.selectedRowId || m.text) : ''
         var budy = (typeof m.text == 'string' ? m.text : '')
-        var prefix = global.prefa
+        var prefix = Config.HANDLER.match(/\[(\W*)\]/)[1][0]
+        var botName = Config.BOT_NAME
         const isCmd = body.startsWith(prefix)
         const command = body.replace(prefix, '').trim().split(/ +/).shift().toLowerCase()
         const args = body.trim().split(/ +/).slice(1)
@@ -103,10 +111,10 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
 
        //  Push Message To Console && Auto Read
         if (m.message) {
-          if (global.read === 'on') {
+          if (Config.READ === 'true') {
             myBot.sendReadReceipt(m.chat, m.sender, [m.key.id])
           } else {}
-          if (global.pushMsgConsole === 'on') {
+          if (Config.MSG_CONSOLE === 'true') {
             log(
               pint(bgPint((new Date), 'white'), 'black.') + '\n' +
               pint(bgPint('[ NUEVO MENSAJE ]', 'white'), 'black.') + '\n' +
@@ -217,34 +225,20 @@ switch(command) {
   }
   break
   case 'alive': {
-    anu = '✪〘 *FUNCIONANDO* 〙✪'
-    let btn = [{
-      urlButton: {
-        displayText: 'Source Code',
-        url: 'https://github.com'
-      }
-    }, {
-      callButton: {
-        displayText: 'Number Phone Owner',
-        phoneNumber: '+57 350-877-0421'
-      }
-    }, {
-      quickReplyButton: {
-        displayText: 'Menu',
-        id: 'menu'
-      }
-    }, {
-      quickReplyButton: {
-        displayText: 'Contact Owner',
-        id: 'owner'
-      }  
-    }, {
-      quickReplyButton: {
-        displayText: 'GitHub',
-        id: 'sc'
-      }
-    }]
-    myBot.send5ButImg(m.chat, anu, 'DrkBot', global.thumb, btn)
+    let btn = [
+     // { urlButton: { displayText: 'Source Code', url: 'https://github.com' } },
+    //  { callButton: { displayText: 'Number Phone Owner', phoneNumber: '+57 350-877-0421' } },
+      { quickReplyButton: { displayText: 'Menu', id: 'menu' } },
+      { quickReplyButton: { displayText: 'Contact Owner', id: 'owner' } },
+      { quickReplyButton: { displayText: 'GitHub', id: 'sc' } }
+    ]
+    let templateMessage = {
+      text: '✪〘 *FUNCIONANDO* 〙✪',
+      footer: `${botName}`,
+      templateButtons: btn,
+      image: {url: './lib/bot.jpg'}
+    }
+    myBot.sendMessage(m.chat, templateMessage)
   }
   break
   case 'menu': {
@@ -276,7 +270,7 @@ switch(command) {
 /* CONVERTER */
   case 'sticker': {
     if (!quoted) throw `Responder video/imagen ${prefix + command}`
-    m.reply(mess.wait)
+    m.reply(LangG.wait)
     if (/image/.test(mime)) {
       let media = await quoted.download()
       let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: global.packname, author: global.author })
@@ -294,7 +288,7 @@ switch(command) {
   case 'toaudio': {
     if (!quoted) throw '*Responde un video*'
     if (!/video/.test(mime) && !/audio/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
-    m.reply(mess.wait)
+    m.reply(LangG.wait)
     let media = await quoted.download()
     let { toAudio } = require('./lib/converter')
     let audio = await toAudio(media, 'mp4')
@@ -304,7 +298,7 @@ switch(command) {
   case 'tomp4': {
     if (!quoted) throw '*Responder Sticker*'
     if (!/webp/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
-    m.reply(mess.wait)
+    m.reply(LangG.wait)
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let webpToMp4 = await webp2mp4File(media)
@@ -315,7 +309,7 @@ switch(command) {
   case 'toimg': {
     if (!quoted) throw '*Responde Un Sticker*'
     if (!/webp/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
-    m.reply(mess.wait)
+    m.reply(LangG.wait)
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let ran = await getRandom('.png')
     exec(`ffmpeg -i ${media} ${ran}`, (err) => {
@@ -330,7 +324,7 @@ switch(command) {
   case 'togif': {
     if (!quoted) throw '*Responder Video o Sticker*'
     if (!/webp/.test(mime)) throw `*Ejemplo:* ${prefix + command}`
-    m.reply(mess.wait)
+    m.reply(LangG.wait)
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let webpToMp4 = await webp2mp4File(media)
@@ -364,7 +358,7 @@ switch(command) {
       if (/smooth/.test(command)) set = '-filter:v "minterpolate=\'mi_mode=mci:mc_mode=aobmc:vsbmc=1:fps=120\'"'
       if (/tupai/.test(command)) set = '-filter:a "atempo=0.5,asetrate=65100"'
       if (/audio/.test(mime)) {
-        m.reply(mess.wait)
+        m.reply(LangG.wait)
         let media = await myBot.downloadAndSaveMediaMessage(quoted)
         let ran = getRandom('.mp3')
         exec(`ffmpeg -i ${media} ${set} ${ran}`, (err, stderr, stdout) => {
@@ -396,7 +390,7 @@ switch(command) {
   case 'song': {
     if(!text) throw `*Necesito el link.*\nEjemplo: ${prefix}song https://youtu.be/Z6L4u2i97Rw`
     try {
-      m.reply(mess.wait)
+      m.reply(LangG.wait)
       ytm = await yta(text)
       if(Number(ytm.size.split(' MB')[0]) >= 99.00) return myBot.sendImage(m.chat, ytm.thumb, `*Link* : ${ytm.link}\n\n🤖 Descarga no permitida por whatsapp.\nDescargalo manual.`, m)
       myBot.sendImage(m.chat, ytm.thumb, `⭔ Título: ${ytm.title}\n⭔ Tamaño: ${ytm.size}\n⭔ Ext: ${ytm.tipe}`, m)
@@ -410,7 +404,7 @@ switch(command) {
     //const ytdl = require('ytdl-core');
     if(!text) throw `*Necesito el link.*\nEjemplo: ${prefix}video https://youtu.be/KRaWnd3LJfs`
     try {
-      m.reply(mess.wait)
+      m.reply(LangG.wait)
       ytm = await ytv(text)
       if(Number(ytm.size.split(' MB')[0]) >= 99.00) return myBot.sendImage(m.chat, ytm.thumb, `*Link* : ${ytm.link}\n\n🤖 Descarga no permitida por whatsapp.\nDescargalo manual.`, m)
       await myBot.sendMessage(m.chat, { video: { url: ytm.link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: `⭔ Título: ${ytm.title}` }, { quoted: m })
@@ -453,7 +447,7 @@ switch(command) {
         ]
         let buttonMessage = {
           image: { url: randomWp },
-          caption: '*-----「 DrkBot 」-----*',
+          caption: `*-----「 ${botName} 」-----*`,
           footer: myBot.user.name,
           buttons: buttons,
           headerType: 4
@@ -510,7 +504,7 @@ switch(command) {
     try{
       const { text } = response.data.messages[0]
       if (text ==='Roberto' || text === 'maite' || text === 'Luis Mario.' || text === 'Ricardo milos\n') {
-        m.reply('🤖 ' + 'mi nombre es DrkBot')
+        m.reply('🤖 ' + `mi nombre es ${botName}`)
       }	else {
         m.reply('🤖 ' + text)
       }
@@ -524,7 +518,7 @@ switch(command) {
 
 /* ########## FOR GROUPS ##########*/
   case 'pareja': {
-    if (!m.isGroup) throw mess.group
+    if (!m.isGroup) throw LangG.group
     let member = participants.map(u => u.id)
     let me = m.sender
     let rnd = member[Math.floor(Math.random() * member.length)]
@@ -537,7 +531,7 @@ switch(command) {
   }
   break
   case 'inventado': {
-    if (!m.isGroup) throw mess.group
+    if (!m.isGroup) throw LangG.group
     let member = participants.map(u => u.id)
     let orang = member[Math.floor(Math.random() * member.length)]
     let jodoh = member[Math.floor(Math.random() * member.length)]
@@ -550,9 +544,9 @@ switch(command) {
   }
   break
   case 'mute': {
-    if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+    if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
     if (args[0] === "on") {
       myBot.groupSettingUpdate(m.chat, 'announcement')
       m.reply(`El Admin *${pushname}* ha silenciado este grupo!\nAhora sólo los administradores pueden envíar mensajes.`)
@@ -564,14 +558,14 @@ switch(command) {
         { buttonId: 'mute on', buttonText: { displayText: 'On' }, type: 1 },
         { buttonId: 'mute off', buttonText: { displayText: 'Off' }, type: 1 }
       ]
-      await myBot.sendButtonText(m.chat, buttons, `DrkBot`, myBot.user.name, m)
+      await myBot.sendButtonText(m.chat, buttons, `${botName}`, myBot.user.name, m)
     }
   }
   break
   case 'antilink': {
-    if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+    if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
     if (args[0] === "on") {
       if (db.data.chats[m.chat].antilink) return m.reply(`Anteriormente activo`)
       db.data.chats[m.chat].antilink = true
@@ -590,44 +584,44 @@ switch(command) {
   }
   break
   case 'kick': {
-		if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+		if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'remove').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
 	case 'add': {
-		if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+		if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
 		let users = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'add').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
 	case 'promote': {
-		if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+		if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
 	case 'demote': {
-		if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+		if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
   case 'tagall': {
-    if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+    if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
 
     const ini = "╔══✪〘 *REPORTENSE* 〙✪══\n"
-    const end = "╚══✪〘 *DrkBot* 〙✪══"
+    const end = `╚══✪〘 *${botName}* 〙✪══`
 
     let mesaj = `➲ *Mensaje:* ${q ? q : ''}\n\n`
     for (let mem of participants) {
@@ -638,14 +632,14 @@ switch(command) {
   }
   break
   case 'hidetag': {
-    if (!m.isGroup) throw mess.group
-    if (!isBotAdmins) throw mess.botAdmin
-    if (!isAdmins) throw mess.admin
+    if (!m.isGroup) throw LangG.group
+    if (!isBotAdmins) throw LangG.botAdmin
+    if (!isAdmins) throw LangG.admin
     myBot.sendMessage(m.chat, { text: q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
   }
   break
   case 'linkgroup': {
-    if (!m.isGroup) throw mess.group
+    if (!m.isGroup) throw LangG.group
     const inviteCode = await myBot.groupInviteCode(m.chat)
     const { subject } = await myBot.groupMetadata(m.chat)
     const caption = `*Nombre del Grupo:* *${subject}*\n\n*Link del grupo:* https://chat.whatsapp.com/${inviteCode}`
@@ -665,10 +659,10 @@ switch(command) {
 */
 // ===== =====
   case 'join': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     if (!text) throw 'Necesito el enlace de invitación!'
     if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) throw 'Link Invalido!'
-    m.reply(mess.wait)
+    m.reply(LangG.wait)
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     await myBot.groupAcceptInvite(result).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
   }
@@ -676,16 +670,16 @@ switch(command) {
 /*
 	case 'juzamma': {
 		if (args[0] === 'pdf') {
-	  	m.reply(mess.wait)
+	  	m.reply(LangG.wait)
 	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.pdf'}, mimetype: 'application/pdf', fileName: 'juz-amma-arab-latin-indonesia.pdf'}, {quoted:m})
 		} else if (args[0] === 'docx') {
-		  m.reply(mess.wait)
+		  m.reply(LangG.wait)
 	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.docx'}, mimetype: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', fileName: 'juz-amma-arab-latin-indonesia.docx'}, {quoted:m})
 		} else if (args[0] === 'pptx') {
-	  	m.reply(mess.wait)
+	  	m.reply(LangG.wait)
 	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.pptx'}, mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', fileName: 'juz-amma-arab-latin-indonesia.pptx'}, {quoted:m})
 		} else if (args[0] === 'xlsx') {
-	  	m.reply(mess.wait)
+	  	m.reply(LangG.wait)
 	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.xlsx'}, mimetype: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileName: 'juz-amma-arab-latin-indonesia.xlsx'}, {quoted:m})
 		} else {
 	  	m.reply(`Mau format apa ? Example : ${prefix + command} pdf
@@ -695,7 +689,7 @@ switch(command) {
 	break
 */
   case 'setcmd': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     if (!m.quoted) throw 'Responde un mensaje!'
     if (!m.quoted.fileSha256) throw 'SHA256 falta el hash'
     if (!text) throw `Que comando?`
@@ -709,20 +703,20 @@ switch(command) {
       at: + new Date,
       locked: false,
     }
-    m.reply(`Hecho!`)
+    m.reply(LangG.success)
   }
   break
   case 'delcmd': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     let hash = m.quoted.fileSha256.toString('base64')
     if (!hash) throw `Falta el hash`
     if (global.db.data.sticker[hash] && global.db.data.sticker[hash].locked) throw 'You have no permission to delete this sticker command'              
     delete global.db.data.sticker[hash]
-    m.reply(`Hecho!`)
+    m.reply(LangG.success)
   }
   break
   case 'listcmd': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     let teks = `
 *Lista de Hash*
 Info: *bold* hash is Locked
@@ -732,7 +726,7 @@ ${Object.entries(global.db.data.sticker).map(([key, value], index) => `${index +
   }
   break
   case 'lockcmd': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     if (!m.quoted) throw 'Reply Pesan!'
     if (!m.quoted.fileSha256) throw 'SHA256 Hash Missing'
     let hash = m.quoted.fileSha256.toString('base64')
@@ -742,7 +736,7 @@ ${Object.entries(global.db.data.sticker).map(([key, value], index) => `${index +
   }
   break
   case 'addmsg': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     if (!m.quoted) throw 'Responda el mensaje que quiere guardar en la base de datos'
     if (!text) throw `Ejemolo: ${prefix + command} nombre`
     let msgs = global.db.data.database
@@ -756,7 +750,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'getmsg': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     if (!text) throw `Ejemplo: ${prefix + command} nombre\n\nVer lista de mensajes con: ${prefix}listmsg`
     let msgs = global.db.data.database
     if (!(text.toLowerCase() in msgs)) throw `'${text}' no aparece en la lista de mensajes`
@@ -764,7 +758,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'listmsg': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     let msgs = JSON.parse(fs.readFileSync('./src/database.json'))
 	  let seplit = Object.entries(global.db.data.database).map(([nama, isi]) => { return { nama, ...isi } })
 		let teks = '「 LIST DATABASE 」\n\n'
@@ -775,7 +769,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
 	}
 	break
   case 'delmsg': case 'deletemsg': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     let msgs = global.db.data.database
     if (!(text.toLowerCase() in msgs)) return m.reply(`'${text}' no aparece en la lista de mensajes`)
 		delete msgs[text.toLowerCase()]
@@ -785,24 +779,24 @@ Ver lista de mensajes con ${prefix}listmsg`)
 
 /* ########## FOR OWNER ##########*/
   case 'react': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
       reactionMessage = {
         react: {
           text: args[0],
-          key: { remoteJid: m.chat, fromMe: true, id: quoted.id }
+          key: { remoteJid: m.chat, fromMe: false, id: quoted.id }
         }
       }
       myBot.sendMessage(m.chat, reactionMessage)
   }
   break  
 	case 'public': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     myBot.public = true
     m.reply('Sukse Change To Public Usage')
   }
   break
   case 'self': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     myBot.public = false
     m.reply('Sukses Change To Self Usage')
   }
@@ -838,13 +832,17 @@ Ver lista de mensajes con ${prefix}listmsg`)
     }
   }
   break
+case 'test': {
+  myBot.sendMessage(botNumber, { text: 'Hola weee' })
+}break
   case 'update': {
+    if (!isCreator) throw LangG.owner
     await git.fetch();
-    var commits = await git.log([updater.BRANCH + '..origin/' + updater.BRANCH]);
+    var commits = await git.log([Config.BRANCH + '..origin/' + Config.BRANCH]);
     if (commits.total === 0) {
-      myBot.sendMessage(m.chat, { text: updater.UPDATE })
+      myBot.sendMessage(m.chat, { text: LangU.UPDATE })
     } else {
-      var degisiklikler = updater.NEW_UPDATE;
+      var degisiklikler = LangU.NEW_UPDATE;
       commits['all'].map(
         (commit) => {
           degisiklikler += '🔸 [' + commit.date.substring(0, 10) + ']: ' + commit.message + ' <' + commit.author_name + '>\n';
@@ -854,10 +852,11 @@ Ver lista de mensajes con ${prefix}listmsg`)
     }
   }break
   case 'actualizar': {
+    if (!isCreator) throw LangG.owner
     await git.fetch();
-    var commits = await git.log([updater.BRANCH + '..origin/' + updater.BRANCH]);
+    var commits = await git.log([Config.BRANCH + '..origin/' + Config.BRANCH]);
     if (commits.total === 0) {
-      myBot.sendMessage(m.chat, { text: updater.UPDATE })
+      myBot.sendMessage(m.chat, { text: LangU.UPDATE })
     } else {
       git.pull((async (err, update) => {
         if(update && update.summary.changes) {
@@ -870,19 +869,19 @@ Ver lista de mensajes con ${prefix}listmsg`)
     }
   }break
   case 'block': {
-		if (!isCreator) throw mess.owner
+		if (!isCreator) throw LangG.owner
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'block').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
   case 'unblock': {
-		if (!isCreator) throw mess.owner
+		if (!isCreator) throw LangG.owner
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'unblock').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
   case 'bc': case 'broadcast': case 'bcall': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     if (!text) throw `Que quieres enviar?\n\nEjemplo: ${prefix + command} text`
     let anu = await store.chats.all().map(v => v.id)
     m.reply(`Enviar difusión a ${anu.length} chat.\nTiempo de envio ${anu.length * 1.5} segundos.`)
@@ -921,7 +920,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'bcgc': case 'bcgroup': {
-    if (!isCreator) throw mess.owner
+    if (!isCreator) throw LangG.owner
     if (!text) throw `Que quieres enviar?\n\nEjemplo: ${prefix + command} text`
     let getGroups = await myBot.groupFetchAllParticipating()
     let groups = Object.entries(getGroups).slice(0).map(entry => entry[1])
@@ -962,7 +961,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
   case 'ping': case 'botstatus': {
-		if (!isCreator) throw mess.owner
+		if (!isCreator) throw LangG.owner
     const used = process.memoryUsage()
     const cpus = os.cpus().map(cpu => {
       cpu.total = Object.keys(cpu.times).reduce((last, type) => last + cpu.times[type], 0)
@@ -1018,7 +1017,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
 
   default:
     if (budy.startsWith('=>')) {
-      if (!isCreator) return m.reply(mess.owner)
+      if (!isCreator) return m.reply(LangG.owner)
       function Return(sul) {
         sat = JSON.stringify(sul, null, 2)
         bang = util.format(sat)
@@ -1035,7 +1034,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
     }
     
     if (budy.startsWith('>')) {
-      if (!isCreator) return m.reply(mess.owner)
+      if (!isCreator) return m.reply(LangG.owner)
       try {
         let evaled = await eval(budy.slice(2))
         if (typeof evaled !== 'string') evaled = require('util').inspect(evaled)
@@ -1046,7 +1045,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
     }
     
     if (budy.startsWith('$')) {
-      if (!isCreator) return m.reply(mess.owner)
+      if (!isCreator) return m.reply(LangG.owner)
       exec(budy.slice(2), (err, stdout) => {
         if(err) return m.reply(err)
         if (stdout) return m.reply(stdout)
@@ -1081,7 +1080,11 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
 		}
 }
     } catch (err) {
-      m.reply(util.format(err))
+      if (Config.LOG == 'false') return
+      //m.reply(util.format(err))
+      myBot.sendMessage(botNumber, { text: `*-- ${LangErr.msgReport} [ ${botName} ] --*\n` +
+        '*Error:* ```' + err + '```'
+      })
     }
 }
 
