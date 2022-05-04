@@ -2,4 +2,8 @@ build:
   docker: 
       worker: Dockerfile
 run:
+<<<<<<< HEAD
    worker: npm start
+=======
+   worker: npm start
+>>>>>>> f20e5733200ec198192366f8472bddb7b9b12466
