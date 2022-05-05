@@ -102,13 +102,13 @@ async function startMybot() {
                 try {
                     ppuser = await myBot.profilePictureUrl(num, 'image')
                 } catch {
-                    ppuser = 'https://i.ibb.co/PZNv21q/Profile-FG98.jpg'
+                    ppuser = fs.readFileSync('./lib/imgProfile.jpg')
                 }
                 // Get Profile Picture Group
                 try {
                     ppgroup = await myBot.profilePictureUrl(anu.id, 'image')
                 } catch {
-                    ppgroup = 'https://i.ibb.co/PZNv21q/Profile-FG98.jpg'
+                    ppgroup = fs.readFileSync('./lib/imgProfile.jpg')
                 }
 
                 if (anu.action == 'add') {
