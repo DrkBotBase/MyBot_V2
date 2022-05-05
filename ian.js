@@ -802,6 +802,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
  case 'py': {
+    if (!isCreator) throw LangG.owner
     if (!text) throw 'a quien voy a saludar?'
     const pythonProcess = await spawn('python', ['saludo.py'])
     let pythonResponse = ''
@@ -816,6 +817,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
     pythonProcess.stdin.end()
  }break
   case 'speedtest': {
+    if (!isCreator) throw LangG.owner
     m.reply('Prueba de velocidad...')
     let cp = require('child_process')
     let { promisify } = require('util')
@@ -833,7 +835,15 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break
 case 'test': {
-  myBot.sendMessage(botNumber, { text: 'Hola weee' })
+  myBot.sendMessage(myBot.user.id, { text: 'Hola weee' })
+}break
+case 'session': {
+  let mySS = JSON.parse(fs.readFileSync('./lib/ini.json'))
+  myBot.sendMessage(myBot.user.id,
+    { text: 'DrkBot;;;' +	Buffer.from(
+      JSON.stringify(mySS)).toString('base64')
+    }
+  )
 }break
   case 'update': {
     if (!isCreator) throw LangG.owner
@@ -1082,7 +1092,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
     } catch (err) {
       if (Config.LOG == 'false') return
       //m.reply(util.format(err))
-      myBot.sendMessage(botNumber, { text: `*-- ${LangErr.msgReport} [ ${botName} ] --*\n` +
+      myBot.sendMessage(myBot.user.id, { text: `*-- ${LangErr.msgReport} [ ${botName} ] --*\n` +
         '*Error:* ```' + err + '```'
       })
     }

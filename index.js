@@ -60,7 +60,7 @@ async function startMybot() {
     const myBot = myBotConnect({
         logger: pino({ level: 'silent' }),
         printQRInTerminal: true,
-        browser: ['DrkBot','Safari','1.0.0'],
+        browser: ["DrkBot", "Safari", "13.0.0"],
         auth: state
     })
 
@@ -212,7 +212,10 @@ async function startMybot() {
             else if (reason === DisconnectReason.loggedOut) { log(`Dispositivo cerrado, escanee nuevamente y ejecute.`); myBot.logout(); }
             else if (reason === DisconnectReason.restartRequired) { log("Reinicio requerido, reiniciando..."); startMybot(); }
             else if (reason === DisconnectReason.timedOut) { log("Se agotó el tiempo de espera de la conexión, reconectando..."); startMybot(); }
-            else myBot.end(`Unknown DisconnectReason: ${reason}|${connection}`)
+            //else myBot.end(`Unknown DisconnectReason: ${reason}|${connection}`)
+            else {
+              log(`Unknown DisconnectReason: ${reason}|${connection}`); startMybot();
+            }
         }
         log('Connected...', update)
     })
