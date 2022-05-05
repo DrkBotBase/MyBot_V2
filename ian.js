@@ -500,7 +500,7 @@ switch(command) {
   break
   case 'bot': {
     if (!text) throw "🤖 *Si aquí estoy*"
-   await axios.get(`http://api.simsimi.net/v2/?text=${text}&lc=es&cf=true`).then((response) => {
+   await axios.get(`https://api-sv2.simsimi.net/v2/?text=${text}&lc=es&cf=true`).then((response) => {
     try{
       const { text } = response.data.messages[0]
       if (text ==='Roberto' || text === 'maite' || text === 'Luis Mario.' || text === 'Ricardo milos\n') {
