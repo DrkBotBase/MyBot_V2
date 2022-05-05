@@ -59,6 +59,7 @@
     "ytdl-core": "^4.11.0"
   },
   "directories": {
+    "lang": "lang",
     "lib": "lib",
     "src": "src"
   },
@@ -67,7 +68,7 @@
     "url": "git+https://github.com/DrkBotBase/MyBot_V2.git"
   },
   "bugs": {
-    "url": "https://github.com/DrkBotBase/MyBot_V2/issues"
+    "url": "https://github.com/DrkBotBase/MyBot_V2/#"
   },
   "homepage": "https://github.com/DrkBotBase/MyBot_V2#readme"
 }

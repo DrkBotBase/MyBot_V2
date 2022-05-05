@@ -11,11 +11,6 @@
       "required": true,
       "value": "V1-MD"
     },
-    "BRANCH": {
-      "description": "Rama en la que se encuentra el codigo, NO cambiar.",
-      "required": false,
-      "value": "master"
-    },
     "SEND_READ": {
       "description": "Parte de lectura de mensaje, ponga true o false si quiere que el mensaje salga leido o no.",
       "required": true,

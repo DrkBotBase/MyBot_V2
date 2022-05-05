@@ -42,7 +42,7 @@ function convertToBool(text, fault = 'true') {
 // env ## not modify ##
 module.exports = {
   BOT_NAME: process.env.BOT_NAME === undefined ? 'DrkBot' : process.env.BOT_NAME,
-  BRANCH: process.env.BRANCH === undefined ? 'master' : process.env.BRANCH,
+  BRANCH: 'master',
   HANDLER: process.env.HANDLER === undefined ? '^[/]' : process.env.HANDLER,
   LANG: process.env.LANGUAGE === undefined ? 'ES' : process.env.LANGUAGE.toUpperCase(),
   LOG: process.env.LOG_ERR === undefined ? 'true' : process.env.LOG_ERR,
