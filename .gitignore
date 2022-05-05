@@ -1,5 +1,4 @@
 node_modules
-lib/ini.json
 clear.sh
 config.env
 package-lock.json
