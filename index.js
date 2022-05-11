@@ -86,6 +86,11 @@ async function startMybot() {
           if (mek.key && mek.key.remoteJid === 'status@broadcast') return
           if (!myBot.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
           if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
+          if (Config.ONLINE === 'online'){
+            await myBot.sendPresenceUpdate('available', mek.key.id);
+          } else if (Config.ONLINE === 'offline'){
+            await myBot.sendPresenceUpdate('unavailable', mek.key.id);
+          }
           m = smsg(myBot, mek, store)
           require("./ian")(myBot, m, chatUpdate, store)
         } catch (err) {
@@ -115,8 +120,8 @@ async function startMybot() {
                   teks = `╔══✪〘 *NUEVO USUARIO* 〙✪══\n╠❖ *Nombre:* @${num.split('@')[0]}\n╚══✪〘 *DrkBot* 〙✪══`
                   myBot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: teks })
                 } else if (anu.action == 'remove') {
-                    teks = `╔══✪〘 *SE FUE* 〙✪══\n╠❖ *Nombre:* @${num.split('@')[0]}\n╚══✪〘 *DrkBot* 〙✪══`
-                    myBot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: teks })
+                  teks = `╔══✪〘 *SE FUE* 〙✪══\n╠❖ *Nombre:* @${num.split('@')[0]}\n╚══✪〘 *DrkBot* 〙✪══`
+                  myBot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: teks })
                 }
             }
         } catch (err) {
@@ -223,6 +228,37 @@ async function startMybot() {
     myBot.ev.on('creds.update', saveState)
 
     // Add Other
+
+    /**
+     *
+     * @param {*} jid
+     * @param {*} url
+     * @param {*} caption
+     * @param {*} quoted
+     * @param {*} options
+     */
+    myBot.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
+      let mime = '';
+      let res = await axios.head(url)
+      mime = res.headers['content-type']
+      if (mime.split("/")[1] === "gif") {
+        return myBot.sendMessage(jid, { video: await getBuffer(url), caption: caption, gifPlayback: true, ...options}, { quoted: quoted, ...options})
+      }
+      let type = mime.split("/")[0]+"Message"
+      if(mime === "application/pdf"){
+        return myBot.sendMessage(jid, { document: await getBuffer(url), mimetype: 'application/pdf', caption: caption, ...options}, { quoted: quoted, ...options })
+      }
+      if(mime.split("/")[0] === "image"){
+        return myBot.sendMessage(jid, { image: await getBuffer(url), caption: caption, ...options}, { quoted: quoted, ...options})
+      }
+      if(mime.split("/")[0] === "video"){
+        return myBot.sendMessage(jid, { video: await getBuffer(url), caption: caption, mimetype: 'video/mp4', ...options}, { quoted: quoted, ...options })
+      }
+      if(mime.split("/")[0] === "audio"){
+        return myBot.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options}, { quoted: quoted, ...options })
+      }
+    }
+
     /** Send Button 5 Image
      *
      * @param {*} jid
@@ -234,18 +270,68 @@ async function startMybot() {
      * @returns
      */
     myBot.send5ButImg = async (jid , text = '' , footer = '', img, but = [], options = {}) =>{
-        let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
-        var template = generateWAMessageFromContent(m.chat, proto.Message.fromObject({
+      let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
+      var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
+        templateMessage: {
+          hydratedTemplate: {
+            imageMessage: message.imageMessage,
+            "hydratedContentText": text,
+            "hydratedFooterText": footer,
+            "hydratedButtons": but
+          }
+        }
+      }), options)
+      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
+    }
+
+    /** Send Button 5 Video
+     *
+     * @param {*} jid
+     * @param {*} text
+     * @param {*} footer
+     * @param {*} Gif
+     * @param [*] button
+     * @param {*} options
+     * @returns
+     */
+    myBot.send5ButVid = async (jid , text = '' , footer = '', vid, but = [], options = {}) =>{
+      let message = await prepareWAMessageMedia({ video: vid }, { upload: myBot.waUploadToServer })
+      var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
         templateMessage: {
         hydratedTemplate: {
-        imageMessage: message.imageMessage,
-               "hydratedContentText": text,
-               "hydratedFooterText": footer,
-               "hydratedButtons": but
-            }
-            }
-            }), options)
-            myBot.relayMessage(jid, template.message, { messageId: template.key.id })
+        videoMessage: message.videoMessage,
+            "hydratedContentText": text,
+            "hydratedFooterText": footer,
+            "hydratedButtons": but
+          }
+        }
+      }), options)
+      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
+    }
+ 
+    /** Send Button 5 Video
+     *
+     * @param {*} jid
+     * @param {*} text
+     * @param {*} footer
+     * @param {*} VideoGif
+     * @param [*] button
+     * @param {*} options
+     * @returns
+     */
+    myBot.send5ButGif = async (jid , text = '' , footer = '', gif, but = [], options = {}) =>{
+      let message = await prepareWAMessageMedia({ video: gif, gifPlayback: true }, { upload: myBot.waUploadToServer })
+      var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
+        templateMessage: {
+          hydratedTemplate: {
+            videoMessage: message.videoMessage,
+            "hydratedContentText": text,
+            "hydratedFooterText": footer,
+            "hydratedButtons": but
+          }
+        }
+      }), options)
+      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
     }
 
     /**
@@ -267,7 +353,7 @@ async function startMybot() {
         }
         myBot.sendMessage(jid, buttonMessage, { quoted, ...options })
     }
-    
+
     /**
      * 
      * @param {*} jid 
@@ -287,7 +373,7 @@ async function startMybot() {
       }
         return await myBot.sendMessage(jid, buttonMessage, { quoted, ...options })
     }
-    
+
     /**
      * 
      * @param {*} jid 
@@ -308,7 +394,7 @@ async function startMybot() {
      * @returns 
      */
     myBot.sendImage = async (jid, path, caption = '', quoted = '', options) => {
-	    let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
+      let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
       return await myBot.sendMessage(jid, { image: buffer, caption: caption, ...options }, { quoted })
     }
 
