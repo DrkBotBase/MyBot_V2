@@ -2,5 +2,6 @@ node_modules
 clear.sh
 config.env
 package-lock.json
+src/database.json
 test.js
 yarn.lock

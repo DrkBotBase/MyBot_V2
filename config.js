@@ -7,7 +7,7 @@
 
 const fs = require('fs')
 if (fs.existsSync('config.env')) require('dotenv').config({ path: './config.env' });
-const { pint } = require('./lib/colores');
+const { log, pint } = require('./lib/colores');
 
 // Website Api
 global.APIs = {
@@ -23,7 +23,7 @@ global.APIKeys = {
 global.owner = ['573508770421']
 global.premium = []
 global.packname = 'DrkBot'
-global.author = 'Ian'
+global.author = 'Dylan'
 global.sessionName = 'ini'
 global.sp = '╠❖'
 
@@ -47,6 +47,7 @@ module.exports = {
   LANG: process.env.LANGUAGE === undefined ? 'ES' : process.env.LANGUAGE.toUpperCase(),
   LOG: process.env.LOG_ERR === undefined ? 'true' : process.env.LOG_ERR,
   MSG_CONSOLE: process.env.MSG_CONSOLE === undefined ? '' : process.env.MSG_CONSOLE,
+  ONLINE: process.env.ONLINE === undefined ? 'online' : process.env.ONLINE,
   READ: process.env.SEND_READ === undefined ? '' : process.env.SEND_READ,
   VERSION: process.env.VERSION === undefined ? 'V1-MD' : process.env.VERSION,
   WORKTYPE: process.env.WORKTYPE === undefined ? 'private' : process.env.WORKTYPE

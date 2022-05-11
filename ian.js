@@ -113,7 +113,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         if (m.message) {
           if (Config.READ === 'true') {
             myBot.sendReadReceipt(m.chat, m.sender, [m.key.id])
-          } else {}
+          }
           if (Config.MSG_CONSOLE === 'true') {
             log(
               pint(bgPint((new Date), 'white'), 'black.') + '\n' +
@@ -122,7 +122,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
               pint('=> Sender: ', 'magenta') + pint(pushname) + ' ' + pint(m.sender, 'yellow') + '\n' +
               pint('=> To: ', 'blue') + ' ' + pint(m.isGroup ? pushname : 'Chat Privado') + ' ' + pint(m.chat) + '\n\n'
             )
-          } else {}
+          }
         }
 	
 	// reset limit every 12 hours
@@ -210,9 +210,9 @@ Selama ${clockString(new Date - user.afkTime)}
             user.afkTime = -1
             user.afkReason = ''
         }
+
 // ======== INICIO COMANDOS ========
 switch(command) {
-/* ########## COMMANDS ##########*/
   case 'afk': {
     let user = global.db.data.users[m.sender]
     user.afkTime = + new Date
@@ -225,20 +225,30 @@ switch(command) {
   }
   break
   case 'alive': {
+    anu = '✪〘 *FUNCIONANDO* 〙✪'
     let btn = [
-     // { urlButton: { displayText: 'Source Code', url: 'https://github.com' } },
-    //  { callButton: { displayText: 'Number Phone Owner', phoneNumber: '+57 350-877-0421' } },
-      { quickReplyButton: { displayText: 'Menu', id: 'menu' } },
-      { quickReplyButton: { displayText: 'Contact Owner', id: 'owner' } },
-      { quickReplyButton: { displayText: 'GitHub', id: 'sc' } }
+      {urlButton: {
+        displayText: 'Source Code',
+        url: 'https://github.com/'
+      }},
+      {callButton: {
+        displayText: 'Number Phone Owner',
+        phoneNumber: '+57 350-877-0421'
+      }},
+      {quickReplyButton: {
+         displayText: 'Status Bot',
+        id: 'ping'
+      }},
+      {quickReplyButton: {
+        displayText: 'Contact Owner',
+        id: 'owner'
+      }},
+      {quickReplyButton: {
+        displayText: 'Script',
+        id: 'sc'
+      }}
     ]
-    let templateMessage = {
-      text: '✪〘 *FUNCIONANDO* 〙✪',
-      footer: `${botName}`,
-      templateButtons: btn,
-      image: {url: './lib/bot.jpg'}
-    }
-    myBot.sendMessage(m.chat, templateMessage)
+    myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, btn)
   }
   break
   case 'menu': {
@@ -267,7 +277,7 @@ switch(command) {
     m.reply('*No olvides dar estrellas*\n\n*Script:* https://github.com\n*Paypal:* https://www.paypal.me')
   }
   break
-/* CONVERTER */
+// CONVERTER
   case 'sticker': {
     if (!quoted) throw `Responder video/imagen ${prefix + command}`
     m.reply(LangG.wait)
@@ -373,7 +383,7 @@ switch(command) {
       m.reply(e)
     }
   break
-/* DOWNLOADS */
+// DOWNLOADS
   case 'yt': {
     if (!text) throw `Que deseas busacar?\n*Ejemplo:* ${prefix + command} Blinding Live`
     try {
@@ -481,7 +491,7 @@ switch(command) {
     }
   }
   break*/
-/* TOOLS */
+// TOOLS
   case 'ebinary': {
     if (!m.quoted.text && !text) throw `Enviar/responder texto ${prefix + command}`
     let { eBinary } = require('./lib/binary')
@@ -514,9 +524,7 @@ switch(command) {
     })
   }
   break
-/* ########## COMMANDS ##########*/
-
-/* ########## FOR GROUPS ##########*/
+// FOR GROUPS
   case 'pareja': {
     if (!m.isGroup) throw LangG.group
     let member = participants.map(u => u.id)
@@ -620,10 +628,10 @@ switch(command) {
     if (!isBotAdmins) throw LangG.botAdmin
     if (!isAdmins) throw LangG.admin
 
-    const ini = "╔══✪〘 *REPORTENSE* 〙✪══\n"
-    const end = `╚══✪〘 *${botName}* 〙✪══`
-
+    let ini = "╔══✪〘 *REPORTENSE* 〙✪══\n"
     let mesaj = `➲ *Mensaje:* ${q ? q : ''}\n\n`
+    let end = `╚══✪〘 *${botName}* 〙✪══`
+
     for (let mem of participants) {
       mesaj += `${global.sp} @${mem.id.split('@')[0]}\n`
       tga = `${ini}${mesaj}${end}`
@@ -647,8 +655,7 @@ switch(command) {
     myBot.sendImage(m.chat, pic, caption, m)
   }
   break
-/* ########## END GROUPS ##########*/
-// ===== CAMBIO =====
+// END GROUPS
 /*
   case 'halah': case 'hilih': case 'huluh': case 'heleh': case 'holoh':
     if (!m.quoted && !text) throw `Kirim/reply text dengan caption ${prefix + command}`
@@ -657,7 +664,6 @@ switch(command) {
     m.reply(tex.replace(/[aiueo]/g, ter).replace(/[AIUEO]/g, ter.toUpperCase())
   break
 */
-// ===== =====
   case 'join': {
     if (!isCreator) throw LangG.owner
     if (!text) throw 'Necesito el enlace de invitación!'
@@ -777,7 +783,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
 	break
 
-/* ########## FOR OWNER ##########*/
+// FOR OWNER
   case 'react': {
     if (!isCreator) throw LangG.owner
       reactionMessage = {
@@ -838,7 +844,7 @@ case 'test': {
   myBot.sendMessage(myBot.user.id, { text: 'Hola weee' })
 }break
 case 'session': {
-  let mySS = JSON.parse(fs.readFileSync('./lib/ini.json'))
+  let mySS = JSON.parse(fs.readFileSync('lib/ini.json'))
   myBot.sendMessage(myBot.user.id,
     { text: 'DrkBot;;;' +	Buffer.from(
       JSON.stringify(mySS)).toString('base64')
