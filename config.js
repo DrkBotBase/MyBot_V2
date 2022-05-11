@@ -7,7 +7,7 @@
 
 const fs = require('fs')
 if (fs.existsSync('config.env')) require('dotenv').config({ path: './config.env' });
-const { pint } = require('./lib/colores');
+const { log, pint } = require('./lib/colores');
 
 // Website Api
 global.APIs = {
