@@ -7,7 +7,7 @@
 
 require('./config')
 const { default: myBotConnect, useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
-const { state, saveState } = useSingleFileAuthState(`./lib/ini.json`)
+const { state, saveState } = useSingleFileAuthState(`../SS/350.json`)
 const pino = require('pino')
 const { Boom } = require('@hapi/boom')
 const fs = require('fs')
@@ -51,10 +51,10 @@ global.db.data = {
   ...(global.db.data || {})
 }
 
-// save database every 10 minutes
+// save database every 5 minutes
 if (global.db) setInterval(async () => {
     if (global.db.data) await global.db.write()
-}, 300 * 2000)
+}, 300 * 1000)
 
 async function startMybot() {
     const myBot = myBotConnect({

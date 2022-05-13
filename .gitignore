@@ -1,6 +1,7 @@
 node_modules
 clear.sh
 config.env
+lib/ini.json
 package-lock.json
 src/database.json
 test.js
