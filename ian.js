@@ -518,6 +518,10 @@ switch(command) {
     }
   }
   break
+  case 'sfw': {
+    
+  }
+  break
   /*case 'sfw': case 'nsfw': {
     if (!text){
       txtt = `Hola *${pushname}*`
