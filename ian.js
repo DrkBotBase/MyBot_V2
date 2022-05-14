@@ -1067,9 +1067,6 @@ case 'session': {
 _Segundos:_ ${latensi.toFixed(4)}
 _Milisegundos:_ ${oldd - neww}
 
-*TIEMPO DE EJECUCIÓN*
-${runtime(process.uptime())}
-
 💻 *INFO SERVER*
 _RAM:_ ${formatp(os.totalmem() - os.freemem())} / ${formatp(os.totalmem())}
 
@@ -1081,7 +1078,12 @@ ${cpus[0] ? `_Total CPU Usage_
 ${cpus[0].model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}: ${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}
 _CPU Core(s) Usage (${cpus.length} Core CPU)_
 ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}: ${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}`).join('\n\n')}` : ''}`.trim()
-    m.reply(respon)
+    if (command === 'ping') {
+      m.reply(respon)
+    } else if (command === 'status') {
+      m.reply(`*TIEMPO DE EJECUCIÓN*
+${runtime(process.uptime())}`)
+    }
   }
   break
 
