@@ -40,8 +40,10 @@ ${p} ${prefix}sticker
 ${p} ${prefix}emojimix
 ${p} ${prefix}img
 ${p} ${prefix}wallpaper
+${p} ${prefix}2wallpaper
 ${p} ${prefix}ebinary
 ${p} ${prefix}dbinary
+${p} ${prefix}calc
 ╚══✪〘 *DrkBot* 〙✪══`
 }
 
