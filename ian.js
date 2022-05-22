@@ -444,6 +444,30 @@ switch(command) {
     } catch (e) { log(pint(e, 'pink')) }
   }
   break
+  case '2wallpaper': {
+    if (!text) m.reply(`*Ejemplo:* ${prefix + command} Mia Khalifa`)
+    res = gis(`wallpaper 4k ${text}`, google)
+    async function google(error, result){
+      if (error){
+        await m.reply('🤖 Parece que tenemos un error.');
+      } else {
+        var gugWp = result
+        var randomWp =  gugWp[Math.floor(Math.random() * gugWp.length)].url
+        let buttons = [
+          {buttonId: `2wallpaper ${text}`, buttonText: {displayText: 'Siguiente'}, type: 1}
+        ]
+        let buttonMessage = {
+          image: { url: randomWp },
+          caption: `*-----「 ${botName} 」-----*`,
+          footer: myBot.user.name,
+          buttons: buttons,
+          headerType: 4
+        }
+        await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+      }
+    }
+  }
+  break
   case 'img': {
     if (!text) m.reply(`*Ejemplo:* ${prefix + command} Mia Khalifa`)
     res = gis(`${text}`, google)
@@ -466,6 +490,36 @@ switch(command) {
         await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
       }
     }
+  }
+  break
+  case 'calc': {
+    if (!text) m.reply('que operación matematica deseas realizar?')
+    let val = text
+      .replace(/[^0-9\-\/+*×÷πEe()piPI/]/g, '')
+      .replace(/×/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/π|pi/gi, 'Math.PI')
+      .replace(/e/gi, 'Math.E')
+      .replace(/\/+/g, '/')
+      .replace(/\++/g, '+')
+      .replace(/-+/g, '-')
+    let format = val
+      .replace(/Math\.PI/g, 'π')
+      .replace(/Math\.E/g, 'e')
+      .replace(/\//g, '÷')
+      .replace(/\*×/g, '×')
+    try {
+      let result = (new Function('return ' + val))()
+      if (!result) throw result
+      myBot.sendText(m.chat, `${format} = _${result}_`, m)
+    } catch (e) {
+      if (e == undefined) log('contenido?')
+      m.reply('Formato incorrecto, solo 0-9 y Símbolos soportados -, +, *, /, ×, ÷, π, e, (, )')
+    }
+  }
+  break
+  case 'sfw': {
+    
   }
   break
   /*case 'sfw': case 'nsfw': {
@@ -640,7 +694,7 @@ switch(command) {
     myBot.sendMessage(m.chat, { text: tga, mentions: participants.map(a => a.id) }, { quoted: m })
   }
   break
-  case 'hidetag': {
+  case 'hdt': {
     if (!m.isGroup) m.reply(LangG.group)
     if (!isBotAdmins) m.reply(LangG.botAdmin)
     if (!isAdmins) m.reply(LangG.admin)
