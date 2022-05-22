@@ -279,20 +279,25 @@ switch(command) {
   break
 // CONVERTER
   case 'sticker': {
-    if (!quoted) m.reply(`Responder video/imagen ${prefix + command}`)
+    if (!quoted) m.reply(`Responder video/imagen ${prefix + command} name sticker`)
+    if (text.length > 0){
+      name = text
+    } else {
+      name = global.packname
+    }
     if (/image/.test(mime)) {
       m.reply(LangG.wait)
       let media = await quoted.download()
-      let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: global.packname, author: global.author })
+      let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: name, author: global.author })
       await fs.unlinkSync(encmedia)
     } else if (/video/.test(mime)) {
       m.reply(LangG.wait)
       if ((quoted.msg || quoted).seconds > 11) return m.reply('Máximo 10 segundos!')
       let media = await quoted.download()
-      let encmedia = await myBot.sendVideoAsSticker(m.chat, media, m, { packname: global.packname, author: global.author })
+      let encmedia = await myBot.sendVideoAsSticker(m.chat, media, m, { packname: name, author: global.author })
       await fs.unlinkSync(encmedia)
     } else {
-      m.reply(`Responder video/imagen ${prefix + command}\nDuración del video 1-10 segundos`)
+      m.reply(`Responder video/imagen ${prefix + command} name sticker\nDuración del video 1-10 segundos`)
     }
   }
   break
