@@ -51,10 +51,10 @@ global.db.data = {
   ...(global.db.data || {})
 }
 
-// save database every 10 minutes
+// save database every 5 minutes
 if (global.db) setInterval(async () => {
     if (global.db.data) await global.db.write()
-}, 300 * 2000)
+}, 300 * 1000)
 
 async function startMybot() {
     const myBot = myBotConnect({
