@@ -12,6 +12,7 @@ RUN apt-get update && \
 
 COPY package.json .
 
+RUN npm install supervisor -g
 RUN npm install
 
 COPY . .
