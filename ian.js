@@ -166,6 +166,15 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     if (db.data.chats[m.chat].mute && !isAdmins && !isCreator) {
       return
     }
+    
+    if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
+      kuis = true
+      jawaban = kuismath[m.sender.split('@')[0]]
+            if (budy.toLowerCase() == jawaban) {
+                await m.reply(`🎮 Kuis Matematika  🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? kirim ${prefix}math mode`)
+                delete kuismath[m.sender.split('@')[0]]
+            } else m.reply('*Jawaban Salah!*')
+        }
 
         // Respon Cmd with media
         if (isMedia && m.msg.fileSha256 && (m.msg.fileSha256.toString('base64') in global.db.data.sticker)) {
@@ -497,6 +506,34 @@ switch(command) {
     }
   }
   break
+  case 'trt': {
+    if (!m.quoted.text && !text) m.reply(`Enviar/responder texto ${prefix + command}`)
+    let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
+    
+    let de = 'en'
+    let para = ''
+    traduct = await translatte(teks, {
+      from: de === '' ? 'auto' : de,
+      to: para === '' ? 'es' : para
+    })
+    if ('text' in ceviri) {
+      return await m.reply(
+        '*▶️ ' + Lang.LANG + ':* ```' + (match[1] === '' ? 'auto' : match[1]) + '```\n'
+      + '*◀️ ' + Lang.FROM + '*: ```' + (match[2] === '' ? config.LANG : match[2]) + '```\n'
+      + '*🔎 ' + Lang.RESULT + ':* ```' + ceviri.text + '```');
+        } 
+    
+    .then(res => {
+      m.reply(
+          '▶️ ' + 'Idioma: ' + de + '\n'
+        + '◀️ ' + 'Idioma traducido: ' + para + '\n'
+        + '🔎 ' + 'Resultado: ' + res.text
+      )
+    }).catch(err => {
+      log(pint(err, 'red.'))
+    });
+  }
+  break
   case 'calc': {
     if (!text) m.reply('que operación matematica deseas realizar?')
     let val = text
@@ -521,10 +558,6 @@ switch(command) {
       if (e == undefined) log('contenido?')
       m.reply('Formato incorrecto, solo 0-9 y Símbolos soportados -, +, *, /, ×, ÷, π, e, (, )')
     }
-  }
-  break
-  case 'sfw': {
-    
   }
   break
   /*case 'sfw': case 'nsfw': {
@@ -570,7 +603,7 @@ switch(command) {
   break
   case 'bot': {
     if (!text) m.reply("🤖 *Si aquí estoy*")
-   await axios.get(`https://api-sv2.simsimi.net/v2/?text=${text}&lc=es&cf=true`).then((response) => {
+    await axios.get(`https://api-sv2.simsimi.net/v2/?text=${text}&lc=es&cf=true`).then((response) => {
     try{
       const { text } = response.data.messages[0]
       if (text ==='Roberto' || text === 'maite' || text === 'Luis Mario.' || text === 'Ricardo milos\n') {
