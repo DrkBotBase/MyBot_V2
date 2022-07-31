@@ -29,7 +29,7 @@ ${p} ${prefix}kick
 ${p} ${prefix}mute
 ${p} ${prefix}unmute
 ${p} ${prefix}linkgroup
-${p} ${prefix}pareja
+${p} ${prefix}love
 ${p} ${prefix}tagall
 ${p} ${prefix}hidetag
 ╠══✪〘 *UTILIDADES* 〙✪══
@@ -44,6 +44,10 @@ ${p} ${prefix}2wallpaper
 ${p} ${prefix}ebinary
 ${p} ${prefix}dbinary
 ${p} ${prefix}calc
+${p} ${prefix}bin
+${p} ${prefix}cambio
+${p} ${prefix}price
+${p} ${prefix}shazam
 ╚══✪〘 *DrkBot* 〙✪══`
 }
 

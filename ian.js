@@ -222,13 +222,6 @@ Selama ${clockString(new Date - user.afkTime)}
 
 // ======== INICIO COMANDOS ========
 switch(command) {
-  case 'afk': {
-    let user = global.db.data.users[m.sender]
-    user.afkTime = + new Date
-    user.afkReason = text
-     m.reply(`${m.pushName} Telah Afk${text ? ': ' + text : ''}`)
-  }
-  break
   case 'owner': {
     myBot.sendContact(m.chat, global.owner, m)
   }
@@ -287,8 +280,9 @@ switch(command) {
   }
   break
 // CONVERTER
+
   case 'sticker': {
-    if (!quoted) m.reply(`Responder video/imagen ${prefix + command} name sticker`)
+    if (!quoted) return m.reply(`Responder video/imagen ${prefix + command} name sticker`)
     if (text.length > 0){
       name = text
     } else {
@@ -311,8 +305,8 @@ switch(command) {
   }
   break
   case 'toaudio': {
-    if (!quoted) m.reply('*Responde un video*')
-    if (!/video/.test(mime) && !/audio/.test(mime)) m.reply(`*Ejemplo:* ${prefix + command}`)
+    if (!quoted) return m.reply('*Responde un video*')
+    if (!/video/.test(mime) && !/audio/.test(mime)) return m.reply(`*Ejemplo:* ${prefix + command}`)
     m.reply(LangG.wait)
     let media = await quoted.download()
     let { toAudio } = require('./lib/converter')
@@ -321,8 +315,8 @@ switch(command) {
   }
   break
   case 'tomp4': {
-    if (!quoted) m.reply('*Responder Sticker*')
-    if (!/webp/.test(mime)) m.reply(`*Ejemplo:* ${prefix + command}`)
+    if (!quoted) return m.reply('*Responder Sticker*')
+    if (!/webp/.test(mime)) return m.reply(`*Ejemplo:* ${prefix + command}`)
     m.reply(LangG.wait)
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
@@ -332,8 +326,8 @@ switch(command) {
   }
   break
   case 'toimg': {
-    if (!quoted) m.reply('*Responde Un Sticker*')
-    if (!/webp/.test(mime)) m.reply(`*Ejemplo:* ${prefix + command}`)
+    if (!quoted) return m.reply('*Responde Un Sticker*')
+    if (!/webp/.test(mime)) return m.reply(`*Ejemplo:* ${prefix + command}`)
     m.reply(LangG.wait)
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let ran = await getRandom('.png')
@@ -347,8 +341,8 @@ switch(command) {
   }
   break
   case 'togif': {
-    if (!quoted) m.reply('*Responder Video o Sticker*')
-    if (!/webp/.test(mime)) m.reply(`*Ejemplo:* ${prefix + command}`)
+    if (!quoted) return m.reply('*Responder Video o Sticker*')
+    if (!/webp/.test(mime)) return m.reply(`*Ejemplo:* ${prefix + command}`)
     m.reply(LangG.wait)
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
@@ -358,7 +352,7 @@ switch(command) {
   }
   break
   case 'emojimix': {
-    if (!text) m.reply(`*Ejemplo:* ${prefix + command} 😅+🤔`)
+    if (!text) return m.reply(`*Ejemplo:* ${prefix + command} 😅+🤔`)
     let [emoji1, emoji2] = text.split`+`
     let anu = await fetchJson(`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=proactive&collection=emoji_kitchen_v5&q=${encodeURIComponent(emoji1)}_${encodeURIComponent(emoji2)}`)
     for (let res of anu.results) {
@@ -400,7 +394,7 @@ switch(command) {
   break
 // DOWNLOADS
   case 'yt': {
-    if (!text) m.reply(`Que deseas busacar?\n*Ejemplo:* ${prefix + command} Blinding Live`)
+    if (!text) return m.reply(`Que deseas busacar?\n*Ejemplo:* ${prefix + command} Blinding Live`)
     try {
       let yts = require("yt-search")
       let search = await yts(text)
@@ -413,7 +407,7 @@ switch(command) {
   }
   break
   case 'song': {
-    if(!text) m.reply(`*Necesito el link.*\nEjemplo: ${prefix}song https://youtu.be/Z6L4u2i97Rw`)
+    if(!text) return m.reply(`*Necesito el link.*\nEjemplo: ${prefix}song https://youtu.be/Z6L4u2i97Rw`)
     try {
       m.reply(LangG.wait)
       ytm = await yta(text)
@@ -427,7 +421,7 @@ switch(command) {
   break
   case 'video': {
     //const ytdl = require('ytdl-core');
-    if(!text) m.reply(`*Necesito el link.*\nEjemplo: ${prefix}video https://youtu.be/KRaWnd3LJfs`)
+    if(!text) return m.reply(`*Necesito el link.*\nEjemplo: ${prefix}video https://youtu.be/KRaWnd3LJfs`)
     try {
       m.reply(LangG.wait)
       ytm = await ytv(text)
@@ -439,7 +433,7 @@ switch(command) {
   }
   break
   case 'wallpaper': {
-    if (!text) m.reply('Que deseas buscar?')
+    if (!text) return m.reply('Que deseas buscar?')
     try {
       let { wallpaper } = require('./lib/scraper')
       anu = await wallpaper(text)
@@ -459,7 +453,7 @@ switch(command) {
   }
   break
   case '2wallpaper': {
-    if (!text) m.reply(`*Ejemplo:* ${prefix + command} Mia Khalifa`)
+    if (!text) return m.reply(`*Ejemplo:* ${prefix + command} Mia Khalifa`)
     res = gis(`wallpaper 4k ${text}`, google)
     async function google(error, result){
       if (error){
@@ -483,7 +477,7 @@ switch(command) {
   }
   break
   case 'img': {
-    if (!text) m.reply(`*Ejemplo:* ${prefix + command} Mia Khalifa`)
+    if (!text) return m.reply(`*Ejemplo:* ${prefix + command} Mia Khalifa`)
     res = gis(`${text}`, google)
     async function google(error, result){
       if (error){
@@ -506,36 +500,8 @@ switch(command) {
     }
   }
   break
-  case 'trt': {
-    if (!m.quoted.text && !text) m.reply(`Enviar/responder texto ${prefix + command}`)
-    let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
-    
-    let de = 'en'
-    let para = ''
-    traduct = await translatte(teks, {
-      from: de === '' ? 'auto' : de,
-      to: para === '' ? 'es' : para
-    })
-    if ('text' in ceviri) {
-      return await m.reply(
-        '*▶️ ' + Lang.LANG + ':* ```' + (match[1] === '' ? 'auto' : match[1]) + '```\n'
-      + '*◀️ ' + Lang.FROM + '*: ```' + (match[2] === '' ? config.LANG : match[2]) + '```\n'
-      + '*🔎 ' + Lang.RESULT + ':* ```' + ceviri.text + '```');
-        } 
-    
-    .then(res => {
-      m.reply(
-          '▶️ ' + 'Idioma: ' + de + '\n'
-        + '◀️ ' + 'Idioma traducido: ' + para + '\n'
-        + '🔎 ' + 'Resultado: ' + res.text
-      )
-    }).catch(err => {
-      log(pint(err, 'red.'))
-    });
-  }
-  break
   case 'calc': {
-    if (!text) m.reply('que operación matematica deseas realizar?')
+    if (!text) return m.reply('que operación matematica deseas realizar?')
     let val = text
       .replace(/[^0-9\-\/+*×÷πEe()piPI/]/g, '')
       .replace(/×/g, '*')
@@ -560,33 +526,9 @@ switch(command) {
     }
   }
   break
-  /*case 'sfw': case 'nsfw': {
-    if (!text){
-      txtt = `Hola *${pushname}*`
-      foot = 'Tu donasión será muy valiosa'
-  
-      let buttons = [
-        { buttonId: `${prefix} waifu`, buttonText: { displayText: '' }, type: 1 },
-        { buttonId: `${prefix} neko`, buttonText: { displayText: '' }, type: 1 }
-      ]
-      await myBot.sendButtonText(m.chat, buttons, txtt, foot, m)
-    }
-    try{
-      if (command == 'sfw' && text == 'waifu'){
-        await axios.get(`https://api.waifu.pics/sfw/waifu`)
-          .then(async (response) => {
-            const { url } = response.data
-            const amin = await axios.get(url, { responseType: 'arraybuffer' })
-            
-          })
-      }
-    } catch{
-    }
-  }
-  break*/
 // TOOLS
   case 'ebinary': {
-    if (!m.quoted.text && !text) m.reply(`Enviar/responder texto ${prefix + command}`)
+    if (!m.quoted.text && !text) return m.reply(`Enviar/responder texto ${prefix + command}`)
     let { eBinary } = require('./lib/binary')
     let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
     let eb = await eBinary(teks)
@@ -594,7 +536,7 @@ switch(command) {
   }
   break
   case 'dbinary': {
-    if (!m.quoted.text && !text) m.reply(`Enviar/responder texto ${prefix + command}`)
+    if (!m.quoted.text && !text) return m.reply(`Enviar/responder texto ${prefix + command}`)
     let { dBinary } = require('./lib/binary')
     let teks = text ? text : m.quoted && m.quoted.text ? m.quoted.text : m.text
     let db = await dBinary(teks)
@@ -602,7 +544,7 @@ switch(command) {
   }
   break
   case 'bot': {
-    if (!text) m.reply("🤖 *Si aquí estoy*")
+    if (!text) return m.reply("🤖 *Si aquí estoy*")
     await axios.get(`https://api-sv2.simsimi.net/v2/?text=${text}&lc=es&cf=true`).then((response) => {
     try{
       const { text } = response.data.messages[0]
@@ -617,9 +559,88 @@ switch(command) {
     })
   }
   break
+  case 'bin': {
+    if (!text) return m.reply('Necesito el BIN')
+    await axios.get(`https://lookup.binlist.net/${args[0]}`).then(async (response) => {
+    json = response.data
+    m.reply(
+      `💳 *BIN:* ${args[0]}\n` + 
+    	' *TIPO:*\n' + 
+    	json.scheme + '\n' + 
+    	json.type + '\n' + 
+      json.brand + '\n' + 
+      ' *PAIS:*\n' + 
+      json.country.emoji + ' ' + 
+      json.country.name + '\n' + 
+      json.country.currency + '\n' + 
+      ' *BANCO:*\n' + 
+      json.bank.name
+    )
+  })
+  }break
+  case 'cambio': {
+    if (!text) return m.reply('Ingresa divisas y valor a convertir.\n*Ejemplo:* usd,cop,1')
+    key = 'bcab649da87b8cc8e5f000d0'
+    if (!key) return m.reply('Falta la key!')
+    if (text.includes(',') && verify(text) == 2) {
+    	var split = text.split(',')
+    	a = split[0].trim()
+    	b = split[1].trim()
+    	am = split[2].trim()
+    }
+    else {
+     return m.reply('Hay un error, Ejemplo: *usd,cop,1*')
+    }
+    await axios.get(`https://v6.exchangerate-api.com/v6/${key}/pair/${a}/${b}/${am}`).then(async (response) => {
+      var {conversion_rate, conversion_result} = response.data
+    	var msg = `*RESULTADO*\n\n*Precio ${a.toUpperCase()}:* ${conversion_rate} ${b.toUpperCase()}\n*${b.toUpperCase()}:* ${conversion_result}`
+    	m.reply(msg)
+    })
+    function verify(str) {
+      let letra = ','
+      let arreglo=[]
+      str= str.split('');
+      str.map(n => {
+        if(n.toLowerCase() === letra){
+          arreglo.push(n)
+        }
+      })
+      return arreglo.length
+    }
+  }break
+  case 'price': {
+    if (!text) return m.reply('Ingresa el Token!')
+    key = '1be6e707f54766812254c65612a60298080cf7b26c2ef6ea9e6ea0b0b11b8890'
+    if (!key) return m.reply('Falta la key!')
+    await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${text.toLowerCase()}&tsyms=USD,COP&api_key={${key}}`).then(async (response) => {
+      var {USD, COP} = response.data
+    	var msg = `*Token:* ${text.toUpperCase()}\n\n*USD:* ${USD}\n*COP:* ${COP}`
+    	m.reply(msg)
+    })
+  }break
+  case 'shazam': {
+    if (/image/.test(mime)) return m.reply('*No se pueden analizar imagenes, solo audio!*')
+    if (/video/.test(mime)) return m.reply(`*No se pueden analizar videos, solo audio!\nSi quieres analizar el audio de este video primero conviertelo con el comando ${prefix}toaudio y despues si puedes usar ${prefix + command}*`)
+    const acrcloud = require("acrcloud")
+    const acr = new acrcloud({ 
+        host: "identify-eu-west-1.acrcloud.com",
+        access_key: "a7982a1f271fc390f3a69cb5bac04498",
+        access_secret: "QPbD6UOnfawRtUiH88lzKx7edUaX20I0erUWCoCW"
+    })
+    m.reply(LangG.wait)
+    let sampleq = await quoted.download()
+    acr.identify(sampleq).then(async (res) => {
+    m.reply(
+    `*Nombre:* ${res.metadata.music[0].title}\n`+
+    `*Artista:* ${res.metadata.music[0].artists[0].name}\n`+
+    `*Album:* ${res.metadata.music[0].album.name}\n`+
+    `*Fecha:* ${res.metadata.music[0].release_date}`
+    )
+    })
+  }break
 // FOR GROUPS
-  case 'pareja': {
-    if (!m.isGroup) m.reply(LangG.group)
+  case 'love': {
+    if (!m.isGroup) return m.reply(LangG.group)
     let member = participants.map(u => u.id)
     let me = m.sender
     let rnd = member[Math.floor(Math.random() * member.length)]
@@ -632,7 +653,7 @@ switch(command) {
   }
   break
   case 'inventado': {
-    if (!m.isGroup) m.reply(LangG.group)
+    if (!m.isGroup) return m.reply(LangG.group)
     let member = participants.map(u => u.id)
     let orang = member[Math.floor(Math.random() * member.length)]
     let jodoh = member[Math.floor(Math.random() * member.length)]
@@ -645,9 +666,9 @@ switch(command) {
   }
   break
   case 'mute': {
-    if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+    if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
     if (args[0] === "on") {
       myBot.groupSettingUpdate(m.chat, 'announcement')
       m.reply(`El Admin *${pushname}* ha silenciado este grupo!\nAhora sólo los administradores pueden envíar mensajes.`)
@@ -664,9 +685,9 @@ switch(command) {
   }
   break
   case 'antilink': {
-    if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+    if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
     if (args[0] === "on") {
       if (db.data.chats[m.chat].antilink) return m.reply(`Anteriormente activo`)
       db.data.chats[m.chat].antilink = true
@@ -685,41 +706,41 @@ switch(command) {
   }
   break
   case 'kick': {
-		if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+		if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'remove').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
 	case 'add': {
-		if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+		if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
 		let users = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'add').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
 	case 'promote': {
-		if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+		if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
 	case 'demote': {
-		if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+		if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
   case 'tagall': {
-    if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+    if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
 
     let ini = "╔══✪〘 *REPORTENSE* 〙✪══\n"
     let mesaj = `➲ *Mensaje:* ${q ? q : ''}\n\n`
@@ -733,14 +754,14 @@ switch(command) {
   }
   break
   case 'hdt': {
-    if (!m.isGroup) m.reply(LangG.group)
-    if (!isBotAdmins) m.reply(LangG.botAdmin)
-    if (!isAdmins) m.reply(LangG.admin)
+    if (!m.isGroup) return m.reply(LangG.group)
+    if (!isBotAdmins) return m.reply(LangG.botAdmin)
+    if (!isAdmins) return m.reply(LangG.admin)
     myBot.sendMessage(m.chat, { text: q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
   }
   break
-  case 'linkgroup': {
-    if (!m.isGroup) m.reply(LangG.group)
+  case'linkgroup': {
+    if (!m.isGroup) return m.reply(LangG.group)
     const inviteCode = await myBot.groupInviteCode(m.chat)
     const { subject } = await myBot.groupMetadata(m.chat)
     const caption = `*Nombre del Grupo:* *${subject}*\n\n*Link del grupo:* https://chat.whatsapp.com/${inviteCode}`
@@ -749,136 +770,18 @@ switch(command) {
   }
   break
 // END GROUPS
-/*
-  case 'halah': case 'hilih': case 'huluh': case 'heleh': case 'holoh':
-    if (!m.quoted && !text) m.reply(`Kirim/reply text dengan caption ${prefix + command}`)
-    ter = command[1].toLowerCase()
-    tex = m.quoted ? m.quoted.text ? m.quoted.text : q ? q : m.text : q ? q : m.text
-    m.reply(tex.replace(/[aiueo]/g, ter).replace(/[AIUEO]/g, ter.toUpperCase())
-  break
-*/
   case 'join': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!text) m.reply('Necesito el enlace de invitación!')
+    if (!isCreator) return m.reply(LangG.owner)
+    if (!text) return m.reply('Necesito el enlace de invitación!')
     if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) m.reply('Link Invalido!')
     m.reply(LangG.wait)
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     await myBot.groupAcceptInvite(result).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
   }
   break
-/*
-	case 'juzamma': {
-		if (args[0] === 'pdf') {
-	  	m.reply(LangG.wait)
-	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.pdf'}, mimetype: 'application/pdf', fileName: 'juz-amma-arab-latin-indonesia.pdf'}, {quoted:m})
-		} else if (args[0] === 'docx') {
-		  m.reply(LangG.wait)
-	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.docx'}, mimetype: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', fileName: 'juz-amma-arab-latin-indonesia.docx'}, {quoted:m})
-		} else if (args[0] === 'pptx') {
-	  	m.reply(LangG.wait)
-	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.pptx'}, mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', fileName: 'juz-amma-arab-latin-indonesia.pptx'}, {quoted:m})
-		} else if (args[0] === 'xlsx') {
-	  	m.reply(LangG.wait)
-	  	myBot.sendMessage(m.chat, {document: {url: 'https://fatiharridho.my.id/database/islam/juz-amma-arab-latin-indonesia.xlsx'}, mimetype: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileName: 'juz-amma-arab-latin-indonesia.xlsx'}, {quoted:m})
-		} else {
-	  	m.reply(`Mau format apa ? Example : ${prefix + command} pdf
-    Format yang tersedia : pdf, docx, pptx, xlsx`)
-  	}
-	}
-	break
-*/
-  case 'setcmd': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!m.quoted) m.reply('Responde un mensaje!')
-    if (!m.quoted.fileSha256) m.reply('SHA256 falta el hash')
-    if (!text) m.reply(`Que comando?`)
-    
-    let hash = m.quoted.fileSha256.toString('base64')
-    if (global.db.data.sticker[hash] && global.db.data.sticker[hash].locked) m.reply('You have no permission to change this sticker command')
-    global.db.data.sticker[hash] = {
-      text,
-      mentionedJid: m.mentionedJid,
-      creator: m.sender,
-      at: + new Date,
-      locked: false,
-    }
-    m.reply(LangG.success)
-  }
-  break
-  case 'delcmd': {
-    if (!isCreator) m.reply(LangG.owner)
-    let hash = m.quoted.fileSha256.toString('base64')
-    if (!hash) m.reply(`Falta el hash`)
-    if (global.db.data.sticker[hash] && global.db.data.sticker[hash].locked) m.reply('You have no permission to delete this sticker command')
-    delete global.db.data.sticker[hash]
-    m.reply(LangG.success)
-  }
-  break
-  case 'listcmd': {
-    if (!isCreator) m.reply(LangG.owner)
-    let teks = `
-*Lista de Hash*
-Info: *bold* hash is Locked
-${Object.entries(global.db.data.sticker).map(([key, value], index) => `${index + 1}. ${value.locked ? `*${key}*` : key} : ${value.text}`).join('\n')}
-`.trim()
-    myBot.sendText(m.chat, teks, m, { mentions: Object.values(global.db.data.sticker).map(x => x.mentionedJid).reduce((a,b) => [...a, ...b], []) })
-  }
-  break
-  case 'lockcmd': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!m.quoted) m.reply('Reply Pesan!')
-    if (!m.quoted.fileSha256) m.reply('SHA256 Hash Missing')
-    let hash = m.quoted.fileSha256.toString('base64')
-    if (!(hash in global.db.data.sticker)) m.reply('Hash not found in database')
-    global.db.data.sticker[hash].locked = !/^un/i.test(command)
-    m.reply('Done!')
-  }
-  break
-  case 'addmsg': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!m.quoted) m.reply('Responda el mensaje que quiere guardar en la base de datos')
-    if (!text) m.reply(`Ejemolo: ${prefix + command} nombre`)
-    let msgs = global.db.data.database
-    if (text.toLowerCase() in msgs) m.reply(`'${text}' ha sido guardado en la lista de mensajes`)
-    msgs[text.toLowerCase()] = quoted.fakeObj
-    m.reply(`Mensaje agregado con éxito en la lista de mensajes como '${text}'
-
-Acceder con: ${prefix}getmsg ${text}
-
-Ver lista de mensajes con ${prefix}listmsg`)
-  }
-  break
-  case 'getmsg': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!text) m.reply(`Ejemplo: ${prefix + command} nombre\n\nVer lista de mensajes con: ${prefix}listmsg`)
-    let msgs = global.db.data.database
-    if (!(text.toLowerCase() in msgs)) m.reply(`'${text}' no aparece en la lista de mensajes`)
-    myBot.copyNForward(m.chat, msgs[text.toLowerCase()], true)
-  }
-  break
-  case 'listmsg': {
-    if (!isCreator) m.reply(LangG.owner)
-    let msgs = JSON.parse(fs.readFileSync('./src/database.json'))
-	  let seplit = Object.entries(global.db.data.database).map(([nama, isi]) => { return { nama, ...isi } })
-		let teks = '「 LIST DATABASE 」\n\n'
-		for (let i of seplit) {
-		  teks += `⬡ *Nombre:* ${i.nama}\n⬡ *Tipo:* ${getContentType(i.message).replace(/Message/i, '')}\n────────────────────────\n\n`
-    }
-	  m.reply(teks)
-	}
-	break
-  case 'delmsg': case 'deletemsg': {
-    if (!isCreator) m.reply(LangG.owner)
-    let msgs = global.db.data.database
-    if (!(text.toLowerCase() in msgs)) return m.reply(`'${text}' no aparece en la lista de mensajes`)
-		delete msgs[text.toLowerCase()]
-		m.reply(`Eliminado con éxito '${text}' de la lista de mensajes`)
-  }
-	break
-
 // FOR OWNER
   case 'react': {
-    if (!isCreator) m.reply(LangG.owner)
+    if (!isCreator) return m.reply(LangG.owner)
       reactionMessage = {
         react: {
           text: args[0],
@@ -889,20 +792,20 @@ Ver lista de mensajes con ${prefix}listmsg`)
   }
   break  
 	case 'public': {
-    if (!isCreator) m.reply(LangG.owner)
+    if (!isCreator) return m.reply(LangG.owner)
     myBot.public = true
     m.reply('Sukse Change To Public Usage')
   }
   break
   case 'self': {
-    if (!isCreator) m.reply(LangG.owner)
+    if (!isCreator) return m.reply(LangG.owner)
     myBot.public = false
     m.reply('Sukses Change To Self Usage')
   }
   break
- case 'py': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!text) m.reply('a quien voy a saludar?')
+  case 'py': {
+    if (!isCreator) return m.reply(LangG.owner)
+    if (!text) return m.reply('a quien voy a saludar?')
     const pythonProcess = await spawn('python', ['saludo.py'])
     let pythonResponse = ''
 
@@ -916,7 +819,7 @@ Ver lista de mensajes con ${prefix}listmsg`)
     pythonProcess.stdin.end()
  }break
   case 'speedtest': {
-    if (!isCreator) m.reply(LangG.owner)
+    if (!isCreator) return m.reply(LangG.owner)
     m.reply('Prueba de velocidad...')
     let cp = require('child_process')
     let { promisify } = require('util')
@@ -933,19 +836,8 @@ Ver lista de mensajes con ${prefix}listmsg`)
     }
   }
   break
-case 'test': {
-  myBot.sendMessage(myBot.user.id, { text: 'Hola weee' })
-}break
-case 'session': {
-  let mySS = JSON.parse(fs.readFileSync('lib/ini.json'))
-  myBot.sendMessage(myBot.user.id,
-    { text: 'DrkBot;;;' +	Buffer.from(
-      JSON.stringify(mySS)).toString('base64')
-    }
-  )
-}break
   case 'update': {
-    if (!isCreator) m.reply(LangG.owner)
+    if (!isCreator) return m.reply(LangG.owner)
     await git.fetch();
     var commits = await git.log([Config.BRANCH + '..origin/' + Config.BRANCH]);
     if (commits.total === 0) {
@@ -961,7 +853,7 @@ case 'session': {
     }
   }break
   case 'actualizar': {
-    if (!isCreator) m.reply(LangG.owner)
+    if (!isCreator) return m.reply(LangG.owner)
     await git.fetch();
     var commits = await git.log([Config.BRANCH + '..origin/' + Config.BRANCH]);
     if (commits.total === 0) {
@@ -978,20 +870,20 @@ case 'session': {
     }
   }break
   case 'block': {
-		if (!isCreator) m.reply(LangG.owner)
+		if (!isCreator) return m.reply(LangG.owner)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'block').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
   case 'unblock': {
-		if (!isCreator) m.reply(LangG.owner)
+		if (!isCreator) return m.reply(LangG.owner)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'unblock').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 	}
 	break
   case 'bc': case 'broadcast': case 'bcall': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!text) m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
+    if (!isCreator) return m.reply(LangG.owner)
+    if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
     let anu = await store.chats.all().map(v => v.id)
     m.reply(`Enviar difusión a ${anu.length} chat.\nTiempo de envio ${anu.length * 1.5} segundos.`)
     for (let yoi of anu) {
@@ -1029,8 +921,8 @@ case 'session': {
   }
   break
   case 'bcgc': case 'bcgroup': {
-    if (!isCreator) m.reply(LangG.owner)
-    if (!text) m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
+    if (!isCreator) return m.reply(LangG.owner)
+    if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
     let getGroups = await myBot.groupFetchAllParticipating()
     let groups = Object.entries(getGroups).slice(0).map(entry => entry[1])
     let anu = groups.map(v => v.id)
@@ -1070,7 +962,7 @@ case 'session': {
   }
   break
   case 'ping': case 'status': {
-		if (!isCreator) m.reply(LangG.owner)
+		if (!isCreator) return m.reply(LangG.owner)
     const used = process.memoryUsage()
     const cpus = os.cpus().map(cpu => {
       cpu.total = Object.keys(cpu.times).reduce((last, type) => last + cpu.times[type], 0)
@@ -1124,7 +1016,6 @@ ${runtime(process.uptime())}`)
     }
   }
   break
-
 
   default:
     if (budy.startsWith('=>')) {

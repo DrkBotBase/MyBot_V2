@@ -19,8 +19,9 @@
   "author": "IanVanh.",
   "license": "MIT",
   "dependencies": {
-    "@adiwajshing/baileys": "^4.1.0",
+    "@adiwajshing/baileys": "4.2.0",
     "@adiwajshing/keyed-db": "^0.2.4",
+    "acrcloud": "^1.4.0",
     "awesome-phonenumber": "^2.64.0",
     "axios": "^0.24.0",
     "chalk": "^4.1.2",
@@ -53,6 +54,7 @@
     "request": "^2.88.2",
     "scrape-primbon": "^1.1.0",
     "simple-git": "2.37.0",
+    "supervisor": "^0.12.0",
     "util": "^0.12.4",
     "yargs": "^17.2.1",
     "yt-search": "^2.10.3",

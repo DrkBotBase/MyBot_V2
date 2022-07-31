@@ -50,7 +50,7 @@ module.exports = {
   ONLINE: process.env.ONLINE === undefined ? 'online' : process.env.ONLINE,
   READ: process.env.SEND_READ === undefined ? '' : process.env.SEND_READ,
   VERSION: process.env.VERSION === undefined ? 'V1-MD' : process.env.VERSION,
-  WORKTYPE: process.env.WORKTYPE === undefined ? 'private' : process.env.WORKTYPE
+  WORKTYPE: process.env.WORKTYPE === undefined ? 'public' : process.env.WORKTYPE
 };
 // end env
 
