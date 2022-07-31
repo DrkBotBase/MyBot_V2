@@ -4,5 +4,5 @@ config.env
 package-lock.json
 src/database.json
 test.js
-yarn-error.lock
+yarn-error.log
 yarn.lock
