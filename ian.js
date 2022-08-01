@@ -412,8 +412,8 @@ switch(command) {
       m.reply(LangG.wait)
       ytm = await yta(text)
       if(Number(ytm.size.split(' MB')[0]) >= 99.00) return myBot.sendImage(m.chat, ytm.thumb, `*Link* : ${ytm.link}\n\n🤖 Descarga no permitida por whatsapp.\nDescargalo manual.`, m)
-      myBot.sendImage(m.chat, ytm.thumb, `⭔ Título: ${ytm.title}\n⭔ Tamaño: ${ytm.size}\n⭔ Ext: ${ytm.tipe}`, m)
-      myBot.sendMessage(m.chat, { audio: { url: ytm.link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
+      await myBot.sendImage(m.chat, ytm.thumb, `⭔ Título: ${ytm.title}\n⭔ Tamaño: ${ytm.size}\n⭔ Ext: ${ytm.tipe}`, m)
+      await myBot.sendMessage(m.chat, { audio: { url: ytm.link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
     } catch {
       m.reply('🤖 Parece que tenemos un error.')
     }
@@ -448,7 +448,7 @@ switch(command) {
         buttons: buttons,
         headerType: 4
       }
-      myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+      await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
     } catch (e) { log(pint(e, 'pink')) }
   }
   break
