@@ -250,7 +250,7 @@ switch(command) {
         id: 'menu'
       }}
     ]
-    myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, btn)
+    await myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, btn)
   }
   break
   case 'menu': {
@@ -260,7 +260,7 @@ switch(command) {
       { buttonId: 'owner', buttonText: { displayText: 'OWNER' }, type: 1 },
       { buttonId: 'sc', buttonText: { displayText: 'GITHUB' }, type: 1 }
     ]
-    myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
+    await myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
   }
   break
   case 'donar':{
