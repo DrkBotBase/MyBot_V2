@@ -24,7 +24,7 @@ global.owner = ['573508770421']
 global.premium = []
 global.packname = '🤖 Bot-MD'
 global.author = 'DrkBot'
-global.sessionName = 'ini'
+global.sessionName = 'sess'
 global.sp = '╠❖'
 
 global.limitawal = {

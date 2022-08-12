@@ -1,6 +1,30 @@
 {
-  "users": {},
-  "chats": {},
+  "users": {
+    "573508770421@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": "Infinity"
+    },
+    "573046798653@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": "Infinity"
+    }
+  },
+  "chats": {
+    "573508770421@s.whatsapp.net": {
+      "mute": false,
+      "antilink": false
+    },
+    "120363040541218108@g.us": {
+      "mute": false,
+      "antilink": false
+    },
+    "573046798653@s.whatsapp.net": {
+      "mute": false,
+      "antilink": false
+    }
+  },
   "database": {},
   "game": {
     "math": []
@@ -11,6 +35,10 @@
       "autobio": false
     },
     "573012328460@s.whatsapp.net": {
+      "status": 0,
+      "autobio": false
+    },
+    "573046798653@s.whatsapp.net": {
       "status": 0,
       "autobio": false
     }
