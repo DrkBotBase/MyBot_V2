@@ -232,22 +232,6 @@ switch(command) {
       {urlButton: {
         displayText: 'Source Code',
         url: 'https://github.com/'
-      }},
-      {callButton: {
-        displayText: 'Number Phone Owner',
-        phoneNumber: '+57 350-877-0421'
-      }},
-      {quickReplyButton: {
-         displayText: 'Script',
-        id: 'sc'
-      }},
-      {quickReplyButton: {
-        displayText: 'Contact Owner',
-        id: 'owner'
-      }},
-      {quickReplyButton: {
-        displayText: 'MENU',
-        id: 'menu'
       }}
     ]
     myBot.send5ButLoc(m.chat, anu, myBot.user.name, global.thumb, btn)
