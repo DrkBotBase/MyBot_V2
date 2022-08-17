@@ -234,7 +234,7 @@ switch(command) {
         url: 'https://github.com/'
       }}
     ]
-    myBot.send5ButLoc(m.chat, anu, myBot.user.name, global.thumb, btn)
+    myBot.sendButLoc(m.chat, anu, myBot.user.name, global.thumb, btn)
   }
   break
   case 'menu': {
