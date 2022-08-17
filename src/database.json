@@ -9,6 +9,11 @@
       "afkTime": -1,
       "afkReason": "",
       "limit": "Infinity"
+    },
+    "17054132366@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": "Infinity"
     }
   },
   "chats": {
@@ -39,6 +44,10 @@
       "autobio": false
     },
     "573046798653@s.whatsapp.net": {
+      "status": 0,
+      "autobio": false
+    },
+    "17054132366@s.whatsapp.net": {
       "status": 0,
       "autobio": false
     }

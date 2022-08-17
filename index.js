@@ -7,7 +7,7 @@
 
 require('./config')
 const { default: myBotConnect, useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
-const { state, saveState } = useSingleFileAuthState(`./lib/${sessionName}.json`)
+const { state, saveState } = useSingleFileAuthState(`./${sessionName}.json`)
 const pino = require('pino')
 const { Boom } = require('@hapi/boom')
 const fs = require('fs')
@@ -281,6 +281,30 @@ async function startMybot() {
      * @param {*} options
      * @returns
      */
+     
+     /** Send List Messaage
+      *
+      *@param {*} jid
+      *@param {*} text
+      *@param {*} footer
+      *@param {*} title
+      *@param {*} butText
+      *@param [*] sections
+      *@param {*} quoted
+      */
+        myBot.sendListMsg = (jid, text = '', footer = '', title = '' , butText = '', sects = [], quoted) => {
+        let sections = sects
+        var listMes = {
+        text: text,
+        footer: footer,
+        title: title,
+        buttonText: butText,
+        sections
+        }
+        myBot.sendMessage(jid, listMes, { quoted: quoted })
+        }
+        
+        
     myBot.send5ButImg = async (jid , text = '' , footer = '', img, but = [], options = {}) =>{
       let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
       var template = generateWAMessageFromContent(jid, proto.Message.fromObject({

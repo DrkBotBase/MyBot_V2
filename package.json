@@ -1,7 +1,7 @@
 {
   "name": "DrkBot-MD",
   "version": "2.0.0",
-  "description": "Project DrkBot userbot helping to improve your Whatsapp experience.",
+  "description": "Project DrkBot helping to improve your Whatsapp experience.",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
@@ -19,7 +19,7 @@
   "author": "IanVanh.",
   "license": "MIT",
   "dependencies": {
-    "@adiwajshing/baileys": "4.2.0",
+    "@adiwajshing/baileys": "github:adiwajshing/baileys",
     "@adiwajshing/keyed-db": "^0.2.4",
     "acrcloud": "^1.4.0",
     "awesome-phonenumber": "^2.64.0",
