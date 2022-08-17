@@ -303,24 +303,64 @@ async function startMybot() {
         }
         myBot.sendMessage(jid, listMes, { quoted: quoted })
         }
+      
+      /** Resize Image
+      *
+      * @param {Buffer} Buffer (Only Image)
+      * @param {Numeric} Width
+      * @param {Numeric} Height
+      */
+      myBot.reSize = async (image, width, height) => {
+        let jimp = require('jimp')
+        var oyy = await jimp.read(image);
+        var kiyomasa = await oyy.resize(width, height).getBufferAsync(jimp.MIME_JPEG)
+        return kiyomasa
+      }
+      
+      /** Send Button 5 Location
+       *
+       * @param {*} jid
+       * @param {*} text
+       * @param {*} footer
+       * @param {*} location
+       * @param [*] button
+       * @param {*} options
+       */
+      myBot.sendButLoc = async (jid , text = '' , footer = '', lok, but = [], options = {}) =>{
+        let bb = await myBot.reSize(lok, 300, 150)
+        myBot.sendMessage(jid, { location: { jpegThumbnail: bb }, caption: text, footer: footer, templateButtons: but, ...options })
+      }
         
-        
-    myBot.send5ButImg = async (jid , text = '' , footer = '', img, but = [], options = {}) =>{
-      let message = await prepareWAMessageMedia({ image: img }, { upload: myBot.waUploadToServer })
-      var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
-        templateMessage: {
-          hydratedTemplate: {
-            imageMessage: message.imageMessage,
-            "hydratedContentText": text,
-            "hydratedFooterText": footer,
-            "hydratedButtons": but
-          }
-        }
-      }), options)
-      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
+    /** Send Button 5 Image
+     *
+     * @param {*} jid
+     * @param {*} text
+     * @param {*} footer
+     * @param {*} image
+     * @param [*] button
+     * @param {*} options
+     * @returns
+     */
+    myBot.send5ButImg = async (jid , text = '' , footer = '', img, but = [], buff, options = {}) =>{
+      myBot.sendMessage(jid, { image: img, caption: text, footer: footer, templateButtons: but, ...options })
     }
-
+    
     /** Send Button 5 Video
+     *
+     * @param {*} jid
+     * @param {*} text
+     * @param {*} footer
+     * @param {*} Video
+     * @param [*] button
+     * @param {*} options
+     * @returns
+     */
+    myBot.send5ButVid = async (jid , text = '' , footer = '', vid, but = [], buff, options = {}) =>{
+      let lol = await myBot.reSize(buf, 300, 150)
+      myBot.sendMessage(jid, { video: vid, jpegThumbnail: lol, caption: text, footer: footer, templateButtons: but, ...options })
+    }
+    
+    /** Send Button 5 Gif
      *
      * @param {*} jid
      * @param {*} text
@@ -330,44 +370,11 @@ async function startMybot() {
      * @param {*} options
      * @returns
      */
-    myBot.send5ButVid = async (jid , text = '' , footer = '', vid, but = [], options = {}) =>{
-      let message = await prepareWAMessageMedia({ video: vid }, { upload: myBot.waUploadToServer })
-      var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
-        templateMessage: {
-        hydratedTemplate: {
-        videoMessage: message.videoMessage,
-            "hydratedContentText": text,
-            "hydratedFooterText": footer,
-            "hydratedButtons": but
-          }
-        }
-      }), options)
-      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
-    }
- 
-    /** Send Button 5 Video
-     *
-     * @param {*} jid
-     * @param {*} text
-     * @param {*} footer
-     * @param {*} VideoGif
-     * @param [*] button
-     * @param {*} options
-     * @returns
-     */
-    myBot.send5ButGif = async (jid , text = '' , footer = '', gif, but = [], options = {}) =>{
-      let message = await prepareWAMessageMedia({ video: gif, gifPlayback: true }, { upload: myBot.waUploadToServer })
-      var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
-        templateMessage: {
-          hydratedTemplate: {
-            videoMessage: message.videoMessage,
-            "hydratedContentText": text,
-            "hydratedFooterText": footer,
-            "hydratedButtons": but
-          }
-        }
-      }), options)
-      myBot.relayMessage(jid, template.message, { messageId: template.key.id })
+    myBot.send5ButGif = async (jid , text = '' , footer = '', gif, but = [], buff, options = {}) =>{
+      let ahh = await myBot.reSize(buf, 300, 150)
+      let a = [1,2]
+      let b = a[Math.floor(Math.random() * a.length)]
+      myBot.sendMessage(jid, { video: gif, gifPlayback: true, gifAttribution: b, caption: text, footer: footer, jpegThumbnail: ahh, templateButtons: but, ...options })
     }
 
     /**
