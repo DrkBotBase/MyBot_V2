@@ -226,17 +226,24 @@ switch(command) {
     myBot.sendContact(m.chat, global.owner, m)
   }
   break
-  case 'alive': {
-    anu = '✪〘 *FUNCIONANDO* 〙✪'
-    let btn = [
-      {urlButton: {
-        displayText: 'Source Code',
-        url: 'https://github.com/'
-      }}
-    ]
-    myBot.sendButLoc(m.chat, anu, myBot.user.name, global.thumb, btn)
+  case 'setmenu': {
+    if (!isCreator) return m.reply(LangG.owner)
+    if (args[0] === 'image'){
+      global.typeMenu = 'image'
+      m.reply(LangG.success)
+    } else if (args[0] === 'template'){
+      global.typeMenu = 'template'
+      m.reply(LangG.success)
+    } else if (args[0] === 'location'){
+      global.typeMenu = 'location'
+      m.reply(LangG.success)
+    }
   }
   break
+  case 'alive': {
+    anu = '✪〘 *FUNCIONANDO* 〙✪'
+    myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'MENU', 'menu')
+  }break
   case 'menu': {
     anu = menu(prefix, pushname)
     let buttons = [
@@ -244,63 +251,35 @@ switch(command) {
       { buttonId: 'owner', buttonText: { displayText: 'OWNER' }, type: 1 },
       { buttonId: 'sc', buttonText: { displayText: 'GITHUB' }, type: 1 }
     ]
-    await myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
+
+    let btn = [
+      {urlButton: {
+        displayText: 'Source Code',
+        url: 'https://github.com/ianvanh'
+      }},
+      {callButton: {
+        displayText: 'Number Phone Owner',
+        phoneNumber: `+${global.owner}`
+      }},
+      {quickReplyButton: {
+        displayText: 'Menu',
+        id: 'menu'
+      }},
+      {quickReplyButton: {
+        displayText: 'Contact Owner',
+        id: 'owner'}},
+      {quickReplyButton: {
+          displayText: 'GitHub',
+          id: 'sc'}}
+    ]
+    if(global.typeMenu === 'image') {
+      myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
+    } else if(global.typeMenu === 'template') {
+      myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, btn)
+    } else if(global.typeMenu === 'location') {
+      myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'MENU', 'menu')
+    }
   }
-  break
-  /*case 'setmenu': {
-    if (!isCreator) throw mess.owner
-    let setbot = db.data.settings[botNumber]
-    if (args[0] === 'templateImage'){
-                setbot.templateImage = true
-                setbot.templateVideo = false
-                setbot.templateGif = false
-                setbot.templateMsg = false
-                setbot.templateLocation = false
-                m.reply(mess.success)
-    } else if (args[0] === 'templateVideo'){
-                setbot.templateImage = false
-                setbot.templateVideo = true
-                setbot.templateGif = false
-                setbot.templateMsg = false
-                setbot.templateLocation = false
-                m.reply(mess.success)
-    } else if (args[0] === 'templateGif'){
-                setbot.templateImage = false
-                setbot.templateVideo = false
-                setbot.templateGif = true
-                setbot.templateMsg = false
-                setbot.templateLocation = false
-                m.reply(mess.success)
-    } else if (args[0] === 'templateMessage'){
-                setbot.templateImage = false
-                setbot.templateVideo = false
-                setbot.templateGif = false
-                setbot.templateMsg = true
-                setbot.templateLocation = false
-                m.reply(mess.success)
-    } else if (args[0] === 'templateLocation'){
-                setbot.templateImage = false
-                setbot.templateVideo = false
-                setbot.templateGif = false
-                setbot.templateMsg = false
-                setbot.templateLocation = true
-                m.reply(mess.success)
-    } else {
-                let sections = [
-                {
-                title: "CHANGE MENU BOT",
-                rows: [
-                {title: "Template Image", rowId: `setmenu templateImage`, description: `Change menu bot to Template Image`},
-                {title: "Template Video", rowId: `setmenu templateVideo`, description: `Change menu bot to Template Video`},
-                {title: "Template Gif", rowId: `setmenu templateGif`, description: `Change menu bot to Template Gif`},
-                {title: "Template Message", rowId: `setmenu templateMessage`, description: `Change menu bot to Template Message`},
-                {title: "Template Location", rowId: `setmenu templateLocation`, description: `Change menu bot to Template Location`}
-                ]
-                },
-                ]
-                myBot.sendListMsg(m.chat, `Please select the menu you want to change!`, myBot.user.name, `Hello Owner !`, `Click Here`, sections, m)
-                }
-  }*/
   break
   case 'donar':{
     txtt = `Hola *${pushname}*\nVEO QUE QUIERES DONAR\nPuedes hacerlo por medio de las siguientes formas disponibles`

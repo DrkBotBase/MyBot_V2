@@ -26,6 +26,7 @@ global.packname = '🤖 Bot-MD'
 global.author = 'DrkBot'
 global.sessionName = 'sess'
 global.sp = '╠❖'
+global.typeMenu = 'image'
 
 global.limitawal = {
     premium: "Infinity",
@@ -49,6 +50,7 @@ module.exports = {
   MSG_CONSOLE: process.env.MSG_CONSOLE === undefined ? '' : process.env.MSG_CONSOLE,
   ONLINE: process.env.ONLINE === undefined ? 'online' : process.env.ONLINE,
   READ: process.env.SEND_READ === undefined ? '' : process.env.SEND_READ,
+  SESSION: process.env.SESSION === undefined ? `${sessionName}.json` : process.env.SESSION,
   VERSION: process.env.VERSION === undefined ? 'V1-MD' : process.env.VERSION,
   WORKTYPE: process.env.WORKTYPE === undefined ? 'public' : process.env.WORKTYPE
 };

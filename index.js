@@ -7,7 +7,8 @@
 
 require('./config')
 const { default: myBotConnect, useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
-const { state, saveState } = useSingleFileAuthState(`./${sessionName}.json`)
+const Config = require('./config');
+const { state, saveState } = useSingleFileAuthState(Config.SESSION)
 const pino = require('pino')
 const { Boom } = require('@hapi/boom')
 const fs = require('fs')
@@ -19,7 +20,6 @@ const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
 const { smsg, isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('./lib/myfunc')
 const { log, pint, bgPint } = require('./lib/colores');
-const Config = require('./config');
 
 var low
 try {
@@ -270,17 +270,6 @@ async function startMybot() {
         return myBot.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options}, { quoted: quoted, ...options })
       }
     }
-
-    /** Send Button 5 Image
-     *
-     * @param {*} jid
-     * @param {*} text
-     * @param {*} footer
-     * @param {*} image
-     * @param [*] button
-     * @param {*} options
-     * @returns
-     */
      
      /** Send List Messaage
       *
@@ -292,17 +281,17 @@ async function startMybot() {
       *@param [*] sections
       *@param {*} quoted
       */
-        myBot.sendListMsg = (jid, text = '', footer = '', title = '' , butText = '', sects = [], quoted) => {
+      myBot.sendListMsg = (jid, text = '', footer = '', title = '' , butText = '', sects = [], quoted) => {
         let sections = sects
         var listMes = {
-        text: text,
-        footer: footer,
-        title: title,
-        buttonText: butText,
-        sections
+          text: text,
+          footer: footer,
+          title: title,
+          buttonText: butText,
+          sections
         }
         myBot.sendMessage(jid, listMes, { quoted: quoted })
-        }
+      }
       
       /** Resize Image
       *
@@ -317,18 +306,22 @@ async function startMybot() {
         return kiyomasa
       }
       
-      /** Send Button 5 Location
-       *
-       * @param {*} jid
-       * @param {*} text
-       * @param {*} footer
-       * @param {*} location
-       * @param [*] button
-       * @param {*} options
-       */
-      myBot.sendButLoc = async (jid , text = '' , footer = '', lok, but = [], options = {}) =>{
-        let bb = await myBot.reSize(lok, 300, 150)
-        myBot.sendMessage(jid, { location: { jpegThumbnail: bb }, caption: text, footer: footer, templateButtons: but, ...options })
+    /** Send Button 5 Message
+     * 
+     * @param {*} jid
+     * @param {*} text
+     * @param {*} footer
+     * @param {*} button
+     * @returns 
+     */
+      myBot.send5ButMsg = (jid, text = '' , footer = '', but = []) =>{
+        let templateButtons = but
+        var templateMessage = {
+          text: text,
+          footer: footer,
+          templateButtons: templateButtons
+        }
+        myBot.sendMessage(jid, templateMessage)
       }
         
     /** Send Button 5 Image
@@ -395,6 +388,25 @@ async function startMybot() {
             ...options
         }
         myBot.sendMessage(jid, buttonMessage, { quoted, ...options })
+    }
+      
+    myBot.sendButtonLoc = async (jid, buffer, content, footer, butname, rowname, quoted, options = {}) => {
+		  let bb = await myBot.reSize(buffer, 300, 150)
+		  let buttons = [
+		    {buttonId: rowname, buttonText: {displayText: butname}, type: 1}
+		  ]
+		  let buttonMessage = {
+		    location: { jpegThumbnail: bb },
+        caption: content,
+        footer: footer,
+        buttons: buttons,
+        headerType: 6
+		  }
+      return await myBot.sendMessage(jid, buttonMessage, {
+        quoted,
+        upload: myBot.waUploadToServer,
+        ...options
+      })
     }
 
     /**
@@ -684,6 +696,14 @@ async function startMybot() {
             data
         }
 
+    }
+    
+    /**
+     * Parses string into mentionedJid(s)
+     * @param {String} text
+     */
+    myBot.parseMention = (text = '') => {
+        return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
     }
 
     return myBot
