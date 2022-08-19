@@ -16,6 +16,11 @@
       "required": true,
       "value": "false"
     },
+    "SESSION": {
+      "description": "Dirección de SESSION externa.",
+      "required": true,
+      "value": ""
+    },
     "WORKTYPE": {
       "description": "Forma de usar el BOT. Si usa public los demas pueden usar el BOT, si usa private solo usted podra usarlo",
       "required": true,
