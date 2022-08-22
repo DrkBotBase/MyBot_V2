@@ -19,7 +19,7 @@
   "author": "IanVanh.",
   "license": "MIT",
   "dependencies": {
-    "@adiwajshing/baileys": "github:DrkBotBase/Baileys",
+    "@adiwajshing/baileys": "^4.4.0",
     "@adiwajshing/keyed-db": "^0.2.4",
     "acrcloud": "^1.4.0",
     "awesome-phonenumber": "^2.64.0",
