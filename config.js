@@ -23,7 +23,7 @@ global.APIKeys = {
 global.owner = ['573508770421']
 global.premium = []
 global.author = 'DrkBot'
-global.sessionName = 'sess'
+global.sessionName = 'sess304'
 global.sp = '╠❖'
 global.typeMenu = 'image'
 
@@ -49,7 +49,7 @@ module.exports = {
   MSG_CONSOLE: process.env.MSG_CONSOLE === undefined ? '' : process.env.MSG_CONSOLE,
   ONLINE: process.env.ONLINE === undefined ? 'online' : process.env.ONLINE,
   READ: process.env.SEND_READ === undefined ? '' : process.env.SEND_READ,
-  SESSION: process.env.SESSION === undefined ? global.sessionName : process.env.SESSION,
+  SESSION: process.env.SESSION === undefined ? `${global.sessionName}.json` : `${process.env.SESSION}.json`,
   VERSION: process.env.VERSION === undefined ? 'V1-MD' : process.env.VERSION,
   WORKTYPE: process.env.WORKTYPE === undefined ? 'public' : process.env.WORKTYPE
 };
