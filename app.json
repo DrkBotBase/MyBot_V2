@@ -1,14 +1,24 @@
 {
-	"name": "MyBot_V2",
-	"description": "DarkBot project - Makes it easy and fun to use Whatsapp..",
+  "name": "MyBot_V2",
+  "description": "DarkBot project - Makes it easy and fun to use Whatsapp..",
   "logo": "https://raw.githubusercontent.com/DrkBotBase/MyBot_V1/master/media/gif/PicsArt_07-18-06.46.26.jpg",
   "repository": "https://github.com/DrkBotBase",
   "keywords": ["whatsapp", "userbot", "DrkBox-MD", "bot", "api", "ai"],
   "stack": "container",
   "env": {
+    "PASSWORD": {
+      "description": "Key de SESSION.",
+      "required": true,
+      "value": ""
+    },
+    "BOT_NAME": {
+      "description": "Nombre del BOT.",
+      "required": false,
+      "value": ""
+    },
     "VERSION": {
       "description": "Version Global By: Ian",
-      "required": true,
+      "required": false,
       "value": "V1-MD"
     },
     "SEND_READ": {
@@ -16,10 +26,15 @@
       "required": true,
       "value": "false"
     },
-    "SESSION": {
-      "description": "Dirección de SESSION externa.",
+    "LOG_ERR": {
+      "description": "true o false si quieres que el BOT te avise de errores ocurridos.",
       "required": true,
-      "value": ""
+      "value": "true"
+    },
+    "MSG_CONSOLE": {
+      "description": "true o false si quiere que el BOT muestre por consola.",
+      "required": false,
+      "value": "false"
     },
     "WORKTYPE": {
       "description": "Forma de usar el BOT. Si usa public los demas pueden usar el BOT, si usa private solo usted podra usarlo",
