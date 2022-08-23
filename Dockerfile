@@ -14,6 +14,7 @@ COPY package.json .
 
 RUN npm install -g npm@8.17.0
 RUN npm install supervisor -g
+RUN npm install
 
 COPY . .
 
