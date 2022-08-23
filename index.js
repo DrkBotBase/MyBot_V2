@@ -6,7 +6,8 @@
 */
 
 require('./config')
-const { default: myBotConnect, useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
+const { default: myBotConnect, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
+const { useSingleFileAuthState } = require('./lib/use-single-file-auth-state')
 const Config = require('./config');
 const { state, saveState } = useSingleFileAuthState(`./${Config.SESSION}.json`)
 const pino = require('pino')
