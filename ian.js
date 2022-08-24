@@ -18,8 +18,6 @@ const { JSDOM } = require('jsdom')
 const speed = require('performance-now')
 const { performance } = require('perf_hooks')
 const gis = require('g-i-s')
-const { Primbon } = require('scrape-primbon')
-const primbon = new Primbon()
 const simpleGit = require('simple-git')
 const git = simpleGit()
 const { smsg, formatp, tanggal, formatDate, getTime, isUrl, sleep, clockString, runtime, fetchJson, getBuffer, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
@@ -311,6 +309,11 @@ switch(command) {
       let media = await quoted.download()
       let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: name, author: global.author })
       await fs.unlinkSync(encmedia)
+     } else if (/webp/.test(mime)) {
+      m.reply(LangG.wait)
+      let media = await quoted.download()
+      let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: name, author: global.author })
+      await fs.unlinkSync(encmedia)
     } else if (/video/.test(mime)) {
       m.reply(LangG.wait)
       if ((quoted.msg || quoted).seconds > 11) return m.reply('Máximo 10 segundos!')
@@ -369,6 +372,20 @@ switch(command) {
     await fs.unlinkSync(media)
   }
   break
+  case 'tourl': {
+    m.reply(LangG.wait)
+		let { UploadFileUgu, webp2mp4File, TelegraPh } = require('./lib/uploader')
+    let media = await myBot.downloadAndSaveMediaMessage(quoted)
+    if (/image/.test(mime)) {
+    let anu = await TelegraPh(media)
+      m.reply(util.format(anu))
+    } else if (!/image/.test(mime)) {
+      let anu = await UploadFileUgu(media)
+      m.reply(util.format(anu))
+    }
+    await fs.unlinkSync(media)
+  }
+  break
   case 'emojimix': {
     if (!text) return m.reply(`*Ejemplo:* ${prefix + command} 😅+🤔`)
     let [emoji1, emoji2] = text.split`+`
@@ -377,6 +394,37 @@ switch(command) {
       let encmedia = await myBot.sendImageAsSticker(m.chat, res.url, m, { packname: botName, author: global.author, categories: res.tags })
       await fs.unlinkSync(encmedia)
 		}
+	}
+	break
+	case 'attp': case 'ttp': {d
+    if (!text) return m.reply(`Ejemplo: ${prefix + command} text`)
+    await myBot.sendMedia(m.chat, `https://xteam.xyz/${command}?file&text=${text}`, 'Bot', 'MD', m, {asSticker: true})
+  }
+  break
+  case 'removebg': {
+    if (!/image/.test(mime)) return m.reply(`Responder solo imagen ${prefix + command}`)
+    let { removeBackgroundFromImageFile, RemoveBgError } = require('remove.bg')
+    let apirnobg = ['HBbdxnge4BVXJwqhcAHqVC', 'uHUYM1Wo4QcrFsqGbWoMr2zi', 'qySfrLUKRQejaMoJ54LHpShB']
+    let apinobg = apirnobg[Math.floor(Math.random() * apirnobg.length)]
+    hmm = await './src/remobg-'+getRandom('')
+    localFile = await myBot.downloadAndSaveMediaMessage(quoted, hmm)
+    outputFile = await './src/hremo-'+getRandom('.png')
+    m.reply(LangG.wait)
+    removeBackgroundFromImageFile({
+      path: localFile,
+      apiKey: apinobg,
+      size: "regular",
+      type: "auto",
+      scale: "100%",
+      outputFile 
+    }).then(async (result) => {
+      myBot.sendMessage(m.chat, {image: fs.readFileSync(outputFile), caption: LangG.success}, { quoted : m })
+      await fs.unlinkSync(localFile)
+      await fs.unlinkSync(outputFile)
+    }).catch((error) => {
+      fs.unlinkSync(localFile)
+      if(error[0].code === 'insufficient_credits') return m.reply('Cambiar ApiKey!')
+    });
 	}
 	break
   case 'bass': case 'blown': case 'deep': case 'earrape': case 'fast': case 'fat': case 'nightcore': case 'reverse': case 'robot': case 'slow': case 'smooth': case 'tupai':
@@ -411,7 +459,7 @@ switch(command) {
     }
   break
 // DOWNLOADS
-  case 'yt': {
+  case 'yts': {
     if (!text) return m.reply(`Que deseas busacar?\n*Ejemplo:* ${prefix + command} Blinding Live`)
     try {
       let yts = require("yt-search")
@@ -448,6 +496,33 @@ switch(command) {
     } catch {
       m.reply('🤖 Parece que tenemos un error.')
     }
+  }
+  break
+  case 'getmusic': {
+    let { yta } = require('./lib/y2mate')
+    if (!text) return m.reply(`Ejemplo: ${prefix + command} 1`)
+    if (!m.quoted) return m.reply('Responde lista obtenida de yts')
+    if (!m.quoted.isBaileys) return m.reply(`Solo puedo responder a mensajes enviados por mi.`)
+		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
+    if (!urls) return m.reply('Responde lista obtenida de yts')
+    let quality = args[1] ? args[1] : '128kbps'
+    let media = await yta(urls[text - 1], quality)
+    if (media.filesize >= 100000) return m.reply('Archivo excede el limite '+util.format(media))
+    myBot.sendImage(m.chat, media.thumb, `⭔ Título: ${media.title}\n⭔ Tamaño: ${media.filesizeF}\n⭔ Url: ${urls[text - 1]}\n⭔ Ext : MP3\n⭔ Resolución: ${args[1] || '128kbps'}`, m)
+    myBot.sendMessage(m.chat, { audio: { url: media.dl_link }, mimetype: 'audio/mpeg', fileName: `${media.title}.mp3` }, { quoted: m })
+  }
+  break
+  case 'getvideo': {
+    let { ytv } = require('./lib/y2mate')
+    if (!text) return m.reply(`Ejemplo: ${prefix + command} 1`)
+    if (!m.quoted) return m.reply('Responde lista obtenida de yts')
+    if (!m.quoted.isBaileys) return m.reply(`Solo puedo responder a mensajes enviados por mi.`)
+		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
+    if (!urls) return m.reply('Responde lista obtenida de yts')
+    let quality = args[1] ? args[1] : '360p'
+    let media = await ytv(urls[text - 1], quality)
+    if (media.filesize >= 100000) return m.reply('Archivo excede el limite '+util.format(media))
+    myBot.sendMessage(m.chat, { video: { url: media.dl_link }, mimetype: 'video/mp4', fileName: `${media.title}.mp4`, caption: `⭔ Título: ${media.title}` }, { quoted: m })
   }
   break
   case 'wallpaper': {

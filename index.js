@@ -7,7 +7,7 @@
 
 require('./config')
 const { default: myBotConnect, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
-const { useSingleFileAuthState } = require('./lib/use-single-file-auth-state')
+const { useSingleFileAuthState } = require('./lib/s-auth-state')
 const Config = require('./config');
 const { state, saveState } = useSingleFileAuthState(`./${Config.SESSION}.json`)
 const pino = require('pino')
@@ -591,7 +591,7 @@ async function startMybot() {
        if (options.asSticker || /webp/.test(mime)) {
         let { writeExif } = require('./lib/exif')
         let media = { mimetype: mime, data }
-        pathFile = await writeExif(media, { packname: options.packname ? options.packname : global.packname, author: options.author ? options.author : global.author, categories: options.categories ? options.categories : [] })
+        pathFile = await writeExif(media, { packname: options.packname ? options.packname : global.packname, author: options.author ? options.author : Config.BOT_NAME, categories: options.categories ? options.categories : [] })
         await fs.promises.unlink(filename)
         type = 'sticker'
         mimetype = 'image/webp'
