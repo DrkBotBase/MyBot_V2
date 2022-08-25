@@ -34,7 +34,7 @@ ${p} ${prefix}love
 ${p} ${prefix}tagall
 ${p} ${prefix}hidetag
 ╠══✪〘 *UTILIDADES* 〙✪══
-${p} ${prefix}yt
+${p} ${prefix}yts
 ${p} ${prefix}song
 ${p} ${prefix}video
 ${p} ${prefix}getmusic
