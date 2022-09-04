@@ -1,8 +1,8 @@
 const moment = require('moment-timezone');
 
-const menu = (prefix, pushname) => {
+const menu = (prefix, pushname, botName) => {
  
-	var time = moment().tz('America/Bogota').format('HH:mm:ss')
+	var time = moment().tz(global.timeZone).format('HH:mm:ss')
 	if(time < "05:00:00"){var saludo = 'Es muy temprano, duerme un poco mas.'}
 	else if(time < "12:00:00"){var saludo = 'Buenos Dias'}
 	else if(time < "19:00:00"){var saludo = 'Buenas Tardes'}
@@ -10,7 +10,7 @@ const menu = (prefix, pushname) => {
 
 	let p = global.sp
 	
-	return `══✪〘 *DrkBot* 〙✪══
+	return `══✪〘 *${botName}* 〙✪══
 
 Hola ${pushname} ${saludo}
 
@@ -32,13 +32,16 @@ ${p} ${prefix}unmute
 ${p} ${prefix}linkgroup
 ${p} ${prefix}love
 ${p} ${prefix}tagall
-${p} ${prefix}hidetag
+${p} ${prefix}hdt
 ╠══✪〘 *UTILIDADES* 〙✪══
+${p} ${prefix}play
 ${p} ${prefix}yts
 ${p} ${prefix}song
 ${p} ${prefix}video
 ${p} ${prefix}getmusic
 ${p} ${prefix}getvideo
+${p} ${prefix}fbdl
+${p} ${prefix}ttdl
 ${p} ${prefix}sticker
 ${p} ${prefix}toaudio
 ${p} ${prefix}tomp4
@@ -48,6 +51,9 @@ ${p} ${prefix}tourl
 ${p} ${prefix}emojimix
 ${p} ${prefix}ttp
 ${p} ${prefix}attp
+${p} ${prefix}trt
+${p} ${prefix}waifu
+${p} ${prefix}neko
 ${p} ${prefix}img
 ${p} ${prefix}wallpaper
 ${p} ${prefix}2wallpaper

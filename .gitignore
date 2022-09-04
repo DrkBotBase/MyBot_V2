@@ -1,5 +1,5 @@
 config.env
-lib/validate.bak
 node_modules/
 src/database.json
+sess304.json
 yarn.lock

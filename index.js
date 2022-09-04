@@ -391,13 +391,13 @@ async function startMybot() {
         myBot.sendMessage(jid, buttonMessage, { quoted, ...options })
     }
       
-    myBot.sendButtonLoc = async (jid, buffer, content, footer, butname, rowname, quoted, options = {}) => {
-		  let bb = await myBot.reSize(buffer, 300, 150)
+    myBot.sendButtonLoc = async (jid, path, content, footer, butname, rowname, quoted, options = {}) => {
+		  let buffer = await myBot.reSize(path, 300, 150)
 		  let buttons = [
 		    {buttonId: rowname, buttonText: {displayText: butname}, type: 1}
 		  ]
 		  let buttonMessage = {
-		    location: { jpegThumbnail: bb },
+		    location: { jpegThumbnail: buffer },
         caption: content,
         footer: footer,
         buttons: buttons,

@@ -9,9 +9,141 @@
       "NEW_UPDATE": "*Hay una nueva actualización disponible para el bot!*\n\nCambios:\n```",
       "UPDATED_LOCAL": "*La actualización fue exitosa!"
     },
+    "alive": {
+      "msg": "✪〘 *FUNCIONANDO* 〙✪"
+    },
+    "sticker": {
+      "quot": "Responder video/imagen\n{} nombre sticker",
+      "time_wait": "Máximo 10 segundos!",
+      "end": "Responder video/imagen\n{} nombre sticker\nDuración del video 1-10 segundos"
+    },
+    "to_audio": {
+      "quot": "*Responde un video*",
+      "q_audio": "*Solo responde a videos y audios*"
+    },
+    "to_mp4": {
+      "quot": "*Responde un sticker*",
+      "q_video": "*Solo responde a videos*"
+    },
+    "to_img": {
+      "quot": "*Responde un sticker*",
+      "q_img": "*Solo responde a stickers*"
+    },
+    "to_gif": {
+      "quot": "*Responder Video/Sticker*",
+      "q_gif": "*Solo responde a Video/Stickers*"
+    },
+    "emojimix": {
+      "msg": "*Ejemplo:* {} 😅+🤔"
+    },
+    "attp": {
+      "msg": "*Ejemplo:* {} texto"
+    },
+    "trt": {
+      "quot": "*Reeponde un texto*",
+      "from": "*Idioma:* ",
+      "to": "*Idioma traducido:* ",
+      "res": "*Resultado:* "
+    },
+    "removebg": {
+      "msg": "*Solo responde una imagen*\n*Ejemplo:* {}",
+      "err": "Intenta nuevamente y si persiste contacta al creador."
+    },
+    "voz_modify": {
+      "msg": "Responde el audio que desea modificar."
+    },
+    "play": {
+      "msg": "Que deseas buscar?\n*Ejemplo:* {} Blinding Live"
+    },
+    "ttdl": {
+      "msg": "Que deseas buscar?\n*Ejemplo:* {} url tiktok"
+    },
+    "yts": {
+      "msg": "Que deseas buscar?\n*Ejemplo:* {} Blinding Live",
+      "res": "*Resultado de:*"
+    },
+    "song": {
+      "msg": "*Necesito el link.*\nEjemplo: {}song https://youtu.be/Z6L4u2i97Rw",
+      "big_size": "🤖 Tamaño maximo de descarga excedido.\nDescargalo manual.\n\n*Link:* {}",
+      "no_size": "🤖 No encuentro el tamaño de ese audio, intenta con otro :)",
+      "caption": "Título: {}\nTamaño: {}\nExt: {}"
+    },
+    "video": {
+      "msg": "*Necesito el link.*\nEjemplo: {}video https://youtu.be/KRaWnd3LJfs",
+      "big_size": "🤖 Tamaño maximo de descarga excedido.\nDescargalo manual.\n\n*Link:* {}",
+      "no_size": "🤖 No encuentro el tamaño de ese video, intenta con otro :)",
+      "caption": "Título: {}"
+    },
+    "get_down": {
+      "msg": "*Ejemplo:* {} 1",
+      "quot": "*Responde lista obtenida de yts*",
+      "no_me": "Solo es valido el mensaje recibido de yts."
+    },
+    "fbdl": {
+      "msg": "*Necesito el link.*\nEjemplo: {}fbdl https://fb.watch/f8zZ2rkjC_/"
+    },
+    "img": {
+      "msg": "Que deseas buscar?\nEjemplo: {} robots"
+    },
+    "calc": {
+      "msg": "que operación matematica deseas realizar?",
+      "err": "Formato incorrecto, solo 0-9 y Símbolos soportados -, +, *, /, ×, ÷, π, e, (, )"
+    },
+    "binary": {
+      "encode": "Enviar/responder texto {} Hola",
+      "decode": "Enviar/responder texto codificado {} 01001000 01101111 01101100 01100001"
+    },
+    "ia": {
+      "msg": "🤖 *Si aquí estoy*",
+      "name": "mi nombre es {}"
+    },
+    "bin": {
+      "msg": "Necesito el BIN"
+    },
+    "exchange": {
+      "msg": "Ingresa divisas y valor a convertir.\n*Ejemplo:* usd,cop,1",
+      "err": "Hay un error, Ejemplo: *usd,cop,1*"
+    },
+    "shazam": {
+      "image": "*No se pueden analizar imagenes, solo audio!*",
+      "video": "*No se pueden analizar videos, solo audio!*\nSi quieres analizar el audio de este video primero conviertelo con el comando *toaudio* y despues si puedes usar *{}*"
+    },
+    "mute": {
+      "on": "El Admin *{}* ha silenciado este grupo!\nAhora sólo los administradores pueden envíar mensajes.",
+      "off": "El Admin *{}* ha abierto este grupo!\nAhora todos pueden envíar mensajes."
+    },
+    "antilink": {
+      "on": "*Antilink Activado.*",
+      "off": "*Antilink Desactivado.*",
+      "own": "Señor creador, pará usted no hay restricciones.",
+      "admin": "Te he detectado enviando enlaces, pero como eres Admin pos no hay problema 😅",
+      "detect": "Link de éste grupo detectado.",
+      "msg": "「 ANTI LINK 」\n\n😧 te he detectado enviando un enlace de grupo, lo sentimos, serás expulsado!"
+    },
+    "group":{
+      "add": "El usuario {} ha sido agregado al grupo.",
+      "kick": "El usuario {} ha sido expulsado del grupo.",
+      "prom": "El usuario {} ahora es admin.",
+      "dem": "El usuario {} ya no es admin.",
+      "tag": {
+        "msg_a": "REPORTENSE",
+        "msg_b": "Mensaje"
+      },
+      "link_grup": "*Nombre del Grupo:*\n*{}*\n\n*Link del grupo:*\nhttps://chat.whatsapp.com/{}"
+    },
+    "own": {
+      "join" :{
+        "link": "Necesito el enlace de invitación!",
+        "link_err": "Link Invalido!",
+        "ok": "🤖 BOT añadido con exito.",
+        "err": "🤖 BOT no añadido."
+      },
+      "self": "Solo tu puedes usar el Bot",
+      "public": "Ahora todos pueden usar el Bot."
+    },
     "global": {
-      "by": "Hecho por *DrkBot*",
-      "success": "✓ Éxito",
+      "by": "Hecho por {}",
+      "success": "✓ Funcion realizada con exito.",
       "admin": "Funciones solo para administradores del grupo!",
       "botAdmin": "El bot debe ser administrador!",
       "owner": "Funciones especiales del propietario del bot.",
@@ -19,7 +151,11 @@
       "private": "Funciones solo para chat privado!",
       "bot": "Funciones solo para el usuario del número del bot",
       "wait": "Un momento...",
-      "endLimit": "Su límite diario ha expirado, el límite se restablecerá cada 12 horas"
+      "endLimit": "Su límite diario ha expirado, el límite se restablecerá cada 12 horas",
+      "err" : "🤖 Parece que tenemos un error.\nIntenta nuevamente."
+    },
+    "sc": {
+      "msg": "No olvides dar estrellas"
     },
     "err": {
       "msgReport": "REPORTE DE ERROR"

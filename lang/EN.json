@@ -1,28 +1,164 @@
 {
   "__JSON__": true,
-  "LANGUAGE": "Español",
+  "LANGUAGE": "English",
   "LANGCODE": "en",
   "AUTHOR": "Ian VanH",
   "STRINGS": {
     "updater": {
-      "UPDATE": "*Your bot is completely updated!*",
-      "NEW_UPDATE": "*There is a new update available for the bot!*\n\n*Changes:*\n```",
+      "UPDATE": "*Your bot is completely up to date!*",
+      "NEW_UPDATE": "*There is a new update available for the bot!*\n\nChanges:\n```",
       "UPDATED_LOCAL": "*The update was successful!*"
     },
+    "alive": {
+      "msg": "✪〘 *WORKING* 〙✪"
+    },
+    "sticker": {
+      "quot": "Answer video/image\n{} name sticker",
+      "time_wait": "Maximum 10 seconds!",
+      "end": "Answer video/image\n{} name sticker\nVideo length 1-10 seconds"
+    },
+    "to_audio": {
+      "quot": "*Answer a video*",
+      "q_audio": "*Only responds to videos and audios*"
+    },
+    "to_mp4": {
+      "quot": "*A sticker responds*",
+      "q_video": "*Only respond to videos*"
+    },
+    "to_img": {
+      "quot": "*A sticker responds*",
+      "q_img": "*Only respond to stickers*"
+    },
+    "to_gif": {
+      "quot": "*Answer Video/Sticker*",
+      "q_gif": "*Only respond to Video/Stickers*"
+    },
+    "emojimix": {
+      "msg": "*Example:* {} 😅+🤔"
+    },
+    "attp": {
+      "msg": "*Example:* {} texto"
+    },
+    "trt": {
+      "quot": "*Reply a text*",
+      "from": "*Language:* ",
+      "to": "*Translated language:* ",
+      "res": "*Result:* "
+    },
+    "removebg": {
+      "msg": "*Only answer pictures*\n*Example:* {}",
+      "err": "Try again and if it persists contact the creator."
+    },
+    "voz_modify": {
+      "msg": "Answer the audio you want to modify."
+    },
+    "play": {
+      "msg": "What do you want to search?\n*Example:* {} Blinding Live"
+    },
+    "ttdl": {
+      "msg": "What do you want to search?\n*Example:* {} url tiktok"
+    },
+    "yts": {
+      "msg": "What do you want to search?\n*Example:* {} Blinding Live",
+      "res": "*Result of:*"
+    },
+    "song": {
+      "msg": "*I need the link.*\nExample: {}song https://youtu.be/Z6L4u2i97Rw",
+      "big_size": "🤖 Maximum download size exceeded.\nDownload manual.\n\n*Link:* {}",
+      "no_size": "🤖 I can't find the size of that audio, try another :)",
+      "caption": "Title: {}\nSize: {}\nExt: {}"
+    },
+    "video": {
+      "msg": "*I need the link.*\nExample: {}video https://youtu.be/KRaWnd3LJfs",
+      "big_size": "🤖 Maximum download size exceeded.\nDownload manual.\n\n*Link:* {}",
+      "no_size": "🤖 I can't find the size of that video, try another :)",
+      "caption": "Title: {}"
+    },
+    "get_down": {
+      "msg": "*Example:* {} 1",
+      "quot": "*Reply list obtained from yts*",
+      "no_me": "Only the message received from yts is valid."
+    },
+    "fbdl": {
+      "msg": "*I need the link.*\nExample: {}fbdl https://fb.watch/f8zZ2rkjC_/"
+    },
+    "img": {
+      "msg": "What do you want to search?\nExample: {} robots"
+    },
+    "calc": {
+      "msg": "What mathematical operation do you want to perform?",
+      "err": "Wrong format, only 0-9 and Symbols supported -, +, *, /, ×, ÷, π, e, (, )"
+    },
+    "binary": {
+      "encode": "Send/reply text {} Hola",
+      "decode": "Reply encrypted text"
+    },
+    "ia": {
+      "msg": "🤖 *yes, here I am*",
+      "name": "my name is {}"
+    },
+    "bin": {
+      "msg": "I need the BIN"
+    },
+    "exchange": {
+      "msg": "Enter currencies and value to convert.\n*Example:* usd,cop,1",
+      "err": "There is an error, Example: *usd,cop,1*"
+    },
+    "shazam": {
+      "image": "*Images cannot be analyzed, only audio!*",
+      "video": "*Videos cannot be analyzed, only audio!*\nIf you want to analyze the audio of this video, first convert it with the *toaudio* command and then if you can use *{}*"
+    },
+    "mute": {
+      "on": "The Admin *{}* has silenced this group!\nNow only administrators can send messages.",
+      "off": "The Admin *{}* has opened this group!\nNow everyone can send messages."
+    },
+    "antilink": {
+      "on": "*Antilink Activated.*",
+      "off": "*Antilink Disabled.*",
+      "own": "Mr. Creator, for you there are no restrictions.",
+      "admin": "I have detected you by sending links, but since you are admin there is no problem 😅",
+      "detect": "if it is the link of this group no problem.",
+      "msg": "「 ANTI LINK 」\n\n😧 I have detected you by sending a group link, we are sorry, you will be expelled!"
+    },
+    "group":{
+      "add": "User {} has been added to the group.",
+      "kick": "User {} has been kicked out of the group.",
+      "prom": "The user {} is now admin.",
+      "dem": "User {} is no longer admin.",
+      "tag": {
+        "msg_a": "Hi everyone",
+        "msg_b": "Message"
+      },
+      "link_grup": "*Group name:*\n*{}*\n\n*Group link:*\nhttps://chat.whatsapp.com/{}"
+    },
+    "own": {
+      "join" :{
+        "link": "I need the invite link!",
+        "link_err": "invalid link!",
+        "ok": "🤖 BOT added successfully.",
+        "err": "🤖 BOT not added."
+      },
+      "self": "Only you can use the Bot",
+      "public": "Now everyone can use the Bot"
+    },
     "global": {
-      "by": "Made by: *DrkBot*",
-      "success": "✓ Exit",
+      "by": "Made by: {}",
+      "success": "✓ Function performed successfully.",
       "admin": "Features for group admins only!",
-      "botAdmin": "The bot must be an administrator!",
+      "botAdmin": "The bot must beadministrator!",
       "owner": "Special functions of the bot owner.",
-      "group": "Features for groups only!",
+      "group": "Functions only for groups!",
       "private": "Features for private chat only!",
       "bot": "Functions only for the bot number user",
-      "wait": "Just a moment...",
-      "endLimit": "Your daily limit has expired, the limit will reset every 12 hours"
+      "wait": "One moment...",
+      "endLimit": "Your daily limit has expired, the limit will reset every 12 hours",
+      "err" : "🤖 It seems we have an error.\nTry again."
+    },
+    "sc": {
+      "msg": "Don't forget to give stars"
     },
     "err": {
-      "msgReport": "REPORT ERROR"
+      "msgReport": "ERROR REPORT"
     }
   }
 }
