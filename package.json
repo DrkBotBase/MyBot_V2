@@ -58,9 +58,7 @@
     "supervisor": "^0.12.0",
     "translatte": "3.0.1",
     "util": "^0.12.4",
-    "yargs": "^17.2.1",
-    "yt-search": "^2.10.3",
-    "ytdl-core": "^4.11.0"
+    "yargs": "^17.2.1"
   },
   "directories": {
     "lang": "lang",
