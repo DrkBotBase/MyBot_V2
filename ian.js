@@ -15,7 +15,6 @@ const path = require('path')
 const os = require('os')
 const speed = require('performance-now')
 const { performance } = require('perf_hooks')
-const gis = require('g-i-s')
 const simpleGit = require('simple-git')
 const git = simpleGit()
 const { formatp, isUrl, sleep, clockString, runtime, fetchJson, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
@@ -478,6 +477,7 @@ switch(command) {
   case 'play': {
     if (!text) return m.reply(myLang('play').msg.replace('{}', prefix+command))
     try {
+      m.reply(myLang('global').wait)
       ytm = await youtubeSearch(text)
       let { thumbnail, title, url } = ytm.video[0]
       let buttons = [
@@ -490,6 +490,7 @@ switch(command) {
   case 'ttdl': {
     if (!text) return m.reply(myLang('ttdl').msg.replace('{}', prefix+command))
     try {
+      m.reply(myLang('global').wait)
       let { video } = await tiktokdl(text)
       await myBot.sendMessage(m.chat, { video: { url: video.no_watermark_hd }, mimetype: 'video/mp4', fileName: `tiktokdl.mp4`, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
     } catch (e) { throw e }
@@ -599,51 +600,26 @@ switch(command) {
     } catch (e) { throw e }
   }
   break
-  case '2wallpaper': {
-    if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
-    res = gis(`wallpaper 4k ${text}`, google)
-    async function google(error, result){
-      if (error){
-        await m.reply(myLang('global').msg.err);
-      } else {
-        var gugWp = result
-        var randomWp =  gugWp[Math.floor(Math.random() * gugWp.length)].url
-        let buttons = [
-          {buttonId: `2wallpaper ${text}`, buttonText: {displayText: '️➡️'}, type: 1}
-        ]
-        let buttonMessage = {
-          image: { url: randomWp },
-          caption: `*-----「 ${botName} 」-----*`,
-          footer: myBot.user.name,
-          buttons: buttons,
-          headerType: 4
-        }
-        await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
-      }
-    }
-  }
-  break
   case 'img': {
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
-    res = gis(`${text}`, google)
-    async function google(error, result){
-      if (error){
-        await m.reply(myLang('global').msg.err);
-      } else {
-        var gugWp = result
-        var randomWp =  gugWp[Math.floor(Math.random() * gugWp.length)].url
-        let buttons = [
-          {buttonId: `img ${text}`, buttonText: {displayText: '➡️'}, type: 1}
-        ]
-        let buttonMessage = {
-          image: { url: randomWp },
-          caption: `*-----「 ${botName} 」-----*`,
-          footer: myBot.user.name,
-          buttons: buttons,
-          headerType: 4
-        }
-        await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+    let gis = require('async-g-i-s');
+    try {
+      const results = await gis(text);
+      let rndImg = results[Math.floor(Math.random() * results.length)].url
+      
+      let buttons = [
+          {buttonId: `2img ${text}`, buttonText: {displayText: '️➡️'}, type: 1}
+      ]
+      let buttonMessage = {
+        image: { url: rndImg },
+        caption: `*-----「 ${botName} 」-----*`,
+        footer: myBot.user.name,
+        buttons: buttons,
+        headerType: 4
       }
+      await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+    } catch (e) {
+      await m.reply(myLang('global').msg.err);
     }
   }
   break
@@ -1205,7 +1181,7 @@ ${runtime(process.uptime())}`)
 }
     } catch (err) {
       if (Config.LOG == 'false') return
-      myBot.sendMessage(myBot.user.id, { text: `*-- ${LangErr.msgReport} [ ${botName} ] --*\n` +
+      myBot.sendMessage(myBot.user.id, { text: `*-- ${myLang('err').msgReport} [ ${botName} ] --*\n` +
         '*Error:* ```' + err + '```'
       })
     }
