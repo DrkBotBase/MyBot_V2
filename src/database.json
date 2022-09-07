@@ -54,6 +54,81 @@
       "afkTime": -1,
       "afkReason": "",
       "limit": 100
+    },
+    "573175055791@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "573012629554@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "56974360925@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "5491156969410@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "51970304005@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "17874545055@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "51990704781@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "5215534945661@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "573242875601@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "51901806872@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "5219992459479@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "573046793853@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": "Infinity"
+    },
+    "51963323307@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "5213121004406@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
+    },
+    "5493417194929@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
     }
   },
   "chats": {
@@ -66,6 +141,26 @@
       "antilink": false
     },
     "120363043425571737@g.us": {
+      "mute": false,
+      "antilink": false
+    },
+    "573207139356-1594472768@g.us": {
+      "mute": false,
+      "antilink": false
+    },
+    "56974360925@s.whatsapp.net": {
+      "mute": false,
+      "antilink": false
+    },
+    "593996485186@s.whatsapp.net": {
+      "mute": false,
+      "antilink": false
+    },
+    "573046793853@s.whatsapp.net": {
+      "mute": false,
+      "antilink": false
+    },
+    "573508770421-1625795519@g.us": {
       "mute": false,
       "antilink": false
     }
