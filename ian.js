@@ -555,7 +555,7 @@ switch(command) {
     let tinyUrl = tiny.data;
     if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', ytm.link), m)
     //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
-    await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ), m)
+    await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ytm.quality), m)
     await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
   }
   break
