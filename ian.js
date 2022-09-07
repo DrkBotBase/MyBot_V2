@@ -513,11 +513,11 @@ switch(command) {
       m.reply(myLang('global').wait)
       let ytm = await youtubedlv2(urls[text - 1])
       let link = await ytm.audio['128kbps'].download()
-      //let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
-      //let tinyUrl = tiny.data;
-      if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', ytm.link), m)
+      let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
+      let tinyUrl = tiny.data;
+      if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', tinyUrl), m)
       //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
-      await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', tinyUrl), m)
+      await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ytm.quality), m)
       await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
     } catch (e){
       throw e
@@ -531,9 +531,9 @@ switch(command) {
       m.reply(myLang('global').wait)
       let ytm = await youtubedlv2(urls[text - 1])
       let link = await ytm.video['360p'].download()
-      //let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
-      //let tinyUrl = tiny.data;
-      if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumbnail, myLang('video').big_size.replace('{}', ytm.link), m)
+      let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
+      let tinyUrl = tiny.data;
+      if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumbnail, myLang('video').big_size.replace('{}', tinyUrl), m)
       //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
       await myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: myLang('video').caption.replace('{}', ytm.title) }, { quoted: m })
     } catch (e) {
@@ -555,7 +555,7 @@ switch(command) {
     let tinyUrl = tiny.data;
     if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', ytm.link), m)
     //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
-    await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', tinyUrl), m)
+    await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ), m)
     await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
   }
   break
