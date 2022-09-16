@@ -69,7 +69,6 @@ ${p} ${prefix}song
 ${p} ${prefix}video
 ${p} ${prefix}getmusic
 ${p} ${prefix}getvideo
-${p} ${prefix}fbdl
 ${p} ${prefix}ttdl
 ${p} ${prefix}sticker
 ${p} ${prefix}toaudio
@@ -85,6 +84,7 @@ ${p} ${prefix}waifu
 ${p} ${prefix}neko
 ${p} ${prefix}img
 ${p} ${prefix}wallpaper
+${p} ${prefix}carbon
 ${p} ${prefix}ebinary
 ${p} ${prefix}dbinary
 ${p} ${prefix}calc

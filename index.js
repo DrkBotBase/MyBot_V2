@@ -6,7 +6,7 @@
 */
 
 require('./config')
-const { default: myBotConnect, DisconnectReason, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
+const { default: myBotConnect, DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
 const { useSingleFileAuthState } = require('./lib/s-auth-state')
 const Config = require('./config');
 const { state, saveState } = useSingleFileAuthState(`./${Config.SESSION}.json`)
@@ -19,8 +19,11 @@ const path = require('path')
 const _ = require('lodash')
 const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
-const { smsg, isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('./lib/myfunc')
-const { log, pint, bgPint } = require('./lib/colores');
+const { smsg, getBuffer, getSizeMedia, await, sleep } = require('./lib/myfunc')
+const { log, pint } = require('./lib/colores');
+
+//language
+const myLang = require('./language').getString
 
 var low
 try {
@@ -209,13 +212,14 @@ async function startMybot() {
     myBot.public = true
 	}
     let wtMyBot = myBot.public == true ? ' Publico' : ' Privado'
+    //let work_type = myBot.public == true ? myLang('work_type').public : myLang('work_type').private
     log(pint('🤖 DrkBot Modo' + wtMyBot, '.'));
     log(pint(
       '[copyright By: Ian]\n' + 
       'Prohibida su venta\n' +
       'Chatea con ©Ian\n' +
       'Wats 573508770421\n\n', '#d30092'
-      ));
+    ));
 
     myBot.serializeM = (m) => smsg(myBot, m, store)
 
@@ -240,8 +244,8 @@ async function startMybot() {
 
     myBot.ev.on('creds.update', saveState)
 
-    // Add Other
 
+    // Add Other
     /**
      *
      * @param {*} jid

@@ -10,7 +10,7 @@
       "UPDATED_LOCAL": "*La actualización fue exitosa!"
     },
     "alive": {
-      "msg": "✪〘 *FUNCIONANDO* 〙✪"
+      "msg": "✪〘 *𝙵𝚄𝙽𝙲𝙸𝙾𝙽𝙰𝙽𝙳𝙾* 〙✪"
     },
     "sticker": {
       "quot": "Responder video/imagen\n{} nombre sticker",
@@ -79,15 +79,19 @@
       "quot": "*Responde lista obtenida de yts*",
       "no_me": "Solo es valido el mensaje recibido de yts."
     },
-    "fbdl": {
-      "msg": "*Necesito el link.*\nEjemplo: {}fbdl https://fb.watch/f8zZ2rkjC_/"
-    },
     "img": {
       "msg": "Que deseas buscar?\nEjemplo: {} robots"
     },
     "calc": {
       "msg": "que operación matematica deseas realizar?",
       "err": "Formato incorrecto, solo 0-9 y Símbolos soportados -, +, *, /, ×, ÷, π, e, (, )"
+    },
+    "carbon": {
+      "msg": "Necesito algun texto.\n*Ejemplo:*\n\nconst axios = require('axios')\naxios.get('https://evilinsult.com/generate_insult.php?lang=es&type=json').then(async (response) => {\n  console.log(response.data.insult)\n})"
+    },
+    "gay": {
+      "quot": "Responde un mensaje o menciona un usuario",
+      "msg": "El usuario *{}* es *{}%* gay🏳️‍🌈"
     },
     "binary": {
       "encode": "Enviar/responder texto {} Hola",
@@ -156,6 +160,10 @@
     },
     "sc": {
       "msg": "No olvides dar estrellas"
+    },
+    "work_type": {
+      "public": "🤖 *DrkBot funciona en modo publico*\n\n_No probar los comandos aca. Este es tu espacio de LOG._\n_Puedes probar los comandos en cualquier chat._",
+      "private": "🤖 *DrkBot funciona en modo privado*\n\n_No probar los comandos aca. Este es tu espacio de LOG._\n_Puedes probar los comandos en cualquier chat._"
     },
     "err": {
       "msgReport": "REPORTE DE ERROR"

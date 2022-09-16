@@ -6,7 +6,7 @@
 */
 
 require('./config')
-const { BufferJSON, WA_DEFAULT_EPHEMERAL, generateWAMessageFromContent, proto, generateWAMessageContent, generateWAMessage, prepareWAMessageMedia, areJidsSameUser, getContentType } = require('@adiwajshing/baileys')
+const { proto, generateWAMessage, areJidsSameUser } = require('@adiwajshing/baileys')
 const fs = require('fs')
 const util = require('util')
 const { exec, spawn, execSync } = require("child_process")
@@ -16,6 +16,7 @@ const os = require('os')
 const speed = require('performance-now')
 const { performance } = require('perf_hooks')
 const simpleGit = require('simple-git')
+const fetch = require('node-fetch')
 const git = simpleGit()
 const { formatp, isUrl, sleep, clockString, runtime, fetchJson, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
 const { yta, ytv } = require('./lib/y2mate')
@@ -117,7 +118,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
             )
           }
         }
-	
+        
 	// reset limit every 12 hours
         let cron = require('node-cron')
         cron.schedule('00 12 * * *', () => {
@@ -216,6 +217,35 @@ Selama ${clockString(new Date - user.afkTime)}
 
 // ======== INICIO COMANDOS ========
 switch(command) {
+  case 'test': {
+    if (!isCreator) return m.reply(myLang('global').owner)
+		let buttonMessage= {
+'document':{'url': 'http://github.com/' },
+'mimetype': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+'fileName': `「 𝔻ℝ𝕂𝔹𝕆𝕋 」`,
+'fileLength': 1000000,
+'pageCount': 1,
+'contextInfo':{
+'forwardingScore':1,
+'isForwarded':true,
+'externalAdReply':{
+'mediaUrl': 'http://github.com/',
+'mediaType': 2,
+'previewType': 2,
+'title': 'SC',
+'body': 'menu',
+'thumbnail': global.thumb,
+'sourceUrl': 'https://www.youtube.com/'}},
+'caption': 'http://github.com/',
+'footer': myBot.user.name,
+'buttons':[
+{'buttonId': 'menu','buttonText':{'displayText':'ᴍᴇɴᴜ'},'type':1},
+{'buttonId': 'status','buttonText':{'displayText':'ʀᴜɴᴛɪᴍᴇ'},'type':1}
+],
+'headerType':6}
+    await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+
+	}break
   case 'owner': {
     myBot.sendContact(m.chat, global.owner, m)
   }
@@ -511,7 +541,7 @@ switch(command) {
     if (!text) return m.reply(myLang('song').msg.replace('{}', prefix))
     try {
       m.reply(myLang('global').wait)
-      let ytm = await youtubedlv2(urls[text - 1])
+      let ytm = await youtubedlv2(text)
       let link = await ytm.audio['128kbps'].download()
       let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
       let tinyUrl = tiny.data;
@@ -529,7 +559,7 @@ switch(command) {
     if (!text) return m.reply(myLang('video').msg.replace('{}', prefix))
     try {
       m.reply(myLang('global').wait)
-      let ytm = await youtubedlv2(urls[text - 1])
+      let ytm = await youtubedlv2(text)
       let link = await ytm.video['360p'].download()
       let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
       let tinyUrl = tiny.data;
@@ -553,7 +583,7 @@ switch(command) {
     let link = await ytm.audio['128kbps'].download()
     let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
     let tinyUrl = tiny.data;
-    if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', ytm.link), m)
+    if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', tinyUrl), m)
     //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
     await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ytm.quality), m)
     await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
@@ -570,7 +600,7 @@ switch(command) {
     let link = await ytm.video['360p'].download()
     let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
     let tinyUrl = tiny.data;
-    if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumbnail, myLang('video').big_size.replace('{}', ytm.link), m)
+    if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumbnail, myLang('video').big_size.replace('{}', tinyUrl), m)
     //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
     await myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: myLang('video').caption.replace('{}', ytm.title) }, { quoted: m })
   }
@@ -676,6 +706,13 @@ switch(command) {
     m.reply( await dBinary(m.quoted.text) )
   }
   break
+  case 'carbon': {
+    if (!text) return m.reply(myLang('carbon').msg)
+    m.reply(myLang('global').wait)
+    let res = await fetch(`https://api-rull.herokuapp.com/api/cmd?code=${encodeURIComponent(text)}`)
+	  if (res.status !== 200) throw res.statusText
+    myBot.sendMessage(m.chat, { image: { url: res.url }}, { quoted: m })
+  }break
   case 'bot': {
     if (!text) return m.reply(myLang('ia').msg)
     let lang = Config.LANG.toLowerCase()
@@ -755,24 +792,32 @@ switch(command) {
   case 'shazam': {
     if (/image/.test(mime)) return m.reply(myLang('shazam').image)
     if (/video/.test(mime)) return m.reply(myLang('shazam').video.replace('{}',prefix+command))
-    const acrcloud = require("acrcloud")
-    const acr = new acrcloud({ 
-        host: "identify-eu-west-1.acrcloud.com",
-        access_key: "a7982a1f271fc390f3a69cb5bac04498",
-        access_secret: "QPbD6UOnfawRtUiH88lzKx7edUaX20I0erUWCoCW"
-    })
-    m.reply(myLang('global').wait)
-    let sampleq = await quoted.download()
-    acr.identify(sampleq).then(async (res) => {
-    m.reply(
-    `🎶 ${res.metadata.music[0].title}\n`+
-    `🎤 ${res.metadata.music[0].artists[0].name}\n`+
-    `💽 ${res.metadata.music[0].album.name}\n`+
-    `📆 ${res.metadata.music[0].release_date}`
-    )
-    })
+    try {
+      const acrcloud = require("acrcloud")
+      const acr = new acrcloud({ 
+          host: "identify-eu-west-1.acrcloud.com",
+          access_key: "a7982a1f271fc390f3a69cb5bac04498",
+          access_secret: "QPbD6UOnfawRtUiH88lzKx7edUaX20I0erUWCoCW"
+      })
+      m.reply(myLang('global').wait)
+      let sampleq = await quoted.download()
+      acr.identify(sampleq).then(async (res) => {
+      m.reply(
+      `🎶 ${res.metadata.music[0].title}\n`+
+      `🎤 ${res.metadata.music[0].artists[0].name}\n`+
+      `💽 ${res.metadata.music[0].album.name}\n`+
+      `📆 ${res.metadata.music[0].release_date}`
+      )
+      })
+    } catch (e) { throw e }
   }break
 // FOR GROUPS
+  case 'gay': {
+    if (!m.isGroup) return m.reply(myLang('global').group)
+    if (!m.quoted) return m.reply(myLang('gay').quot)
+    await myBot.sendMessage(m.chat, { video: fs.readFileSync('./src/media/gay.mp4'), caption: myLang('gay').msg.replace('{}', '+'+m.quoted.sender.split('@')[0]).replace('{}',Math.floor(100*Math.random())), gifPlayback: true, mentions: m.quoted.sender }, { quoted: m })
+  }
+  break
   case 'love': {
     if (!m.isGroup) return m.reply(myLang('global').group)
     let member = participants.map(u => u.id)
@@ -1123,7 +1168,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
     if (command === 'ping') {
       m.reply(respon)
     } else if (command === 'status') {
-      m.reply(`*TIEMPO DE EJECUCIÓN*
+      m.reply(`*𝚃𝙸𝙴𝙼𝙿𝙾 𝙳𝙴 𝙴𝙹𝙴𝙲𝚄𝙲𝙸Ó𝙽*
 ${runtime(process.uptime())}`)
     }
   }

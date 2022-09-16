@@ -79,15 +79,19 @@
       "quot": "*Reply list obtained from yts*",
       "no_me": "Only the message received from yts is valid."
     },
-    "fbdl": {
-      "msg": "*I need the link.*\nExample: {}fbdl https://fb.watch/f8zZ2rkjC_/"
-    },
     "img": {
       "msg": "What do you want to search?\nExample: {} robots"
     },
     "calc": {
       "msg": "What mathematical operation do you want to perform?",
       "err": "Wrong format, only 0-9 and Symbols supported -, +, *, /, ×, ÷, π, e, (, )"
+    },
+    "carbon": {
+      "msg": "I need some text.\n*Example:*\n\nconst axios = require('axios')\naxios.get('https://evilinsult.com/generate_insult.php?lang=en&type=json').then(async (response) => {\n  console.log(response.data.insult)\n})"
+    },
+    "gay": {
+      "quot": "Reply to a message or mention a user",
+      "msg": "User *{}* is *{}%* gay🏳️‍🌈"
     },
     "binary": {
       "encode": "Send/reply text {} Hola",
@@ -156,6 +160,10 @@
     },
     "sc": {
       "msg": "Don't forget to give stars"
+    },
+    "work_type": {
+      "public": "🤖 *{} works in public mode*\n\n_Don't test the commands here. This is your LOG space._\n_You can try the commands in any chat._",
+      "private": "🤖 *{} works in private mode*\n\n_Don't test the commands here. This is your LOG space._\n_You can try the commands in any chat._"
     },
     "err": {
       "msgReport": "ERROR REPORT"
