@@ -18,15 +18,33 @@ const { performance } = require('perf_hooks')
 const simpleGit = require('simple-git')
 const fetch = require('node-fetch')
 const git = simpleGit()
-const { formatp, isUrl, sleep, clockString, runtime, fetchJson, jsonformat, format, parseMention, getRandom } = require('./lib/myfunc')
-const { yta, ytv } = require('./lib/y2mate')
+const { formatp, isUrl, sleep, clockString, runtime, fetchJson, jsonformat, format, parseMention, getRandom, modifyLetter } = require('./lib/myfunc')
+//const { yta, ytv } = require('./lib/y2mate')
 const { log, pint, bgPint } = require('./lib/colores');
 const { menu } = require('./src/assets/menu')
 const Config = require('./config');
 const { youtubedlv2, youtubeSearch, tiktokdlv2 } = require('@bochilteam/scraper')
 
 // Language
-const myLang = require('./language').getString
+const { JSDOM } = require('jsdom')
+async function testLetter(text){
+  let res = await fetch('http://qaz.wtf/u/convert.cgi?text=' + encodeURIComponent(text))
+  let html = await res.text()
+  let dom = new JSDOM(html)
+  let table = dom.window.document.querySelector('table').children[0].children
+let obj = {}
+  for (let tr of table) {
+    let name = tr.querySelector('.aname').innerHTML
+    let content = tr.children[1].textContent.replace(/^\n/, '').replace(/\n$/, '')
+    obj[name + (obj[name] ? ' Reversed' : '')] = content
+  }
+  return(obj[global.botFon])
+}
+if (global.newFont = 'on') {
+  const myLang = require('./language').getString
+} else {
+  const myLang = require('./language').getString
+}
 
 // read database
 let kuismath = db.data.game.math = []
@@ -1043,36 +1061,10 @@ switch(command) {
     if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
     let anu = await store.chats.all().map(v => v.id)
     m.reply(`Enviar difusión a ${anu.length} chat.\nTiempo de envio ${anu.length * 1.5} segundos.`)
-    for (let yoi of anu) {
+    for (let i of anu) {
       await sleep(1500)
-      let btn = [{
-        urlButton: {
-          displayText: 'Source Code',
-          url: 'https://github.com/ianvanh'
-        }
-      }, {
-        callButton: {
-          displayText: 'Number Phone Owner',
-          phoneNumber: '+57 350-877-0421'
-        }
-      }, {
-        quickReplyButton: {
-          displayText: 'Menu',
-          id: 'menu'
-        }
-      }, {
-        quickReplyButton: {
-          displayText: 'Contact Owner',
-          id: 'owner'
-        }  
-      }, {
-        quickReplyButton: {
-          displayText: 'GitHub',
-          id: 'sc'
-        }
-      }]
       let txt = `「 Difusor Bot 」\n\n${text}`
-      myBot.send5ButImg(yoi, txt, myBot.user.name, global.thumb, btn)
+      myBot.sendButtonLoc(i, global.thumb, txt, myBot.user.name, 'MENU', 'menu')
     }
     m.reply('Difusion Enviada')
   }
@@ -1086,34 +1078,8 @@ switch(command) {
     m.reply(`Enviar difusión a ${anu.length} grupos.\nTiempo de envio ${anu.length * 1.5} segundos.`)
     for (let i of anu) {
       await sleep(1500)
-      let btn = [{
-        urlButton: {
-          displayText: 'Source Code',
-          url: 'https://github.com/ianvanh'
-        }
-      }, {
-        callButton: {
-          displayText: 'Number Phone Owner',
-          phoneNumber: '+57 350-877-0421'
-        }
-      }, {
-        quickReplyButton: {
-          displayText: 'Menu',
-          id: 'menu'
-        }
-      }, {
-        quickReplyButton: {
-          displayText: 'Contact Owner',
-          id: 'owner'
-        }  
-      }, {
-        quickReplyButton: {
-          displayText: 'GitHub',
-          id: 'sc'
-        }
-      }]
       let txt = `「 Difusor Bot 」\n\n${text}`
-      myBot.send5ButImg(i, txt, myBot.user.name, global.thumb, btn)
+      myBot.sendButtonLoc(i, global.thumb, txt, myBot.user.name, 'MENU', 'menu')
     }
     m.reply('Difusion Enviada')
   }

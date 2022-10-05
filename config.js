@@ -24,6 +24,8 @@ global.typeMenu = 'image'
 global.timeZone = 'America/Bogota'
 global.timeLocale = 'co'
 global.sourceCode = 'https://github.com'
+global.newFont = 'on'
+global.botFont = 'Math monospace'
 
 global.limitawal = {
     premium: "Infinity",
