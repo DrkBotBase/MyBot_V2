@@ -38,13 +38,9 @@ let obj = {}
     let content = tr.children[1].textContent.replace(/^\n/, '').replace(/\n$/, '')
     obj[name + (obj[name] ? ' Reversed' : '')] = content
   }
-  return(obj[global.botFon])
+  return(obj[global.botFont])
 }
-if (global.newFont = 'on') {
-  const myLang = require('./language').getString
-} else {
-  const myLang = require('./language').getString
-}
+const myLang = require('./language').getString
 
 // read database
 let kuismath = db.data.game.math = []
@@ -283,7 +279,7 @@ switch(command) {
   }
   break
   case 'alive': {
-    anu = myLang('alive').msg
+    anu = await testLetter(myLang('alive').msg)
     myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'MENU', 'menu')
   }break
   case 'menu': {

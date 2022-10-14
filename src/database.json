@@ -129,6 +129,11 @@
       "afkTime": -1,
       "afkReason": "",
       "limit": 100
+    },
+    "50578743835@s.whatsapp.net": {
+      "afkTime": -1,
+      "afkReason": "",
+      "limit": 100
     }
   },
   "chats": {
@@ -169,6 +174,10 @@
       "antilink": false
     },
     "573012328460@s.whatsapp.net": {
+      "mute": false,
+      "antilink": false
+    },
+    "status@broadcast": {
       "mute": false,
       "antilink": false
     }
