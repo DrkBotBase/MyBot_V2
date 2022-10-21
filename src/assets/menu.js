@@ -54,6 +54,7 @@ ${p} ${prefix}donar
 ╠══✪〘 *${list_b}* 〙✪══
 ${p} ${prefix}promote
 ${p} ${prefix}demote
+${p} ${prefix}gay
 ${p} ${prefix}add
 ${p} ${prefix}kick
 ${p} ${prefix}mute
