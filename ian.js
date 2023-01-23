@@ -231,7 +231,7 @@ Selama ${clockString(new Date - user.afkTime)}
 
 // ======== INICIO COMANDOS ========
 switch(command) {
-  case 'test': {
+  /*case 'test': {
     if (!isCreator) return m.reply(myLang('global').owner)
 		let buttonMessage= {
 'document':{'url': 'http://github.com/' },
@@ -259,6 +259,9 @@ switch(command) {
 'headerType':6}
     await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
 
+	}break*/
+	case 'test': {
+    if (!isCreator) return m.reply(myLang('global').owner)
 	}break
   case 'owner': {
     myBot.sendContact(m.chat, global.owner, m)
@@ -1065,7 +1068,7 @@ switch(command) {
     m.reply('Difusion Enviada')
   }
   break
-  case 'bcgc': case 'bcgroup': {
+  case 'bgc': case 'bcgroup': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
     let getGroups = await myBot.groupFetchAllParticipating()

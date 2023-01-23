@@ -218,7 +218,7 @@ async function startMybot() {
       '[copyright By: Ian]\n' + 
       'Prohibida su venta\n' +
       'Chatea con ©Ian\n' +
-      'Wats 573508770421\n\n', '#d30092'
+      'Wats +573508770421\n\n', '#d30092'
     ));
 
     myBot.serializeM = (m) => smsg(myBot, m, store)
