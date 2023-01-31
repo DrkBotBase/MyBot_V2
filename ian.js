@@ -42,9 +42,6 @@ let obj = {}
 }
 const myLang = require('./language').getString
 
-// read database
-let kuismath = db.data.game.math = []
-let vote = db.data.others.vote = []
 
 module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     try {
@@ -63,6 +60,10 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         const quoted = m.quoted ? m.quoted : m
         const mime = (quoted.msg || quoted).mimetype || ''
         const isMedia = /image|video|sticker|audio/.test(mime)
+        
+        // New Functions BD
+        const regUser = user.chekUser(m.sender, _user)
+        const chekBlock = user.showData(m.sender, _user)
 	
         // Group
         const groupMetadata = m.isGroup ? await myBot.groupMetadata(m.chat).catch(e => {}) : ''
@@ -72,45 +73,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         const groupOwner = m.isGroup ? groupMetadata.owner : ''
         const isBotAdmins = m.isGroup ? groupAdmins.includes(botNumber) : false
         const isAdmins = m.isGroup ? groupAdmins.includes(m.sender) : false
-        const isPremium = isCreator || global.premium.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender) || false
-	
-	
-	try {
-            let isNumber = x => typeof x === 'number' && !isNaN(x)
-            let limitUser = isPremium ? global.limitawal.premium : global.limitawal.free
-            let user = global.db.data.users[m.sender]
-            if (typeof user !== 'object') global.db.data.users[m.sender] = {}
-            if (user) {
-                if (!isNumber(user.afkTime)) user.afkTime = -1
-                if (!('afkReason' in user)) user.afkReason = ''
-                if (!isNumber(user.limit)) user.limit = limitUser
-            } else global.db.data.users[m.sender] = {
-                afkTime: -1,
-                afkReason: '',
-                limit: limitUser,
-            }
-    
-            let chats = global.db.data.chats[m.chat]
-            if (typeof chats !== 'object') global.db.data.chats[m.chat] = {}
-            if (chats) {
-                if (!('mute' in chats)) chats.mute = false
-                if (!('antilink' in chats)) chats.antilink = false
-            } else global.db.data.chats[m.chat] = {
-                mute: false,
-                antilink: false,
-            }
-      let setting = global.db.data.settings[botNumber]
-      if (typeof setting !== 'object') global.db.data.settings[botNumber] = {}
-      if (setting) {
-        if (!isNumber(setting.status)) setting.status = 0
-        if (!('autobio' in setting)) setting.autobio = false
-      } else global.db.data.settings[botNumber] = {
-        status: 0,
-        autobio: false,
-      }
-	} catch (err) {
-	  log(pint(err, 'red.'))
-  }
+        const isPremium = global.premium.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender) || false
 
         // Public & Self
         if (!myBot.public) {
@@ -132,62 +95,39 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
             )
           }
         }
-        
-	// reset limit every 12 hours
+
+	// reset users every 12 hours
         let cron = require('node-cron')
         cron.schedule('00 12 * * *', () => {
-            let user = Object.keys(global.db.data.users)
-            let limitUser = isPremium ? global.limitawal.premium : global.limitawal.free
-            for (let jid of user) global.db.data.users[jid].limit = limitUser
-            log(pint('Reseted Limit', 'yellow.'))
+            user.resetDataUsers(_user);
+            log(pint('Reseted Data', 'yellow.'))
         }, {
             scheduled: true,
             timezone: global.timeZone
         })
-        
-	// auto set bio
-	if (db.data.settings[botNumber].autobio) {
-	    let setting = global.db.data.settings[botNumber]
-	    if (new Date() * 1 - setting.status > 1000) {
-		let uptime = await runtime(process.uptime())
-		await myBot.setStatus(`${myBot.user.name} | Runtime : ${runtime(uptime)}`)
-		setting.status = new Date() * 1
-	    }
-	}
-	    
+
 	  // Anti Link
-    if (db.data.chats[m.chat].antilink) {
-      if (budy.match(`chat.whatsapp.com`)) {
-        if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
-        let gclink = (`https://chat.whatsapp.com/`+await myBot.groupInviteCode(m.chat))
-        let isLinkThisGc = new RegExp(gclink, 'i')
-        let isgclink = isLinkThisGc.test(m.text)
-        if (isCreator) return m.reply(myLang('antilink').own)
-        if (isAdmins) return m.reply(myLang('antilink').admin)
-        if (isgclink) return m.reply(myLang('antilink').detect)
-        m.reply(myLang('antilink').msg)
-        await sleep(3000)
-        myBot.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
-      }
+  /*if (budy.match(`chat.whatsapp.com`)) {
+      if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
+      let gclink = (`https://chat.whatsapp.com/`+await myBot.groupInviteCode(m.chat))
+      let isLinkThisGc = new RegExp(gclink, 'i')
+      let isgclink = isLinkThisGc.test(m.text)
+      if (isCreator) return m.reply(myLang('antilink').own)
+      if (isAdmins) return m.reply(myLang('antilink').admin)
+      if (isgclink) return m.reply(myLang('antilink').detect)
+      m.reply(myLang('antilink').msg)
+      await sleep(3000)
+      myBot.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
     }
         
       // Mute Chat
     if (db.data.chats[m.chat].mute && !isAdmins && !isCreator) {
       return
-    }
-    
-    if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-      kuis = true
-      jawaban = kuismath[m.sender.split('@')[0]]
-            if (budy.toLowerCase() == jawaban) {
-                await m.reply(`🎮 Kuis Matematika  🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? kirim ${prefix}math mode`)
-                delete kuismath[m.sender.split('@')[0]]
-            } else m.reply('*Jawaban Salah!*')
-        }
+    }*/
 
         // Respon Cmd with media
-        if (isMedia && m.msg.fileSha256 && (m.msg.fileSha256.toString('base64') in global.db.data.sticker)) {
-        let hash = global.db.data.sticker[m.msg.fileSha256.toString('base64')]
+        if (isMedia && m.msg.fileSha256 && (m.msg.fileSha256.toString('base64'))) {
+        let hash = m.msg.fileSha256.toString('base64')
         let { text, mentionedJid } = hash
         let messages = await generateWAMessage(m.chat, { text: text, mentions: mentionedJid }, {
             userJid: myBot.user.id,
@@ -204,34 +144,10 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         }
         myBot.ev.emit('messages.upsert', msg)
         }
-        
-        let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])]
-        for (let jid of mentionUser) {
-          let user = global.db.data.users[jid]
-          if (!user) continue
-          let afkTime = user.afkTime
-          if (!afkTime || afkTime < 0) continue
-          let reason = user.afkReason || ''
-          m.reply(`
-Jangan tag dia!
-Dia sedang AFK ${reason ? 'dengan alasan ' + reason : 'tanpa alasan'}
-Selama ${clockString(new Date - afkTime)}
-`.trim())
-        }
-
-        if (db.data.users[m.sender].afkTime > -1) {
-            let user = global.db.data.users[m.sender]
-            m.reply(`
-Kamu berhenti AFK${user.afkReason ? ' setelah ' + user.afkReason : ''}
-Selama ${clockString(new Date - user.afkTime)}
-`.trim())
-            user.afkTime = -1
-            user.afkReason = ''
-        }
 
 // ======== INICIO COMANDOS ========
 switch(command) {
-  /*case 'test': {
+  /*case 'test': { if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (!isCreator) return m.reply(myLang('global').owner)
 		let buttonMessage= {
 'document':{'url': 'http://github.com/' },
@@ -259,14 +175,36 @@ switch(command) {
 'headerType':6}
     await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
 
+	  user.addUsageUser(m.sender, _user) }break*/
+
+	case 'reg': {
+	  if (m.isGroup) return m.reply(myLang('reg').msg)
+	  if (regUser === true) return m.reply(myLang('reg').check)
+    user.addUser(m.sender, pushname, _user)
+    m.reply(myLang('reg').ok)
+	}break
+	case 'unreg': {
+    user.unreg(m.sender, _user);
+	}break
+	/*case 'test': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    m.reply('Hola')
+    user.addFailUser(m.sender, _user)
 	}break*/
-	case 'test': {
+	case 'kill': {
     if (!isCreator) return m.reply(myLang('global').owner)
+    if (args[0] === 'add') {
+      user.addBlockUser(args[1] + "@s.whatsapp.net", _user);
+    } else if (args[0] === 'del') {
+      user.delBlockUser(args[1] + "@s.whatsapp.net", _user);
+    }
+    user.addUsageUser(m.sender, _user)
 	}break
   case 'owner': {
     myBot.sendContact(m.chat, global.owner, m)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'setmenu': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (args[0] === 'image'){
@@ -279,13 +217,17 @@ switch(command) {
       global.typeMenu = 'location'
       m.reply(myLang('global').success)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user) }break
   case 'alive': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     anu = await testLetter(myLang('alive').msg)
     myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'MENU', 'menu')
+    user.addUsageUser(m.sender, _user)
   }break
   case 'menu': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     anu = menu(prefix, pushname, botName)
     let buttons = [
       { buttonId: 'menu', buttonText: { displayText: 'MENU' }, type: 1 },
@@ -320,9 +262,11 @@ switch(command) {
     } else if(global.typeMenu === 'location') {
       myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'MENU', 'menu')
     }
-  }
-  break
-  case 'donar':{
+    user.addUsageUser(m.sender, _user)
+  }break
+  case 'donar': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     txtt = `Hola *${pushname}*\nVEO QUE QUIERES DONAR\nPuedes hacerlo por medio de las siguientes formas disponibles`
     ftext = 'Tu donasión será muy valiosa'
 
@@ -332,15 +276,19 @@ switch(command) {
       { buttonId: `${prefix}dvplata`, buttonText: { displayText: 'DaviPlata' }, type: 1 }
     ]
     await myBot.sendButtonText(m.chat, buttons, txtt, ftext, m)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'sc': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     m.reply(`*${myLang('sc').msg}*\n\n*Script:* ${sourceCode}`)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
 // CONVERTER
 
   case 'sticker': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!quoted) return m.reply(myLang('sticker').quot.replace('{}', prefix+command))
     if (text.length > 0){
       name = text
@@ -366,9 +314,11 @@ switch(command) {
     } else {
       m.reply(myLang('sticker').end.replace('{}', prefix+command))
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'toaudio': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!quoted) return m.reply(myLang('to_audio').quot)
     if (!/video/.test(mime) && !/audio/.test(mime)) return m.reply(myLang('to_audio').q_audio)
     m.reply(myLang('global').wait)
@@ -376,9 +326,11 @@ switch(command) {
     let { toAudio } = require('./lib/converter')
     let audio = await toAudio(media, 'mp4')
     myBot.sendMessage(m.chat, {audio: audio, mimetype: 'audio/mpeg'}, { quoted : m })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'tomp4': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!quoted) return m.reply(myLang('to_mp4').quot)
     if (!/webp/.test(mime)) return m.reply(myLang('to_mp4').q_video)
     m.reply(myLang('global').wait)
@@ -387,9 +339,11 @@ switch(command) {
     let webpToMp4 = await webp2mp4File(media)
     await myBot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: myLang('global').by.replace('{}', botName) } }, { quoted: m })
     await fs.unlinkSync(media)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'toimg': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!quoted) return m.reply(myLang('to_img').quot)
     if (!/webp/.test(mime)) return m.reply(myLang('to_img').q_img)
     m.reply(myLang('global').wait)
@@ -402,9 +356,11 @@ switch(command) {
       myBot.sendMessage(m.chat, { image: buffer }, { quoted: m })
       fs.unlinkSync(ran)
     })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'togif': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!quoted) return m.reply(myLang('to_gif').quot)
     if (!/webp/.test(mime) && !/video/.test(mime)) return m.reply(myLang('to_gif').q_gif)
     m.reply(myLang('global').wait)
@@ -413,9 +369,11 @@ switch(command) {
     let webpToMp4 = await webp2mp4File(media)
     await myBot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: myLang('global').by.replace('{}', botName) }, gifPlayback: true }, { quoted: m })
     await fs.unlinkSync(media)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'tourl': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     m.reply(myLang('global').wait)
 		let { UploadFileUgu, webp2mp4File, TelegraPh } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
@@ -427,9 +385,11 @@ switch(command) {
       m.reply(util.format(anu))
     }
     await fs.unlinkSync(media)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'emojimix': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('emojimix').msg.replace('{}', prefix+command))
     let [emoji1, emoji2] = text.split`+`
     let anu = await fetchJson(`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=proactive&collection=emoji_kitchen_v5&q=${encodeURIComponent(emoji1)}_${encodeURIComponent(emoji2)}`)
@@ -437,14 +397,20 @@ switch(command) {
       let encmedia = await myBot.sendImageAsSticker(m.chat, res.url, m, { packname: botName, author: global.author, categories: res.tags })
       await fs.unlinkSync(encmedia)
 		}
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+  }break
+	/*
 	case 'attp': case 'ttp': {
+	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+	  if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('attp').msg.replace('{}', prefix+command))
     await myBot.sendMedia(m.chat, `https://xteam.xyz/${command}?file&text=${text}`, 'Bot', 'MD', m, {asSticker: true})
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+	}break
+  */
   case 'trt': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.quoted && !text) return m.reply(myLang('trt').quot)
     const translatte = require('translatte')
     var split = text.split(' ')
@@ -461,8 +427,11 @@ switch(command) {
     }).catch(err => {
         m.reply(myLang('global').err)
     });
+    user.addUsageUser(m.sender, _user)
   }break
   case 'removebg': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!/image/.test(mime)) return m.reply(myLang('removebg').msg.replace('{}', prefix+command))
     let { removeBackgroundFromImageFile, RemoveBgError } = require('remove.bg')
     let apirnobg = ['HBbdxnge4BVXJwqhcAHqVC', 'uHUYM1Wo4QcrFsqGbWoMr2zi', 'qySfrLUKRQejaMoJ54LHpShB']
@@ -487,9 +456,11 @@ switch(command) {
       if(error[0].code === 'insufficient_credits') m.reply(myLang('removebg').err)
       throw 'Cambiar ApiKey removebg!'
     });
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+  }break
   case 'bass': case 'blown': case 'deep': case 'earrape': case 'fast': case 'fat': case 'nightcore': case 'reverse': case 'robot': case 'slow': case 'smooth': case 'tupai':
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     try {
       let set
       if (/bass/.test(command)) set = '-af equalizer=f=54:width_type=o:width=2:g=20'
@@ -519,9 +490,12 @@ switch(command) {
     } catch (e) {
       throw e
     }
+  user.addUsageUser(m.sender, _user)
   break
 // DOWNLOADS
   case 'play': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('play').msg.replace('{}', prefix+command))
     try {
       m.reply(myLang('global').wait)
@@ -533,16 +507,22 @@ switch(command) {
       ]
       myBot.sendButImage(m.chat, thumbnail, `*${title}*`, myBot.user.name, buttons)
     } catch (e) { throw e }
+    user.addUsageUser(m.sender, _user)
   }break
   case 'ttdl': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('ttdl').msg.replace('{}', prefix+command))
     try {
       m.reply(myLang('global').wait)
       let { video } = await tiktokdlv2(text)
       await myBot.sendMessage(m.chat, { video: { url: video.no_watermark }, mimetype: 'video/mp4', fileName: `tiktokdl.mp4`, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
     } catch (e) { throw e }
+    user.addUsageUser(m.sender, _user)
   }break
   case 'yts': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('yts').msg.replace('{}', prefix+command))
     try {
       search = await youtubeSearch(text)
@@ -552,9 +532,11 @@ switch(command) {
       });
       myBot.sendImage(m.chat, search.video[0].thumbnail, teks)
     } catch (e) { throw e }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'song': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('song').msg.replace('{}', prefix))
     try {
       m.reply(myLang('global').wait)
@@ -570,9 +552,11 @@ switch(command) {
       throw e
       m.reply(myLang('global').err)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'video': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('video').msg.replace('{}', prefix))
     try {
       m.reply(myLang('global').wait)
@@ -587,9 +571,11 @@ switch(command) {
       throw e
       m.reply(myLang('global').err)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'getmusic': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('get_down').msg.replace('{}', prefix+command))
     if (!m.quoted) return m.reply(myLang('get_down').quot)
     if (!m.quoted.isBaileys) return m.reply(myLang('get_down').no_me)
@@ -604,9 +590,11 @@ switch(command) {
     //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
     await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ytm.quality), m)
     await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'getvideo': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('get_down').msg.replace('{}', prefix+command))
     if (!m.quoted) return m.reply(myLang('get_down').quot)
     if (!m.quoted.isBaileys) return m.reply(myLang('get_down').no_me)
@@ -620,9 +608,11 @@ switch(command) {
     if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumbnail, myLang('video').big_size.replace('{}', tinyUrl), m)
     //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
     await myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: myLang('video').caption.replace('{}', ytm.title) }, { quoted: m })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   /*case 'fbdl': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if(!args[0]) return m.reply(myLang('fbdl').msg.replace('{}', prefix))
     try {
       m.reply(myLang('global').wait)
@@ -632,16 +622,21 @@ switch(command) {
     } catch (e) {
       m.reply(myLang('global').err)
     }
-  }
-  break*/
+    user.addUsageUser(m.sender, _user)
+  }break*/
   case 'waifu': case 'neko': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     res = await fetchJson(`https://api.waifu.pics/nsfw/${command}`)
      let buttons = [
       { buttonId: command, buttonText: { displayText: '➡️' }, type: 1 }
     ]
     myBot.sendButImage(m.chat, res.url, myLang('global').by.replace('{}', botName), myBot.user.name, buttons)
+    user.addUsageUser(m.sender, _user)
   }break
   case 'wallpaper': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
     try {
       let { wallpaper } = require('./lib/scraper')
@@ -659,9 +654,11 @@ switch(command) {
       }
       await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
     } catch (e) { throw e }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'img': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
     let gis = require('async-g-i-s');
     try {
@@ -682,9 +679,11 @@ switch(command) {
     } catch (e) {
       await m.reply(myLang('global').msg.err);
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'calc': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('calc').msg)
     let val = text
       .replace(/[^0-9\-\/+*×÷πEe()piPI/]/g, '')
@@ -707,30 +706,41 @@ switch(command) {
     } catch (e) {
       if (e == undefined) return m.reply(myLang('calc').err)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
 // TOOLS
   case 'ebinary': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.quoted && !text) return m.reply(myLang('binary').encode.replace('{}', prefix+command))
     let { eBinary } = require('./lib/binary')
     teks = text ? text : m.quoted.text
     m.reply( await eBinary(teks) )
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'dbinary': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.quoted) return m.reply(myLang('binary').decode.replace('{}', prefix+command))
     let { dBinary } = require('./lib/binary')
     m.reply( await dBinary(m.quoted.text) )
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
+  /*
   case 'carbon': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('carbon').msg)
     m.reply(myLang('global').wait)
     let res = await fetch(`https://api-rull.herokuapp.com/api/cmd?code=${encodeURIComponent(text)}`)
 	  if (res.status !== 200) throw res.statusText
     myBot.sendMessage(m.chat, { image: { url: res.url }}, { quoted: m })
+    user.addUsageUser(m.sender, _user)
   }break
+  */
   case 'bot': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('ia').msg)
     let lang = Config.LANG.toLowerCase()
     await axios.get(`https://api.simsimi.net/v2/?text=${text}&lc=${lang}&cf=true`).then((response) => {
@@ -745,9 +755,11 @@ switch(command) {
       throw err
     }
     })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'bin': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('bin').msg)
     await axios.get(`https://lookup.binlist.net/${args[0]}`).then(async (response) => {
     json = response.data
@@ -765,8 +777,11 @@ switch(command) {
       json.bank.name
     )
   })
+    user.addUsageUser(m.sender, _user)
   }break
   case 'cambio': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('exchange').msg)
     key = 'bcab649da87b8cc8e5f000d0'
     if (!key) throw ('Falta la key!')
@@ -795,9 +810,12 @@ switch(command) {
       })
       return arreglo.length
     }
+    user.addUsageUser(m.sender, _user)
   }break
   case 'price': {
-    if (!text) return m.reply('Token?¹')
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (!text) return m.reply('Token?')
     key = '1be6e707f54766812254c65612a60298080cf7b26c2ef6ea9e6ea0b0b11b8890'
     if (!key) throw m.reply('Falta la key!')
     await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${text.toLowerCase()}&tsyms=USD,COP&api_key={${key}}`).then(async (response) => {
@@ -805,8 +823,11 @@ switch(command) {
     	var msg = `*Token:* ${text.toUpperCase()}\n\n*USD:* ${USD}\n*COP:* ${COP}`
     	m.reply(msg)
     })
+    user.addUsageUser(m.sender, _user)
   }break
   case 'shazam': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (/image/.test(mime)) return m.reply(myLang('shazam').image)
     if (/video/.test(mime)) return m.reply(myLang('shazam').video.replace('{}',prefix+command))
     try {
@@ -827,15 +848,20 @@ switch(command) {
       )
       })
     } catch (e) { throw e }
+    user.addUsageUser(m.sender, _user)
   }break
 // FOR GROUPS
   case 'gay': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!m.quoted) return m.reply(myLang('gay').quot)
     await myBot.sendMessage(m.chat, { video: fs.readFileSync('./src/media/gay.mp4'), caption: myLang('gay').msg.replace('{}', '+'+m.quoted.sender.split('@')[0]).replace('{}',Math.floor(100*Math.random())), gifPlayback: true, mentions: m.quoted.sender }, { quoted: m })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'love': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.isGroup) return m.reply(myLang('global').group)
     let member = participants.map(u => u.id)
     let me = m.sender
@@ -846,9 +872,11 @@ switch(command) {
       { buttonId: 'love', buttonText: { displayText: '👩‍❤️‍👨' }, type: 1 }
     ]
     await myBot.sendButtonText(m.chat, buttons, jawab, myBot.user.name, m, {mentions: ments})
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'mute': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
@@ -865,17 +893,19 @@ switch(command) {
       ]
       await myBot.sendButtonText(m.chat, buttons, `${botName}`, myBot.user.name, m)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'antilink': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
     if (args[0] === "on") {
-      db.data.chats[m.chat].antilink = true
+      //db.data.chats[m.chat].antilink = true
       m.reply(myLang('antilink').on)
     } else if (args[0] === "off") {
-      db.data.chats[m.chat].antilink = false
+      //db.data.chats[m.chat].antilink = false
       m.reply(myLang('antilink').off)
     } else {
       let buttons = [
@@ -884,45 +914,53 @@ switch(command) {
       ]
       await myBot.sendButtonText(m.chat, buttons, `MOD ANTILINK`, myBot.user.name, m)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
 	case 'add': {
+	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
-    if (!isAdmins) return m.reply(myLang('global').admin)
+    if (!isAdmins || !isCreator) return m.reply(myLang('global').admin)
 		let users = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'add')
 		m.reply(myLang('group').add.replace('{}',users).replace('@s.whatsapp.net',''))
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+	}break
   case 'kick': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'remove')
 		m.reply(myLang('group').kick.replace('{}',users).replace('@s.whatsapp.net',''))
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+  }break
 	case 'promote': {
+	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+	  if (chekBlock === true) return m.reply('Estas Bloqueado.')
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote')
 		m.reply(myLang('group').prom.replace('{}',users).replace('@s.whatsapp.net',''))
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+	}break
 	case 'demote': {
+	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+	  if (chekBlock === true) return m.reply('Estas Bloqueado.')
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote')
 		m.reply(myLang('group').dem.replace('{}',users).replace('@s.whatsapp.net',''))
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+	}break
   case 'tagall': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
@@ -936,24 +974,28 @@ switch(command) {
       tga = `${ini}${mesaj}${end}`
     }
     myBot.sendMessage(m.chat, { text: tga, mentions: participants.map(a => a.id) }, { quoted: m })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'hdt': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
     myBot.sendMessage(m.chat, { text: q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case'linkgroup': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!m.isGroup) return m.reply(myLang('global').group)
     const inviteCode = await myBot.groupInviteCode(m.chat)
     const { subject } = await myBot.groupMetadata(m.chat)
     const caption = myLang('group').link_grup.replace('{}',subject).replace('{}',inviteCode)
     try { pic = await myBot.profilePictureUrl(m.chat, 'image') } catch (e) { pic = global.thumb }
     myBot.sendImage(m.chat, pic, caption, m)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
 // END GROUPS
 // FOR OWNER
   case 'join': {
@@ -963,20 +1005,20 @@ switch(command) {
     m.reply(myLang('global').wait)
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     await myBot.groupAcceptInvite(result).then((res) => m.reply(myLang('own').join.ok)).catch((err) => m.reply(myLang('own').join.err))
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
 	case 'public': {
     if (!isCreator) return m.reply(myLang('global').owner)
     myBot.public = true
     m.reply(myLang('own').public)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+	}break
   case 'self': {
     if (!isCreator) return m.reply(myLang('global').owner)
     myBot.public = false
     m.reply(myLang('own').self)
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'py': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply('a quien voy a saludar?')
@@ -991,7 +1033,8 @@ switch(command) {
     })
     pythonProcess.stdin.write(text)
     pythonProcess.stdin.end()
- }break
+   user.addUsageUser(m.sender, _user)
+  }break
   case 'speedtest': {
     if (!isCreator) return m.reply(myLang('global').owner)
     m.reply('Prueba de velocidad...')
@@ -1008,8 +1051,8 @@ switch(command) {
     if (stdout.trim()) m.reply(stdout)
     if (stderr.trim()) m.reply(stderr)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'update': {
     if (!isCreator) return m.reply(myLang('global').owner)
     await git.fetch();
@@ -1025,6 +1068,7 @@ switch(command) {
       );
       myBot.sendMessage(m.chat, { text: degisiklikler + '```' })
     }
+    user.addUsageUser(m.sender, _user)
   }break
   case 'actualizar': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -1042,23 +1086,24 @@ switch(command) {
         }
       }));
     }
+    user.addUsageUser(m.sender, _user)
   }break
   case 'block': {
 		if (!isCreator) return m.reply(myLang('global').owner)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'block').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+  }break
   case 'unblock': {
 		if (!isCreator) return m.reply(myLang('global').owner)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'unblock').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-	}
-	break
+	  user.addUsageUser(m.sender, _user)
+  }break
   case 'bc': case 'broadcast': case 'bcall': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
-    let anu = await store.chats.all().map(v => v.id)
+    let anu = await Object.keys(_user).map(i => _user[i].phone )
     m.reply(`Enviar difusión a ${anu.length} chat.\nTiempo de envio ${anu.length * 1.5} segundos.`)
     for (let i of anu) {
       await sleep(1500)
@@ -1066,8 +1111,8 @@ switch(command) {
       myBot.sendButtonLoc(i, global.thumb, txt, myBot.user.name, 'MENU', 'menu')
     }
     m.reply('Difusion Enviada')
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'bgc': case 'bcgroup': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
@@ -1081,8 +1126,8 @@ switch(command) {
       myBot.sendButtonLoc(i, global.thumb, txt, myBot.user.name, 'MENU', 'menu')
     }
     m.reply('Difusion Enviada')
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'ping': case 'status': {
 		if (!isCreator) return m.reply(myLang('global').owner)
     const used = process.memoryUsage()
@@ -1136,8 +1181,8 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
       m.reply(`*𝚃𝙸𝙴𝙼𝙿𝙾 𝙳𝙴 𝙴𝙹𝙴𝙲𝚄𝙲𝙸Ó𝙽*
 ${runtime(process.uptime())}`)
     }
-  }
-  break
+    user.addUsageUser(m.sender, _user)
+  }break
 
   default:
     if (budy.startsWith('=>')) {
@@ -1198,7 +1243,8 @@ ${runtime(process.uptime())}`)
     if (isCmd && budy.toLowerCase() != undefined) {
       if (m.chat.endsWith('broadcast')) return
       if (m.isBaileys) return
-      let msgs = global.db.data.database
+      //let msgs = global.db.data.database
+      let msgs = _user
       if (!(budy.toLowerCase() in msgs)) return
       myBot.copyNForward(m.chat, msgs[budy.toLowerCase()], true)
 		}

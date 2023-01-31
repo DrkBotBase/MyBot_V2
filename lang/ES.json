@@ -9,6 +9,11 @@
       "NEW_UPDATE": "*Hay una nueva actualización disponible para el bot!*\n\nCambios:\n```",
       "UPDATED_LOCAL": "*La actualización fue exitosa!"
     },
+    "reg": {
+      "msg": "El registro solo se puede hacer por chat privado.",
+      "check": "Ya estas registrado.",
+      "ok": "Te has registrado con exito."
+    },
     "alive": {
       "msg": "✪〘 *FUNCIONANDO* 〙✪"
     },
@@ -156,7 +161,8 @@
       "bot": "Funciones solo para el usuario del número del bot",
       "wait": "Un momento...",
       "endLimit": "Su límite diario ha expirado, el límite se restablecerá cada 12 horas",
-      "err" : "🤖 Parece que tenemos un error.\nIntenta nuevamente."
+      "err": "🤖 Parece que tenemos un error.\nIntenta nuevamente.",
+      "noReg": "Para usar los comandos del BOT, necesitas registrarte. Escribe {}reg\n\n*EL REGISTRO SOLO SE PUEDE HACER EN CHAT PRIVADO*"
     },
     "sc": {
       "msg": "No olvides dar estrellas"

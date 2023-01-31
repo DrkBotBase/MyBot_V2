@@ -16,6 +16,7 @@ if (existsSync('config.env')) require('dotenv').config({ path: './config.env' })
 
 // Other
 global.owner = ['573508770421']
+global.bot = '573046793853'
 global.premium = []
 global.author = 'DrkBot'
 global.sessionName = 'sess304'
@@ -34,6 +35,9 @@ global.limitawal = {
 
 global.thumb = readFileSync('./lib/bot.jpg')
 global.nothing = readFileSync('./lib/nsp.webp')
+
+global.user = require("./src/data")
+global._user = JSON.parse(readFileSync("./src/people.json"))
 
 function convertToBool(text, fault = 'true') {
     return text === fault ? true : false;
