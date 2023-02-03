@@ -18,7 +18,7 @@ const addUser = (userId, name, _db) => {
         }
     })
     if (position === false) {
-        const obj = { id: randomId(20), phone: userId, name: name, register: true, block: false, usage: 0, fail: 0}
+        const obj = { id: randomId(20), phone: userId, name: name, register: true, block: false, usage: 0, cash: 1000, fail: 0}
         _db.push(obj)
         fs.writeFileSync('./src/people.json', JSON.stringify(_db, null, 2))
         return false
@@ -99,6 +99,7 @@ const resetDataUsers = (_db) => {
   Object.keys(_db).forEach((i) => {
     _db[i].fail = 0
     _db[i].block = false
+    //_db[i].cash = 1000
   })
   fs.writeFile('./src/people.json', JSON.stringify(_db, null, 2))
 }
@@ -112,6 +113,14 @@ const addUsageUser = (userId, _db) => {
 	fs.writeFileSync("./src/people.json", JSON.stringify(_db, null, 2))
 }
 
+const addCashUser = (userId, monei, _db) => {
+	Object.keys(_db).forEach((i) => {
+		if (_db[i].phone === userId) {
+		  _db[i].cash += monei
+		}
+	})
+	fs.writeFileSync("./src/people.json", JSON.stringify(_db, null, 2))
+}
 
 module.exports = {
   addUser,
@@ -122,5 +131,6 @@ module.exports = {
   unreg,
   addFailUser,
   resetDataUsers,
-  addUsageUser
+  addUsageUser,
+  addCashUser
 }

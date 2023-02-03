@@ -18,12 +18,12 @@ const { performance } = require('perf_hooks')
 const simpleGit = require('simple-git')
 const fetch = require('node-fetch')
 const git = simpleGit()
-const { formatp, isUrl, sleep, clockString, runtime, fetchJson, jsonformat, format, parseMention, getRandom, modifyLetter } = require('./lib/myfunc')
+const { formatp, isUrl, sleep, clockString, runtime, fetchJson, jsonformat, format, parseMention, getRandom, pickRandom, modifyLetter } = require('./lib/myfunc')
 //const { yta, ytv } = require('./lib/y2mate')
 const { log, pint, bgPint } = require('./lib/colores');
-const { menu } = require('./src/assets/menu')
+const { menu, butImage, butTemplate } = require('./src/assets/menu')
 const Config = require('./config');
-const { youtubedlv2, youtubeSearch, tiktokdlv2 } = require('@bochilteam/scraper')
+const { youtubedlv2, youtubeSearch, tiktokdlv2, googleImage, savefrom } = require('@bochilteam/scraper')
 
 // Language
 const { JSDOM } = require('jsdom')
@@ -47,8 +47,8 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     try {
         var body = (m.mtype === 'conversation') ? m.message.conversation : (m.mtype == 'imageMessage') ? m.message.imageMessage.caption : (m.mtype == 'videoMessage') ? m.message.videoMessage.caption : (m.mtype == 'extendedTextMessage') ? m.message.extendedTextMessage.text : (m.mtype == 'buttonsResponseMessage') ? m.message.buttonsResponseMessage.selectedButtonId : (m.mtype == 'listResponseMessage') ? m.message.listResponseMessage.singleSelectReply.selectedRowId : (m.mtype == 'templateButtonReplyMessage') ? m.message.templateButtonReplyMessage.selectedId : (m.mtype === 'messageContextInfo') ? (m.message.buttonsResponseMessage?.selectedButtonId || m.message.listResponseMessage?.singleSelectReply.selectedRowId || m.text) : ''
         var budy = (typeof m.text == 'string' ? m.text : '')
-        var prefix = Config.HANDLER.match(/\[(\W*)\]/)[1][0]
         var botName = Config.BOT_NAME
+        const prefix = Config.HANDLER.match(/\[(\W*)\]/)[1][0]
         const isCmd = body.startsWith(prefix)
         const command = body.replace(prefix, '').trim().split(/ +/).shift().toLowerCase()
         const args = body.trim().split(/ +/).slice(1)
@@ -64,6 +64,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         // New Functions BD
         const regUser = user.chekUser(m.sender, _user)
         const chekBlock = user.showData(m.sender, _user)
+        const { _keys, _unlock } = require('./src/keyGames')
 	
         // Group
         const groupMetadata = m.isGroup ? await myBot.groupMetadata(m.chat).catch(e => {}) : ''
@@ -147,36 +148,6 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
 
 // ======== INICIO COMANDOS ========
 switch(command) {
-  /*case 'test': { if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (!isCreator) return m.reply(myLang('global').owner)
-		let buttonMessage= {
-'document':{'url': 'http://github.com/' },
-'mimetype': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-'fileName': `「 𝔻ℝ𝕂𝔹𝕆𝕋 」`,
-'fileLength': 1000000,
-'pageCount': 1,
-'contextInfo':{
-'forwardingScore':1,
-'isForwarded':true,
-'externalAdReply':{
-'mediaUrl': 'http://github.com/',
-'mediaType': 2,
-'previewType': 2,
-'title': 'SC',
-'body': 'menu',
-'thumbnail': global.thumb,
-'sourceUrl': 'https://www.youtube.com/'}},
-'caption': 'http://github.com/',
-'footer': myBot.user.name,
-'buttons':[
-{'buttonId': 'menu','buttonText':{'displayText':'ᴍᴇɴᴜ'},'type':1},
-{'buttonId': 'status','buttonText':{'displayText':'ʀᴜɴᴛɪᴍᴇ'},'type':1}
-],
-'headerType':6}
-    await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
-
-	  user.addUsageUser(m.sender, _user) }break*/
-
 	case 'reg': {
 	  if (m.isGroup) return m.reply(myLang('reg').msg)
 	  if (regUser === true) return m.reply(myLang('reg').check)
@@ -189,8 +160,7 @@ switch(command) {
 	/*case 'test': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    m.reply('Hola')
-    user.addFailUser(m.sender, _user)
+    user.resetDataUsers(_user)
 	}break*/
 	case 'kill': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -216,8 +186,25 @@ switch(command) {
     } else if (args[0] === 'location'){
       global.typeMenu = 'location'
       m.reply(myLang('global').success)
+    } else if (args[0] === 'source'){
+      global.typeMenu = 'source'
+      m.reply(myLang('global').success)
+    } else {
+      let sections = [
+        {
+          title: 'OPCIONES DE CAMBIO DE MENÚ',
+          rows: [
+            {title: "Menú Image", rowId: `setmenu image`, description: `Menú con imagen`},
+            {title: "Menú Location", rowId: `setmenu location`, description: `Menú Pequeño`},
+            {title: "Menú Archivo", rowId: `setmenu source`, description: `Menú Archivo`},
+            {title: "Menú Template", rowId: `setmenu template`, description: `Menú Botones Template`}
+            ]
+        },
+        ]
+      myBot.sendListMsg(m.chat, 'Selecciona el tipo de Munú del Bot', myBot.user.name, `Hola ${pushname}`, '⬆️', sections, m)
     }
-    user.addUsageUser(m.sender, _user) }break
+    user.addUsageUser(m.sender, _user)
+  }break
   case 'alive': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
@@ -229,38 +216,38 @@ switch(command) {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
     anu = menu(prefix, pushname, botName)
-    let buttons = [
-      { buttonId: 'menu', buttonText: { displayText: 'MENU' }, type: 1 },
-      { buttonId: 'owner', buttonText: { displayText: 'OWNER' }, type: 1 },
-      { buttonId: 'sc', buttonText: { displayText: 'GITHUB' }, type: 1 }
-    ]
-
-    let btn = [
-      {urlButton: {
-        displayText: 'Source Code',
-        url: `${sourceCode}`
-      }},
-      {callButton: {
-        displayText: 'Number Phone Owner',
-        phoneNumber: `+${global.owner}`
-      }},
-      {quickReplyButton: {
-        displayText: 'Menu',
-        id: 'menu'
-      }},
-      {quickReplyButton: {
-        displayText: 'Contact Owner',
-        id: 'owner'}},
-      {quickReplyButton: {
-          displayText: 'GitHub',
-          id: 'sc'}}
-    ]
+    let buttonMessage = {
+'document':{'url': 'http://github.com/' },
+'mimetype': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+'fileName': `「 𝔻ℝ𝕂𝔹𝕆𝕋 」`,
+'fileLength': 1000000,
+'pageCount': 1,
+'contextInfo':{
+'forwardingScore':1,
+'isForwarded':true,
+'externalAdReply':{
+'mediaUrl': 'http://github.com/',
+'mediaType': 2,
+'previewType': 2,
+'title': 'SC',
+'body': 'menu',
+'thumbnail': global.thumb,
+'sourceUrl': 'https://www.youtube.com/'}},
+'caption': anu,
+'footer': myBot.user.name,
+'buttons':[
+{'buttonId': 'menu','buttonText':{'displayText':'ᴍᴇɴᴜ'},'type':1},
+{'buttonId': 'status','buttonText':{'displayText':'ʀᴜɴᴛɪᴍᴇ'},'type':1}
+],
+'headerType':6}
     if(global.typeMenu === 'image') {
-      myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, buttons)
+      myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, butImage)
     } else if(global.typeMenu === 'template') {
-      myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, btn)
+      myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, butTemplate)
     } else if(global.typeMenu === 'location') {
-      myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'MENU', 'menu')
+      myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'CONTACT OWNER', 'owner')
+    } else if(global.typeMenu === 'source') {
+      await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
     }
     user.addUsageUser(m.sender, _user)
   }break
@@ -525,6 +512,7 @@ switch(command) {
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('yts').msg.replace('{}', prefix+command))
     try {
+      m.reply(myLang('global').wait)
       search = await youtubeSearch(text)
       let teks = myLang('yts').res +' *'+text+'*\n\n'
       search.video.map((video) => {
@@ -614,14 +602,10 @@ switch(command) {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if(!args[0]) return m.reply(myLang('fbdl').msg.replace('{}', prefix))
-    try {
       m.reply(myLang('global').wait)
       let res = await savefrom(args[0])
-      let url = res[0].sd.url
-      myBot.sendMessage(m.chat, { video: { url }, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
-    } catch (e) {
-      m.reply(myLang('global').err)
-    }
+      let link = await res[0].sd.url
+      myBot.sendMessage(m.chat, { video: { url: link }, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
     user.addUsageUser(m.sender, _user)
   }break*/
   case 'waifu': case 'neko': {
@@ -639,6 +623,7 @@ switch(command) {
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
     try {
+      m.reply(myLang('global').wait)
       let { wallpaper } = require('./lib/scraper')
       anu = await wallpaper(text)
       result = anu[Math.floor(Math.random() * anu.length)]
@@ -660,10 +645,10 @@ switch(command) {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
-    let gis = require('async-g-i-s');
     try {
-      const results = await gis(text);
-      let rndImg = results[Math.floor(Math.random() * results.length)].url
+      m.reply(myLang('global').wait)
+      let res = await googleImage(text);
+      let rndImg = await res[Math.floor(Math.random() * res.length)]
       
       let buttons = [
           {buttonId: `img ${text}`, buttonText: {displayText: '️➡️'}, type: 1}
@@ -851,6 +836,164 @@ switch(command) {
     user.addUsageUser(m.sender, _user)
   }break
 // FOR GROUPS
+  // GAMES
+  case 'dados': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    //if (!m.isGroup) return m.reply(myLang('global').group)
+    let da = ['./src/media/1.webp', './src/media/2.webp', './src/media/3.webp', './src/media/4.webp', './src/media/5.webp', './src/media/6.webp'];
+    let res = pickRandom(da)
+    if (res === './src/media/1.webp') {
+      await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
+      user.addUsageUser(m.sender, _user)
+      user.addCashUser(m.sender, -20, _user)
+    } else if (res === './src/media/2.webp') {
+      await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
+      user.addUsageUser(m.sender, _user)
+      user.addCashUser(m.sender, 4, _user)
+    } else if (res === './src/media/3.webp') {
+      await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
+      user.addUsageUser(m.sender, _user)
+      user.addCashUser(m.sender, 6, _user)
+    } else if (res === './src/media/4.webp') {
+      await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
+      user.addUsageUser(m.sender, _user)
+      user.addCashUser(m.sender, 8, _user)
+    } else if (res === './src/media/5.webp') {
+      await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
+      user.addUsageUser(m.sender, _user)
+      user.addCashUser(m.sender, 10, _user)
+    } else if (res === './src/media/6.webp') {
+      await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
+      user.addUsageUser(m.sender, _user)
+      user.addCashUser(m.sender, 20, _user)
+    }
+  }break
+  case 'ppt': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    //if (!m.isGroup) return m.reply(myLang('global').group)
+    let reseqv = `Seleccione piedra/papel/tijera\n\nEjemplo : *${prefix + command}* piedra`
+    if (!text) return m.reply(reseqv)
+    var rnd = Math.floor(Math.random() * (9 - 1 + 1)) + 1
+
+    if (rnd <= 3) {
+        rnd = 'piedra'
+    } else if (rnd > 3 && rnd <= 6) {
+        rnd = 'tijera'
+    } else {
+        rnd = 'papel'
+    }
+
+    if (text == rnd) {
+      m.reply(`*Empate*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
+      user.addCashUser(m.sender, 10, _user)
+    } else if (text == 'piedra') {
+      if (rnd == 'tijera') {
+          m.reply(`*Ganaste* 🎊\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
+          user.addCashUser(m.sender, 20, _user)
+      } else {
+        m.reply(`*Perdiste*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
+          user.addCashUser(m.sender, -20, _user)
+      }
+    } else if (text == 'tijera') {
+      if (rnd == 'papel') {
+        m.reply(`*Ganaste* 🎊\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
+          user.addCashUser(m.sender, 20, _user)
+      } else {
+        m.reply(`*Perdiste*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
+        user.addCashUser(m.sender, -20, _user)
+      }
+    } else if (text == 'papel') {
+      if (rnd == 'piedra') {
+        m.reply(`*Ganaste* 🎊\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
+        user.addCashUser(m.sender, 20, _user)
+      } else {
+        m.reply(`*Perdiste*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
+        user.addCashUser(m.sender, -20, _user)
+      }
+    } else {
+      return m.reply(reseqv)
+    }
+  }break
+  case 'slot': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    //if (!m.isGroup) return m.reply(myLang('global').group)
+    a = '💎'
+    b = '♠️'
+    c = '♣️'
+    e = '♥️'
+    f = '♦️'
+    g = '💤'
+    pw = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck = pw[Math.floor(Math.random() * pw.length)]
+    pw1 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck1 = pw1[Math.floor(Math.random() * pw1.length)]
+    pw2 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck2 = pw2[Math.floor(Math.random() * pw2.length)]
+    pw3 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck3 = pw3[Math.floor(Math.random() * pw3.length)]
+    pw4 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck4 = pw4[Math.floor(Math.random() * pw4.length)]
+    pw5 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck5 = pw5[Math.floor(Math.random() * pw5.length)]
+    pw6 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck6 = pw6[Math.floor(Math.random() * pw6.length)]
+    pw7 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck7 = pw7[Math.floor(Math.random() * pw7.length)]
+    pw8 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
+    luck8 = pw8[Math.floor(Math.random() * pw8.length)]
+    d = `${luck}   ${luck1}   ${luck2}`
+    r = `${luck3}   ${luck4}   ${luck5}`
+    k = `${luck6}   ${luck7}   ${luck8}`
+    const slt = (lineA, lineB, lineC, msg) => {
+      return `${msg}
+──────
+${lineA}
+${lineB}
+${lineC}
+──────
+🔮𝉃𝜄𝜐𝉃𝜍𝜅𝉃𝛾🔮`
+    }
+    if (r == '♠️   ♠️   ♠️') {
+      user.addCashUser(m.sender, points*5, _user)
+      myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 50 PUNTOS*'), m)
+    } else if (r == '💎   💎   💎' ) {
+      user.addCashUser(m.sender, points*10, _user)
+      myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 100 PUNTOS*'), m)
+    } else if (r == '♥️   ♥️   ♥️' ) {
+      user.addCashUser(m.sender, points*2, _user)
+      myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 20 PUNTOS*'), m)
+    } else if (r == '♣️   ♣️   ♣' ) {
+      user.addCashUser(m.sender, points*2, _user)
+      myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 20 PUNTOS*'), m)
+    } else if (r == '♦   ♦   ♦️' ) {
+      user.addCashUser(m.sender, points*2, _user)
+      myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 20 PUNTOS*'), m)
+    } else if (d == '💤   💤   💤'  || r == '💤   💤   💤' || k == '💤   💤   💤') {
+      myBot.sendText(m.chat, slt(d, r, k, '🥶 *BLOQUEADO*'), m)
+      user.addBlockUser(m.sender, _user);
+    } else {
+      user.addCashUser(m.sender, -20, _user)
+      myBot.sendText(m.chat, slt(d, r, k, '😭 *PERDISTE 20 PUNTOS*'), m)
+      myBot.sendText(m.chat, pickRandom(_keys), m)
+    }
+  }break
+  
+  case 'unlock': {
+    if (_unlock.includes(args[0])) {
+      user.delBlockUser(m.sender, _user);
+      m.reply(`Usaste satisfactoriamente la Key *${args[0]}* para desbloquearte, sigue jugando y acumulando Keys.`)
+    } else {
+      m.reply('Sigue intentando')
+    }
+  }break
+  /*case 'key' {
+    
+  }break*/
+
+  // END GAMES
   case 'gay': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (chekBlock === true) return m.reply('Estas Bloqueado.')
@@ -1103,12 +1246,17 @@ switch(command) {
   case 'bc': case 'broadcast': case 'bcall': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
+    try {
+      imgbc = await quoted.download()
+    } catch {
+      imgbc = global.thumb
+    }
     let anu = await Object.keys(_user).map(i => _user[i].phone )
     m.reply(`Enviar difusión a ${anu.length} chat.\nTiempo de envio ${anu.length * 1.5} segundos.`)
     for (let i of anu) {
       await sleep(1500)
       let txt = `「 Difusor Bot 」\n\n${text}`
-      myBot.sendButtonLoc(i, global.thumb, txt, myBot.user.name, 'MENU', 'menu')
+      myBot.sendButtonLoc(i, imgbc, txt, myBot.user.name, 'MENU', 'menu')
     }
     m.reply('Difusion Enviada')
     user.addUsageUser(m.sender, _user)

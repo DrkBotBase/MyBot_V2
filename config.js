@@ -21,23 +21,21 @@ global.premium = []
 global.author = 'DrkBot'
 global.sessionName = 'sess304'
 global.sp = '╠❖'
-global.typeMenu = 'image'
+global.typeMenu = 'location'
 global.timeZone = 'America/Bogota'
 global.timeLocale = 'co'
 global.sourceCode = 'https://github.com'
 global.newFont = 'on'
 global.botFont = 'Math monospace'
 
-global.limitawal = {
-    premium: "Infinity",
-    free: 100
-}
+global.points = 10
 
 global.thumb = readFileSync('./lib/bot.jpg')
 global.nothing = readFileSync('./lib/nsp.webp')
 
 global.user = require("./src/data")
 global._user = JSON.parse(readFileSync("./src/people.json"))
+
 
 function convertToBool(text, fault = 'true') {
     return text === fault ? true : false;

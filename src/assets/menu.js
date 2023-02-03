@@ -97,4 +97,32 @@ ${p} ${prefix}romevebg
 ╚══✪〘 *DrkBot* 〙✪══`
 }
 
-module.exports = { menu }
+const butImage  = [
+      { buttonId: 'menu', buttonText: { displayText: 'MENU' }, type: 1 },
+      { buttonId: 'owner', buttonText: { displayText: 'OWNER' }, type: 1 },
+      { buttonId: 'sc', buttonText: { displayText: 'GITHUB' }, type: 1 }
+    ]
+
+const butTemplate  = [
+      {urlButton: {
+        displayText: 'Source Code',
+        url: `${sourceCode}`
+      }},
+      {callButton: {
+        displayText: 'Number Phone Owner',
+        phoneNumber: `+${global.owner}`
+      }},
+      {quickReplyButton: {
+        displayText: 'Menu',
+        id: 'menu'
+      }},
+      {quickReplyButton: {
+        displayText: 'Contact Owner',
+        id: 'owner'}},
+      {quickReplyButton: {
+          displayText: 'GitHub',
+          id: 'sc'}}
+    ]
+
+
+module.exports = { menu, butImage, butTemplate }
