@@ -18,28 +18,16 @@ const { performance } = require('perf_hooks')
 const simpleGit = require('simple-git')
 const fetch = require('node-fetch')
 const git = simpleGit()
-const { formatp, isUrl, sleep, clockString, runtime, fetchJson, jsonformat, format, parseMention, getRandom, pickRandom, modifyLetter } = require('./lib/myfunc')
+const { formatp, isUrl, sleep, clockString, runtime, getBuffer, fetchJson, jsonformat, format, parseMention, getRandom, pickRandom, modifyLetter } = require('./lib/myfunc')
 //const { yta, ytv } = require('./lib/y2mate')
 const { log, pint, bgPint } = require('./lib/colores');
-const { menu, butImage, butTemplate } = require('./src/assets/menu')
+const { menu, butTemplate, rules } = require('./plugins/menu')
 const Config = require('./config');
+const yts = require('yt-search')
 const { youtubedlv2, youtubeSearch, tiktokdlv2, googleImage, savefrom } = require('@bochilteam/scraper')
+const { y1s, expandUrl, wallpaper } = require('./lib/scraper')
 
 // Language
-const { JSDOM } = require('jsdom')
-async function testLetter(text){
-  let res = await fetch('http://qaz.wtf/u/convert.cgi?text=' + encodeURIComponent(text))
-  let html = await res.text()
-  let dom = new JSDOM(html)
-  let table = dom.window.document.querySelector('table').children[0].children
-let obj = {}
-  for (let tr of table) {
-    let name = tr.querySelector('.aname').innerHTML
-    let content = tr.children[1].textContent.replace(/^\n/, '').replace(/\n$/, '')
-    obj[name + (obj[name] ? ' Reversed' : '')] = content
-  }
-  return(obj[global.botFont])
-}
 const myLang = require('./language').getString
 
 
@@ -62,9 +50,10 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         const isMedia = /image|video|sticker|audio/.test(mime)
         
         // New Functions BD
-        const regUser = user.chekUser(m.sender, _user)
-        const chekBlock = user.showData(m.sender, _user)
-        const { _keys, _unlock } = require('./src/keyGames')
+        const { User, addUserKey, totalHit } = require('./src/data')
+        const regUser = User.check(m.sender)
+        const checkUser = User.show(m.sender)
+        const { keysAll, _unlock, _puntosMas, _puntosMenos } = require('./src/keys')
 	
         // Group
         const groupMetadata = m.isGroup ? await myBot.groupMetadata(m.chat).catch(e => {}) : ''
@@ -100,7 +89,6 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
 	// reset users every 12 hours
         let cron = require('node-cron')
         cron.schedule('00 12 * * *', () => {
-            user.resetDataUsers(_user);
             log(pint('Reseted Data', 'yellow.'))
         }, {
             scheduled: true,
@@ -146,34 +134,47 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         myBot.ev.emit('messages.upsert', msg)
         }
 
+
 // ======== INICIO COMANDOS ========
 switch(command) {
+  // ======== REGISTRO DB ========
 	case 'reg': {
 	  if (m.isGroup) return m.reply(myLang('reg').msg)
 	  if (regUser === true) return m.reply(myLang('reg').check)
-    user.addUser(m.sender, pushname, _user)
+    new User(m.sender, pushname)
     m.reply(myLang('reg').ok)
 	}break
-	case 'unreg': {
-    user.unreg(m.sender, _user);
-	}break
-	/*case 'test': {
+	case 'profile': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    user.resetDataUsers(_user)
-	}break*/
+    let message = '*ID: '+checkUser.id+'*\n'+
+      '*Número:* '+checkUser.number.split('@')[0]+'\n'+
+      '*Nombre:* '+checkUser.name+'\n'+
+      '*Puntos:* '+checkUser.points+'\n'+
+      '*Uso del Bot:* '+checkUser.use+'\n'+
+      '*Reportes:* '+checkUser.report;
+    if (!m.isGroup) {
+      message += '\n*Keys:* '+jsonformat(checkUser.keys).replace(/"/g, '*').replace(/,/g, '');
+    }
+    m.reply(message)
+	}break
+	case 'rules': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+	  myBot.sendImage(m.chat, rulesImg, rules)
+    User.counter(m.sender, {usage: 1})
+	}break
 	case 'kill': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (args[0] === 'add') {
-      user.addBlockUser(args[1] + "@s.whatsapp.net", _user);
+      User.change(args[1] + "@s.whatsapp.net", {block: true});
     } else if (args[0] === 'del') {
-      user.delBlockUser(args[1] + "@s.whatsapp.net", _user);
+      User.change(args[1] + "@s.whatsapp.net", {block: false});
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
 	}break
   case 'owner': {
     myBot.sendContact(m.chat, global.owner, m)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'setmenu': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -186,9 +187,6 @@ switch(command) {
     } else if (args[0] === 'location'){
       global.typeMenu = 'location'
       m.reply(myLang('global').success)
-    } else if (args[0] === 'source'){
-      global.typeMenu = 'source'
-      m.reply(myLang('global').success)
     } else {
       let sections = [
         {
@@ -196,64 +194,42 @@ switch(command) {
           rows: [
             {title: "Menú Image", rowId: `setmenu image`, description: `Menú con imagen`},
             {title: "Menú Location", rowId: `setmenu location`, description: `Menú Pequeño`},
-            {title: "Menú Archivo", rowId: `setmenu source`, description: `Menú Archivo`},
             {title: "Menú Template", rowId: `setmenu template`, description: `Menú Botones Template`}
             ]
         },
         ]
       myBot.sendListMsg(m.chat, 'Selecciona el tipo de Munú del Bot', myBot.user.name, `Hola ${pushname}`, '⬆️', sections, m)
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'alive': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    anu = await testLetter(myLang('alive').msg)
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    anu = await modifyLetter(myLang('alive').msg)
     myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'MENU', 'menu')
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'menu': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    anu = menu(prefix, pushname, botName)
-    let buttonMessage = {
-'document':{'url': 'http://github.com/' },
-'mimetype': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-'fileName': `「 𝔻ℝ𝕂𝔹𝕆𝕋 」`,
-'fileLength': 1000000,
-'pageCount': 1,
-'contextInfo':{
-'forwardingScore':1,
-'isForwarded':true,
-'externalAdReply':{
-'mediaUrl': 'http://github.com/',
-'mediaType': 2,
-'previewType': 2,
-'title': 'SC',
-'body': 'menu',
-'thumbnail': global.thumb,
-'sourceUrl': 'https://www.youtube.com/'}},
-'caption': anu,
-'footer': myBot.user.name,
-'buttons':[
-{'buttonId': 'menu','buttonText':{'displayText':'ᴍᴇɴᴜ'},'type':1},
-{'buttonId': 'status','buttonText':{'displayText':'ʀᴜɴᴛɪᴍᴇ'},'type':1}
-],
-'headerType':6}
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    anu = menu(prefix, pushname, botName, totalHit())
+    linkS = ['https://youtu.be/13aBcRrL0oE','https://youtu.be/e-fA-gBCkj0','https://youtu.be/CQLsdm1ZYAw','https://youtu.be/Bznxx12Ptl0','https://youtu.be/u9LH_y159sg','https://youtu.be/HhjHYkPQ8F0','https://youtu.be/nPvuNsRccVw','https://youtu.be/KRaWnd3LJfs','https://youtu.be/KBtk5FUeJbk','https://youtu.be/ZaflNU45bVY','https://youtu.be/D9G1VOjN_84']
+    let enlace = {contextInfo: {externalAdReply: {title: 'MUSICA SELECCIONADA',body: 'Link :)',sourceUrl: linkS[Math.floor(linkS.length * Math.random())],thumbnail: global.miniRobot}}}
     if(global.typeMenu === 'image') {
-      myBot.sendButImage(m.chat, global.thumb, anu, myBot.user.name, butImage)
+      myBot.sendButton(m.chat, anu, myBot.user.name, global.thumb, [['MENU','menu'],['OWNER','owner'],['GITHUB','github']], m, enlace)
     } else if(global.typeMenu === 'template') {
       myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, butTemplate)
     } else if(global.typeMenu === 'location') {
-      myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'CONTACT OWNER', 'owner')
-    } else if(global.typeMenu === 'source') {
-      await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
+      myBot.sendButtonLoc(m.chat, global.thumb, anu, myBot.user.name, 'REGLAS', 'rules')
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'donar': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     txtt = `Hola *${pushname}*\nVEO QUE QUIERES DONAR\nPuedes hacerlo por medio de las siguientes formas disponibles`
     ftext = 'Tu donasión será muy valiosa'
 
@@ -263,37 +239,32 @@ switch(command) {
       { buttonId: `${prefix}dvplata`, buttonText: { displayText: 'DaviPlata' }, type: 1 }
     ]
     await myBot.sendButtonText(m.chat, buttons, txtt, ftext, m)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'sc': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     m.reply(`*${myLang('sc').msg}*\n\n*Script:* ${sourceCode}`)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
 // CONVERTER
-
   case 'sticker': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('sticker').quot.replace('{}', prefix+command))
     if (text.length > 0){
       name = text
     } else {
       name = botName
     }
-    if (/image/.test(mime)) {
-      m.reply(myLang('global').wait)
-      let media = await quoted.download()
-      let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: name, author: global.author })
-      await fs.unlinkSync(encmedia)
-     } else if (/webp/.test(mime)) {
-      m.reply(myLang('global').wait)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    if (/image|webp/.test(mime)) {
       let media = await quoted.download()
       let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: name, author: global.author })
       await fs.unlinkSync(encmedia)
     } else if (/video/.test(mime)) {
-      m.reply(myLang('global').wait)
       if ((quoted.msg || quoted).seconds > 11) return m.reply(myLang('sticker').time_wait)
       let media = await quoted.download()
       let encmedia = await myBot.sendVideoAsSticker(m.chat, media, m, { packname: name, author: global.author })
@@ -301,39 +272,42 @@ switch(command) {
     } else {
       m.reply(myLang('sticker').end.replace('{}', prefix+command))
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'toaudio': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_audio').quot)
     if (!/video/.test(mime) && !/audio/.test(mime)) return m.reply(myLang('to_audio').q_audio)
-    m.reply(myLang('global').wait)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     let media = await quoted.download()
     let { toAudio } = require('./lib/converter')
     let audio = await toAudio(media, 'mp4')
     myBot.sendMessage(m.chat, {audio: audio, mimetype: 'audio/mpeg'}, { quoted : m })
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'tomp4': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_mp4').quot)
     if (!/webp/.test(mime)) return m.reply(myLang('to_mp4').q_video)
-    m.reply(myLang('global').wait)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let webpToMp4 = await webp2mp4File(media)
     await myBot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: myLang('global').by.replace('{}', botName) } }, { quoted: m })
     await fs.unlinkSync(media)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'toimg': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_img').quot)
     if (!/webp/.test(mime)) return m.reply(myLang('to_img').q_img)
-    m.reply(myLang('global').wait)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let ran = await getRandom('.png')
     exec(`ffmpeg -i ${media} ${ran}`, (err) => {
@@ -343,40 +317,46 @@ switch(command) {
       myBot.sendMessage(m.chat, { image: buffer }, { quoted: m })
       fs.unlinkSync(ran)
     })
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'togif': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_gif').quot)
     if (!/webp/.test(mime) && !/video/.test(mime)) return m.reply(myLang('to_gif').q_gif)
-    m.reply(myLang('global').wait)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let webpToMp4 = await webp2mp4File(media)
     await myBot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: myLang('global').by.replace('{}', botName) }, gifPlayback: true }, { quoted: m })
     await fs.unlinkSync(media)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'tourl': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    m.reply(myLang('global').wait)
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
 		let { UploadFileUgu, webp2mp4File, TelegraPh } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
-    if (/image/.test(mime)) {
+    if (/image|audio/.test(mime)) {
     let anu = await TelegraPh(media)
       m.reply(util.format(anu))
-    } else if (!/image/.test(mime)) {
-      let anu = await UploadFileUgu(media)
+    } else if (/video/.test(mime)) {
+      if ((quoted.msg || quoted).seconds > 11) return m.reply(myLang('sticker').time_wait)
+      let anu = await TelegraPh(media)
       m.reply(util.format(anu))
+    } else {
+      m.reply(myLang('removebg').err)
     }
     await fs.unlinkSync(media)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'emojimix': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('emojimix').msg.replace('{}', prefix+command))
     let [emoji1, emoji2] = text.split`+`
     let anu = await fetchJson(`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=proactive&collection=emoji_kitchen_v5&q=${encodeURIComponent(emoji1)}_${encodeURIComponent(emoji2)}`)
@@ -384,20 +364,12 @@ switch(command) {
       let encmedia = await myBot.sendImageAsSticker(m.chat, res.url, m, { packname: botName, author: global.author, categories: res.tags })
       await fs.unlinkSync(encmedia)
 		}
-	  user.addUsageUser(m.sender, _user)
+	  User.counter(m.sender, {usage: 1})
   }break
-	/*
-	case 'attp': case 'ttp': {
-	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-	  if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    if (!text) return m.reply(myLang('attp').msg.replace('{}', prefix+command))
-    await myBot.sendMedia(m.chat, `https://xteam.xyz/${command}?file&text=${text}`, 'Bot', 'MD', m, {asSticker: true})
-    user.addUsageUser(m.sender, _user)
-	}break
-  */
   case 'trt': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.quoted && !text) return m.reply(myLang('trt').quot)
     const translatte = require('translatte')
     var split = text.split(' ')
@@ -414,11 +386,12 @@ switch(command) {
     }).catch(err => {
         m.reply(myLang('global').err)
     });
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'removebg': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!/image/.test(mime)) return m.reply(myLang('removebg').msg.replace('{}', prefix+command))
     let { removeBackgroundFromImageFile, RemoveBgError } = require('remove.bg')
     let apirnobg = ['HBbdxnge4BVXJwqhcAHqVC', 'uHUYM1Wo4QcrFsqGbWoMr2zi', 'qySfrLUKRQejaMoJ54LHpShB']
@@ -426,7 +399,7 @@ switch(command) {
     hmm = await './src/remobg-'+getRandom('')
     localFile = await myBot.downloadAndSaveMediaMessage(quoted, hmm)
     outputFile = await './src/hremo-'+getRandom('.png')
-    m.reply(myLang('global').wait)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     removeBackgroundFromImageFile({
       path: localFile,
       apiKey: apinobg,
@@ -436,18 +409,22 @@ switch(command) {
       outputFile 
     }).then(async (result) => {
       myBot.sendMessage(m.chat, {image: fs.readFileSync(outputFile), caption: myLang('global').by.replace('{}', botName) }, { quoted : m })
+	    User.counter(m.sender, {usage: 1})
       await fs.unlinkSync(localFile)
       await fs.unlinkSync(outputFile)
     }).catch((error) => {
       fs.unlinkSync(localFile)
-      if(error[0].code === 'insufficient_credits') m.reply(myLang('removebg').err)
-      throw 'Cambiar ApiKey removebg!'
+      if(error[0].code === 'insufficient_credits') {
+        m.reply(myLang('removebg').err)
+        myBot.sendText(global.owner+'@s.whatsapp.net', 'Cambiar ApiKey removebg!')
+      }
     });
-	  user.addUsageUser(m.sender, _user)
   }break
   case 'bass': case 'blown': case 'deep': case 'earrape': case 'fast': case 'fat': case 'nightcore': case 'reverse': case 'robot': case 'slow': case 'smooth': case 'tupai':
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
       let set
       if (/bass/.test(command)) set = '-af equalizer=f=54:width_type=o:width=2:g=20'
@@ -463,7 +440,6 @@ switch(command) {
       if (/smooth/.test(command)) set = '-filter:v "minterpolate=\'mi_mode=mci:mc_mode=aobmc:vsbmc=1:fps=120\'"'
       if (/tupai/.test(command)) set = '-filter:a "atempo=0.5,asetrate=65100"'
       if (/audio/.test(mime)) {
-        m.reply(myLang('global').wait)
         let media = await myBot.downloadAndSaveMediaMessage(quoted)
         let ran = getRandom('.mp3')
         exec(`ffmpeg -i ${media} ${set} ${ran}`, (err, stderr, stdout) => {
@@ -471,160 +447,152 @@ switch(command) {
           if (err) return m.reply(err)
           let buff = fs.readFileSync(ran)
           myBot.sendMessage(m.chat, { audio: buff, mimetype: 'audio/mpeg' }, { quoted : m })
+          User.counter(m.sender, {usage: 1})
           fs.unlinkSync(ran)
         })
       } else m.reply(myLang('voz_modify').msg)
     } catch (e) {
       throw e
     }
-  user.addUsageUser(m.sender, _user)
   break
 // DOWNLOADS
   case 'play': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('play').msg.replace('{}', prefix+command))
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
-      m.reply(myLang('global').wait)
-      ytm = await youtubeSearch(text)
-      let { thumbnail, title, url } = ytm.video[0]
+      let ytm = await yts(text)
+      let { thumbnail, title, url } = ytm.all[0]
       let buttons = [
         { buttonId: `song ${url}`, buttonText: { displayText: 'AUDIO' }, type: 1 },
         { buttonId: `video ${url}`, buttonText: { displayText: 'VIDEO' }, type: 1 }
       ]
       myBot.sendButImage(m.chat, thumbnail, `*${title}*`, myBot.user.name, buttons)
-    } catch (e) { throw e }
-    user.addUsageUser(m.sender, _user)
+      User.counter(m.sender, {usage: 1})
+    } catch (e) { m.reply(myLang('global').err) }
   }break
   case 'ttdl': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('ttdl').msg.replace('{}', prefix+command))
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
-      m.reply(myLang('global').wait)
       let { video } = await tiktokdlv2(text)
       await myBot.sendMessage(m.chat, { video: { url: video.no_watermark }, mimetype: 'video/mp4', fileName: `tiktokdl.mp4`, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
-    } catch (e) { throw e }
-    user.addUsageUser(m.sender, _user)
+      User.counter(m.sender, {usage: 1})
+    } catch (e) { m.reply(myLang('global').err) }
   }break
   case 'yts': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('yts').msg.replace('{}', prefix+command))
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
-      m.reply(myLang('global').wait)
-      search = await youtubeSearch(text)
+      let search = await yts(text)
       let teks = myLang('yts').res +' *'+text+'*\n\n'
-      search.video.map((video) => {
+      search.all.map((video) => {
         teks += '*' + video.title + '* - ' + video.url + '\n'
       });
-      myBot.sendImage(m.chat, search.video[0].thumbnail, teks)
-    } catch (e) { throw e }
-    user.addUsageUser(m.sender, _user)
+      myBot.sendImage(m.chat, search.all[0].thumbnail, teks)
+      User.counter(m.sender, {usage: 1})
+    } catch (e) { m.reply(myLang('global').err) }
   }break
   case 'song': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('song').msg.replace('{}', prefix))
-    try {
-      m.reply(myLang('global').wait)
-      let ytm = await youtubedlv2(text)
-      let link = await ytm.audio['128kbps'].download()
-      let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
-      let tinyUrl = tiny.data;
-      if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', tinyUrl), m)
-      //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
-      await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ytm.quality), m)
-      await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
-    } catch (e){
-      throw e
-      m.reply(myLang('global').err)
-    }
-    user.addUsageUser(m.sender, _user)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    let down = await y1s('mp3', await expandUrl(text))
+    if(!down.status) return m.reply(myLang('global').err)
+    let tsize = down.size.split(' ')[1]
+    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
+    if(!down.dlink) return m.reply(myLang('global').err)
+    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
+    await myBot.sendMessage(m.chat, {document: {url: down.dlink}, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})
+    User.counter(m.sender, {usage: 1})
   }break
   case 'video': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('video').msg.replace('{}', prefix))
-    try {
-      m.reply(myLang('global').wait)
-      let ytm = await youtubedlv2(text)
-      let link = await ytm.video['360p'].download()
-      let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
-      let tinyUrl = tiny.data;
-      if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumbnail, myLang('video').big_size.replace('{}', tinyUrl), m)
-      //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
-      await myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: myLang('video').caption.replace('{}', ytm.title) }, { quoted: m })
-    } catch (e) {
-      throw e
-      m.reply(myLang('global').err)
-    }
-    user.addUsageUser(m.sender, _user)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    let down = await y1s('mp4', await expandUrl(text))
+    if(!down.status) return m.reply(myLang('global').err)
+    let tsize = down.size.split(' ')[1]
+    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
+    if(!down.dlink) return m.reply(myLang('global').err)
+    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
+    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})
+    User.counter(m.sender, {usage: 1})
   }break
   case 'getmusic': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('get_down').msg.replace('{}', prefix+command))
     if (!m.quoted) return m.reply(myLang('get_down').quot)
     if (!m.quoted.isBaileys) return m.reply(myLang('get_down').no_me)
 		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
     if (!urls) return m.reply(myLang('get_down').quot)
-    m.reply(myLang('global').wait)
-    let ytm = await youtubedlv2(urls[text - 1])
-    let link = await ytm.audio['128kbps'].download()
-    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
-    let tinyUrl = tiny.data;
-    if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumb, myLang('song').big_size.replace('{}', tinyUrl), m)
-    //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
-    await myBot.sendImage(m.chat, ytm.thumbnail, myLang('song').caption.replace('{}', ytm.title).replace('{}', ytm.fileSizeH).replace('{}', ytm.quality), m)
-    await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
-    user.addUsageUser(m.sender, _user)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    let down = await y1s('mp3', urls[text - 1])
+    if(!down.status) return m.reply(myLang('global').err)
+    let tsize = down.size.split(' ')[1]
+    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
+    if(!down.dlink) return m.reply(myLang('global').err)
+    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
+    await myBot.sendImage(m.chat, down.thumbnail, myLang('song').caption.replace('{}', down.title).replace('{}', down.size).replace('{}', down.fquality), m)
+    await myBot.sendMessage(m.chat, {document: {url: down.dlink}, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})
+    User.counter(m.sender, {usage: 1})
   }break
   case 'getvideo': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('get_down').msg.replace('{}', prefix+command))
     if (!m.quoted) return m.reply(myLang('get_down').quot)
     if (!m.quoted.isBaileys) return m.reply(myLang('get_down').no_me)
 		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
     if (!urls) return m.reply(myLang('get_down').quot)
-    m.reply(myLang('global').wait)
-    let ytm = await youtubedlv2(urls[text - 1])
-    let link = await ytm.video['360p'].download()
-    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${link}`);
-    let tinyUrl = tiny.data;
-    if (ytm.filesize >= 100000) return myBot.sendImage(m.chat, ytm.thumbnail, myLang('video').big_size.replace('{}', tinyUrl), m)
-    //if(!Number(ytm.fileSizeH.split(' MB')[0])) return m.reply(myLang('song').no_size)
-    await myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: myLang('video').caption.replace('{}', ytm.title) }, { quoted: m })
-    user.addUsageUser(m.sender, _user)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    let down = await y1s('mp4', urls[text - 1])
+    if(!down.status) return m.reply(myLang('global').err)
+    let tsize = down.size.split(' ')[1]
+    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
+    if(!down.dlink) return m.reply(myLang('global').err)
+    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
+    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})
+    User.counter(m.sender, {usage: 1})
   }break
-  /*case 'fbdl': {
-    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    if(!args[0]) return m.reply(myLang('fbdl').msg.replace('{}', prefix))
-      m.reply(myLang('global').wait)
-      let res = await savefrom(args[0])
-      let link = await res[0].sd.url
-      myBot.sendMessage(m.chat, { video: { url: link }, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
-    user.addUsageUser(m.sender, _user)
-  }break*/
   case 'waifu': case 'neko': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    res = await fetchJson(`https://api.waifu.pics/nsfw/${command}`)
-     let buttons = [
-      { buttonId: command, buttonText: { displayText: '➡️' }, type: 1 }
-    ]
-    myBot.sendButImage(m.chat, res.url, myLang('global').by.replace('{}', botName), myBot.user.name, buttons)
-    user.addUsageUser(m.sender, _user)
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    try {
+      res = await fetchJson(`https://api.waifu.pics/nsfw/${command}`)
+      let buttons = [
+        { buttonId: command, buttonText: { displayText: '➡️' }, type: 1 }
+      ]
+      myBot.sendButImage(m.chat, res.url, myLang('global').by.replace('{}', botName), myBot.user.name, buttons)
+      User.counter(m.sender, {usage: 1})
+    } catch {
+      m.reply(myLang('global').msg.err);
+    }
   }break
   case 'wallpaper': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
-      m.reply(myLang('global').wait)
-      let { wallpaper } = require('./lib/scraper')
       anu = await wallpaper(text)
       result = anu[Math.floor(Math.random() * anu.length)]
       let buttons = [
@@ -638,15 +606,16 @@ switch(command) {
         headerType: 4
       }
       await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
-    } catch (e) { throw e }
-    user.addUsageUser(m.sender, _user)
+      User.counter(m.sender, {usage: 1})
+    } catch { m.reply(myLang('global').msg.err) }
   }break
   case 'img': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
-      m.reply(myLang('global').wait)
       let res = await googleImage(text);
       let rndImg = await res[Math.floor(Math.random() * res.length)]
       
@@ -661,14 +630,25 @@ switch(command) {
         headerType: 4
       }
       await myBot.sendMessage(m.chat, buttonMessage, { quoted: m })
-    } catch (e) {
-      await m.reply(myLang('global').msg.err);
-    }
-    user.addUsageUser(m.sender, _user)
+      User.counter(m.sender, {usage: 1})
+    } catch { m.reply(myLang('global').msg.err); }
+  }break
+  case 'ssweb': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    if (!text) return m.reply('Necesito la url.')
+    const regex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i
+    if (!regex.test(text)) return m.reply('Necesito una url valida.')
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    let img = await fetchJson(`https://api.apiflash.com/v1/urltoimage?access_key=9260ae15ebae448692cae6a5809c6e85&full_page=true&format=png&response_type=json&url=${text}`)
+    myBot.sendImage(m.chat, img.url, 'DrkBot', m)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'calc': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('calc').msg)
     let val = text
       .replace(/[^0-9\-\/+*×÷πEe()piPI/]/g, '')
@@ -688,44 +668,34 @@ switch(command) {
       let result = (new Function('return ' + val))()
       if (!result) throw result
       myBot.sendText(m.chat, `${format} = _${result}_`, m)
+      User.counter(m.sender, {usage: 1})
     } catch (e) {
       if (e == undefined) return m.reply(myLang('calc').err)
     }
-    user.addUsageUser(m.sender, _user)
   }break
 // TOOLS
   case 'ebinary': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.quoted && !text) return m.reply(myLang('binary').encode.replace('{}', prefix+command))
     let { eBinary } = require('./lib/binary')
     teks = text ? text : m.quoted.text
     m.reply( await eBinary(teks) )
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'dbinary': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.quoted) return m.reply(myLang('binary').decode.replace('{}', prefix+command))
     let { dBinary } = require('./lib/binary')
     m.reply( await dBinary(m.quoted.text) )
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
-  /*
-  case 'carbon': {
-    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    if (!text) return m.reply(myLang('carbon').msg)
-    m.reply(myLang('global').wait)
-    let res = await fetch(`https://api-rull.herokuapp.com/api/cmd?code=${encodeURIComponent(text)}`)
-	  if (res.status !== 200) throw res.statusText
-    myBot.sendMessage(m.chat, { image: { url: res.url }}, { quoted: m })
-    user.addUsageUser(m.sender, _user)
-  }break
-  */
   case 'bot': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (!text) return m.reply(myLang('ia').msg)
     let lang = Config.LANG.toLowerCase()
     await axios.get(`https://api.simsimi.net/v2/?text=${text}&lc=${lang}&cf=true`).then((response) => {
@@ -736,37 +706,74 @@ switch(command) {
       }	else {
         m.reply('🤖 ' + text)
       }
-    } catch (err) {
-      throw err
-    }
+      User.counter(m.sender, {usage: 1})
+    } catch (err) { m.reply(myLang('global').err) }
     })
-    user.addUsageUser(m.sender, _user)
+  }break
+  case 'gpt': {
+    //myBot.sendMessage(m.chat, {react: {text: '🚧', key: m.key}})
+    //return myBot.sendImage(m.chat, global.maintenance, '⚠️', m)
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    if (checkUser.points < 3000) return m.reply(myLang('ia').gpt_no_points.replace('{}', 3000 - checkUser.points))
+    
+    msg = 'Ingrese o responda solo texto.'
+    if (/audio/.test(mime)) return m.reply(msg)
+    if (/image/.test(mime)) return m.reply(msg)
+    if (/video/.test(mime)) return m.reply(msg)
+    if (!m.quoted && !text) return m.reply(myLang('ia').gpt_msg)
+    
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    try {
+      const { Configuration, OpenAIApi } = require("openai");
+  
+      const configuration = new Configuration({
+        apiKey: process.env.OPEN_AI_KEY,
+      });
+      const openai = new OpenAIApi(configuration);
+      
+      const response = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: text ? text : m.quoted.text,
+        temperature: 0.5,
+        max_tokens: 500,
+        top_p: 1.0,
+        frequency_penalty: 0.5,
+        presence_penalty: 0.0,
+        stop: ["You:"],
+      });
+      myBot.sendMessage(m.chat, { text: response.data.choices[0].text.trim() }, { quoted: m })
+      User.counter(m.sender, {usage: 1})
+    } catch { m.reply(myLang('global').msg.err) }
   }break
   case 'bin': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('bin').msg)
     await axios.get(`https://lookup.binlist.net/${args[0]}`).then(async (response) => {
-    json = response.data
-    m.reply(
-      `💳 *BIN:* ${args[0]}\n` + 
-    	' *TYPE:*\n' + 
-    	json.scheme + '\n' + 
-    	json.type + '\n' + 
-      json.brand + '\n' + 
-      ' *COUNTRY:*\n' + 
-      json.country.emoji + ' ' + 
-      json.country.name + '\n' + 
-      json.country.currency + '\n' + 
-      ' *BANK:*\n' + 
-      json.bank.name
-    )
-  })
-    user.addUsageUser(m.sender, _user)
+      json = response.data
+      m.reply(
+        `💳 *BIN:* ${args[0]}\n` + 
+      	' *TYPE:*\n' + 
+      	json.scheme + '\n' + 
+      	json.type + '\n' + 
+        json.brand + '\n' + 
+        ' *COUNTRY:*\n' + 
+        json.country.emoji + ' ' + 
+        json.country.name + '\n' + 
+        json.country.currency + '\n' + 
+        ' *BANK:*\n' + 
+        json.bank.name
+      )
+    })
+    User.counter(m.sender, {usage: 1})
   }break
   case 'cambio': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('exchange').msg)
     key = 'bcab649da87b8cc8e5f000d0'
     if (!key) throw ('Falta la key!')
@@ -795,11 +802,12 @@ switch(command) {
       })
       return arreglo.length
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'price': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply('Token?')
     key = '1be6e707f54766812254c65612a60298080cf7b26c2ef6ea9e6ea0b0b11b8890'
     if (!key) throw m.reply('Falta la key!')
@@ -808,13 +816,15 @@ switch(command) {
     	var msg = `*Token:* ${text.toUpperCase()}\n\n*USD:* ${USD}\n*COP:* ${COP}`
     	m.reply(msg)
     })
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'shazam': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (/image/.test(mime)) return m.reply(myLang('shazam').image)
     if (/video/.test(mime)) return m.reply(myLang('shazam').video.replace('{}',prefix+command))
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
       const acrcloud = require("acrcloud")
       const acr = new acrcloud({ 
@@ -822,7 +832,6 @@ switch(command) {
           access_key: "a7982a1f271fc390f3a69cb5bac04498",
           access_secret: "QPbD6UOnfawRtUiH88lzKx7edUaX20I0erUWCoCW"
       })
-      m.reply(myLang('global').wait)
       let sampleq = await quoted.download()
       acr.identify(sampleq).then(async (res) => {
       m.reply(
@@ -832,121 +841,75 @@ switch(command) {
       `📆 ${res.metadata.music[0].release_date}`
       )
       })
-    } catch (e) { throw e }
-    user.addUsageUser(m.sender, _user)
+      User.counter(m.sender, {usage: 1})
+    } catch (e) { m.reply(myLang('global').err) }
   }break
 // FOR GROUPS
   // GAMES
   case 'dados': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    //if (!m.isGroup) return m.reply(myLang('global').group)
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     let da = ['./src/media/1.webp', './src/media/2.webp', './src/media/3.webp', './src/media/4.webp', './src/media/5.webp', './src/media/6.webp'];
     let res = pickRandom(da)
     if (res === './src/media/1.webp') {
       await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
-      user.addUsageUser(m.sender, _user)
-      user.addCashUser(m.sender, -20, _user)
+      User.counter(m.sender, {usage: 1, cash: 2})
     } else if (res === './src/media/2.webp') {
       await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
-      user.addUsageUser(m.sender, _user)
-      user.addCashUser(m.sender, 4, _user)
+      User.counter(m.sender, {usage: 1, cash: 4})
     } else if (res === './src/media/3.webp') {
       await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
-      user.addUsageUser(m.sender, _user)
-      user.addCashUser(m.sender, 6, _user)
+      User.counter(m.sender, {usage: 1, cash: 6})
     } else if (res === './src/media/4.webp') {
       await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
-      user.addUsageUser(m.sender, _user)
-      user.addCashUser(m.sender, 8, _user)
+      User.counter(m.sender, {usage: 1, cash: 8})
     } else if (res === './src/media/5.webp') {
       await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
-      user.addUsageUser(m.sender, _user)
-      user.addCashUser(m.sender, 10, _user)
+      User.counter(m.sender, {usage: 1, cash: 10})
     } else if (res === './src/media/6.webp') {
       await myBot.sendMedia(m.chat, res, 'Bot', 'MD', m, {asSticker: true})
-      user.addUsageUser(m.sender, _user)
-      user.addCashUser(m.sender, 20, _user)
+      User.counter(m.sender, {usage: 1, cash: 12})
     }
   }break
   case 'ppt': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    //if (!m.isGroup) return m.reply(myLang('global').group)
-    let reseqv = `Seleccione piedra/papel/tijera\n\nEjemplo : *${prefix + command}* piedra`
-    if (!text) return m.reply(reseqv)
-    var rnd = Math.floor(Math.random() * (9 - 1 + 1)) + 1
-
-    if (rnd <= 3) {
-        rnd = 'piedra'
-    } else if (rnd > 3 && rnd <= 6) {
-        rnd = 'tijera'
-    } else {
-        rnd = 'papel'
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    if (!text) return m.reply(`Seleccione piedra/papel/tijera\n\nEjemplo : *${prefix + command}* piedra`)
+    const choices = ['piedra', 'papel', 'tijera'];
+    while (!choices.includes(text)) {
+      return m.reply('Opción inválida. Elije: piedra, papel o tijera')
     }
-
-    if (text == rnd) {
-      m.reply(`*Empate*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
-      user.addCashUser(m.sender, 10, _user)
-    } else if (text == 'piedra') {
-      if (rnd == 'tijera') {
-          m.reply(`*Ganaste* 🎊\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
-          user.addCashUser(m.sender, 20, _user)
-      } else {
-        m.reply(`*Perdiste*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
-          user.addCashUser(m.sender, -20, _user)
-      }
-    } else if (text == 'tijera') {
-      if (rnd == 'papel') {
-        m.reply(`*Ganaste* 🎊\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
-          user.addCashUser(m.sender, 20, _user)
-      } else {
-        m.reply(`*Perdiste*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
-        user.addCashUser(m.sender, -20, _user)
-      }
-    } else if (text == 'papel') {
-      if (rnd == 'piedra') {
-        m.reply(`*Ganaste* 🎊\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
-        user.addCashUser(m.sender, 20, _user)
-      } else {
-        m.reply(`*Perdiste*\n\n‣ Tú : ${text}\n‣ 🤖 : ${rnd}`)
-        user.addCashUser(m.sender, -20, _user)
-      }
+    const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+    if (text === computerChoice) {
+      m.reply(`EMPATE\nTu: ${text} -- 🤖: ${computerChoice}`)
+      User.counter(m.sender, {usage: 1, cash: 10})
+    } else if (text === "piedra" && computerChoice === "tijera" ||
+               text === "papel" && computerChoice === "piedra" ||
+               text === "tijera" && computerChoice === "papel") {
+      m.reply(`🥳 *GANASTE 20 PUNTOS*\nTu: ${text} -- 🤖: ${computerChoice}`)
+      User.counter(m.sender, {usage: 1, cash: 20})
     } else {
-      return m.reply(reseqv)
+      m.reply(`😭 *PERDISTE 20 PUNTOS*\nTu: ${text} -- 🤖: ${computerChoice}`)
+      User.counter(m.sender, {usage: 1, cash: -20})
     }
   }break
   case 'slot': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
-    //if (!m.isGroup) return m.reply(myLang('global').group)
-    a = '💎'
-    b = '♠️'
-    c = '♣️'
-    e = '♥️'
-    f = '♦️'
-    g = '💤'
-    pw = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck = pw[Math.floor(Math.random() * pw.length)]
-    pw1 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck1 = pw1[Math.floor(Math.random() * pw1.length)]
-    pw2 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck2 = pw2[Math.floor(Math.random() * pw2.length)]
-    pw3 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck3 = pw3[Math.floor(Math.random() * pw3.length)]
-    pw4 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck4 = pw4[Math.floor(Math.random() * pw4.length)]
-    pw5 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck5 = pw5[Math.floor(Math.random() * pw5.length)]
-    pw6 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck6 = pw6[Math.floor(Math.random() * pw6.length)]
-    pw7 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck7 = pw7[Math.floor(Math.random() * pw7.length)]
-    pw8 = [`${a}`, `${b}`, `${c}`, `${e}`, `${f}`, `${g}`]
-    luck8 = pw8[Math.floor(Math.random() * pw8.length)]
-    d = `${luck}   ${luck1}   ${luck2}`
-    r = `${luck3}   ${luck4}   ${luck5}`
-    k = `${luck6}   ${luck7}   ${luck8}`
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    const suits = ['💎', '♠️', '♣️', '❤️', '💤'];
+    let d = '', r = '', k = '';
+    for (let i = 0; i < 9; i++) {
+      let suit = suits[Math.floor(Math.random() * suits.length)];
+      if (i < 3) {
+        d += ` ${suit} `;
+      } else if (i < 6) {
+        r += ` ${suit} `;
+      } else {
+        k += ` ${suit} `;
+      }
+    }
     const slt = (lineA, lineB, lineC, msg) => {
       return `${msg}
 ──────
@@ -956,55 +919,82 @@ ${lineC}
 ──────
 🔮𝉃𝜄𝜐𝉃𝜍𝜅𝉃𝛾🔮`
     }
-    if (r == '♠️   ♠️   ♠️') {
-      user.addCashUser(m.sender, points*5, _user)
+    picas = ' ♠️  ♠️  ♠️ '
+    diamond = ' 💎  💎  💎 '
+    heart = ' ❤️  ❤️  ❤️ '
+    clover = ' ♣️  ♣️  ♣️ '
+    zzz = ' 💤  💤  💤 '
+    if (d == picas || r == picas || k == picas) {
+      User.counter(m.sender, {usage: 1, cash: 50})
       myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 50 PUNTOS*'), m)
-    } else if (r == '💎   💎   💎' ) {
-      user.addCashUser(m.sender, points*10, _user)
+    } else if (d == diamond || r == diamond || k == diamond) {
+      User.counter(m.sender, {usage: 1, cash: 100})
       myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 100 PUNTOS*'), m)
-    } else if (r == '♥️   ♥️   ♥️' ) {
-      user.addCashUser(m.sender, points*2, _user)
+    } else if (d == heart || r == heart || k == heart) {
+      User.counter(m.sender, {usage: 1, cash: 20})
       myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 20 PUNTOS*'), m)
-    } else if (r == '♣️   ♣️   ♣' ) {
-      user.addCashUser(m.sender, points*2, _user)
+    } else if (d == clover || r == clover || k == clover) {
+      User.counter(m.sender, {usage: 1, cash: 20})
       myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 20 PUNTOS*'), m)
-    } else if (r == '♦   ♦   ♦️' ) {
-      user.addCashUser(m.sender, points*2, _user)
-      myBot.sendText(m.chat, slt(d, r, k, '🥳 *GANASTE 20 PUNTOS*'), m)
-    } else if (d == '💤   💤   💤'  || r == '💤   💤   💤' || k == '💤   💤   💤') {
+    } else if (d == zzz || r == zzz || k == zzz) {
       myBot.sendText(m.chat, slt(d, r, k, '🥶 *BLOQUEADO*'), m)
-      user.addBlockUser(m.sender, _user);
+      User.change(m.sender, {block: true})
     } else {
-      user.addCashUser(m.sender, -20, _user)
-      myBot.sendText(m.chat, slt(d, r, k, '😭 *PERDISTE 20 PUNTOS*'), m)
-      myBot.sendText(m.chat, pickRandom(_keys), m)
+      User.counter(m.sender, {usage: 1, cash: -20})
+      myBot.sendMessage(m.chat, { text: slt(d, r, k, '😭 *PERDISTE 20 PUNTOS*') }, { quoted: m })
+      await sleep(2000)
+      myBot.sendMessage(m.sender, { text: pickRandom(keysAll) }, { quoted: m })
     }
   }break
-  
   case 'unlock': {
+    if (!args[0]) return m.reply('Necesito la Key.')
     if (_unlock.includes(args[0])) {
-      user.delBlockUser(m.sender, _user);
+      User.change(m.sender, {block: false});
       m.reply(`Usaste satisfactoriamente la Key *${args[0]}* para desbloquearte, sigue jugando y acumulando Keys.`)
     } else {
-      m.reply('Sigue intentando')
+      m.reply('Sigue intentando :(')
     }
   }break
-  /*case 'key' {
-    
-  }break*/
-
-  // END GAMES
+  case 'key': {
+    if (!m.quoted && !args[0]) return m.reply('Envia la key o respondela')
+    teks = args[0] ? args[0] : m.quoted.text
+    if (isNaN(teks) || !Number.isInteger(Number(teks))) {
+      m.reply('El formato de la key es invalido');
+      return;
+    }
+    if (_unlock.includes(teks)) {
+      return m.reply(`La Key ${teks} es válida para desbloqueo.`);
+    }
+    let keyData;
+    if (_puntosMas.includes(teks)) {
+      keyData = { points: 20, message: `La Key ${teks} es válida por +20 puntos.` };
+    } else if (_puntosMenos.includes(teks)) {
+      keyData = { points: -20, message: `La Key ${teks} es válida por -20 puntos.` };
+    }
+    if (keyData) {
+      if (addUserKey(m.sender, teks) === false) {
+        return m.reply(`La llave *[ ${teks} ]* ha alcanzado el límite máximo de usos`);
+      }
+      User.counter(m.sender, { cash: keyData.points });
+      m.reply(keyData.message);
+    } else {
+      m.reply('Key no válida');
+    }
+  }break
+// END GAMES
   case 'gay': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!m.quoted) return m.reply(myLang('gay').quot)
     await myBot.sendMessage(m.chat, { video: fs.readFileSync('./src/media/gay.mp4'), caption: myLang('gay').msg.replace('{}', '+'+m.quoted.sender.split('@')[0]).replace('{}',Math.floor(100*Math.random())), gifPlayback: true, mentions: m.quoted.sender }, { quoted: m })
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'love': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
     let member = participants.map(u => u.id)
     let me = m.sender
@@ -1015,11 +1005,12 @@ ${lineC}
       { buttonId: 'love', buttonText: { displayText: '👩‍❤️‍👨' }, type: 1 }
     ]
     await myBot.sendButtonText(m.chat, buttons, jawab, myBot.user.name, m, {mentions: ments})
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'mute': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
@@ -1036,11 +1027,12 @@ ${lineC}
       ]
       await myBot.sendButtonText(m.chat, buttons, `${botName}`, myBot.user.name, m)
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'antilink': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
@@ -1057,53 +1049,60 @@ ${lineC}
       ]
       await myBot.sendButtonText(m.chat, buttons, `MOD ANTILINK`, myBot.user.name, m)
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
 	case 'add': {
 	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins || !isCreator) return m.reply(myLang('global').admin)
 		let users = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'add')
 		m.reply(myLang('group').add.replace('{}',users).replace('@s.whatsapp.net',''))
-	  user.addUsageUser(m.sender, _user)
+	  User.counter(m.sender, {usage: 1})
 	}break
   case 'kick': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'remove')
 		m.reply(myLang('group').kick.replace('{}',users).replace('@s.whatsapp.net',''))
-	  user.addUsageUser(m.sender, _user)
+	  User.counter(m.sender, {usage: 1})
   }break
 	case 'promote': {
 	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-	  if (chekBlock === true) return m.reply('Estas Bloqueado.')
+	  if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'promote')
 		m.reply(myLang('group').prom.replace('{}',users).replace('@s.whatsapp.net',''))
-	  user.addUsageUser(m.sender, _user)
+	  User.counter(m.sender, {usage: 1})
 	}break
 	case 'demote': {
 	  if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-	  if (chekBlock === true) return m.reply('Estas Bloqueado.')
+	  if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
 		if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.groupParticipantsUpdate(m.chat, [users], 'demote')
 		m.reply(myLang('group').dem.replace('{}',users).replace('@s.whatsapp.net',''))
-	  user.addUsageUser(m.sender, _user)
+	  User.counter(m.sender, {usage: 1})
 	}break
   case 'tagall': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
@@ -1117,50 +1116,76 @@ ${lineC}
       tga = `${ini}${mesaj}${end}`
     }
     myBot.sendMessage(m.chat, { text: tga, mentions: participants.map(a => a.id) }, { quoted: m })
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'hdt': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
     myBot.sendMessage(m.chat, { text: q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
-  case'linkgroup': {
+  case 'groupinfo': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-    if (chekBlock === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
-    const inviteCode = await myBot.groupInviteCode(m.chat)
-    const { subject } = await myBot.groupMetadata(m.chat)
-    const caption = myLang('group').link_grup.replace('{}',subject).replace('{}',inviteCode)
-    try { pic = await myBot.profilePictureUrl(m.chat, 'image') } catch (e) { pic = global.thumb }
-    myBot.sendImage(m.chat, pic, caption, m)
-    user.addUsageUser(m.sender, _user)
+    if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    try { pp = await myBot.profilePictureUrl(m.chat, 'image') } catch (e) { pp = global.thumb }
+    let groupAdmins = participants.filter(p => p.admin) 
+    let { infoGroup } = require('./plugins/group_info')
+    anu = infoGroup(
+      await myBot.groupInviteCode(m.chat), //groupCode
+      groupMetadata.subject, // groupName
+      groupMetadata.desc?.toString(), // groupDesc
+      participants.length, // groupParticipants
+      groupOwner.split('@')[0], // groupCreator
+      groupAdmins.map((v, i) => `${global.BOX.med} @${v.id.split('@')[0]}`).join('\n') // groupAdmins
+    )
+    await myBot.sendButton(m.chat, ' ', anu, pp, [['𝗠 𝗘 𝗡 𝗨', 'menu']], m, { mentions: [...groupAdmins.map(v => v.id), owner] })
+    User.counter(m.sender, {usage: 1})
   }break
 // END GROUPS
 // FOR OWNER
+  case 'whatgroup': {
+    if (!isCreator) return m.reply(myLang('global').owner)
+    if (!text) return m.reply(myLang('own').join.link)
+    if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) m.reply(myLang('own').join.link_err)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    let result = args[0].split('https://chat.whatsapp.com/')[1]
+    let code = await myBot.groupGetInviteInfo(result)
+    try { pic = await myBot.profilePictureUrl(code.id, 'image') } catch (e) { pic = global.thumb }
+    msg = `Nombre: ${code.subject}
+Creador: ${code.owner.split('@')[0]}
+Tamaño: ${code.size}
+Desc: ${!code.desc ? 'No hay descriction' : code.desc}`
+    myBot.sendImage(m.chat, pic, msg)
+    User.counter(m.sender, {usage: 1})
+  }break
   case 'join': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(myLang('own').join.link)
     if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) m.reply(myLang('own').join.link_err)
-    m.reply(myLang('global').wait)
+    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     await myBot.groupAcceptInvite(result).then((res) => m.reply(myLang('own').join.ok)).catch((err) => m.reply(myLang('own').join.err))
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
 	case 'public': {
     if (!isCreator) return m.reply(myLang('global').owner)
     myBot.public = true
     m.reply(myLang('own').public)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
 	}break
   case 'self': {
     if (!isCreator) return m.reply(myLang('global').owner)
     myBot.public = false
     m.reply(myLang('own').self)
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'py': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -1176,7 +1201,7 @@ ${lineC}
     })
     pythonProcess.stdin.write(text)
     pythonProcess.stdin.end()
-   user.addUsageUser(m.sender, _user)
+   User.counter(m.sender, {usage: 1})
   }break
   case 'speedtest': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -1194,7 +1219,7 @@ ${lineC}
     if (stdout.trim()) m.reply(stdout)
     if (stderr.trim()) m.reply(stderr)
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'update': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -1211,7 +1236,7 @@ ${lineC}
       );
       myBot.sendMessage(m.chat, { text: degisiklikler + '```' })
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'actualizar': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -1229,19 +1254,19 @@ ${lineC}
         }
       }));
     }
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'block': {
 		if (!isCreator) return m.reply(myLang('global').owner)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'block').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-	  user.addUsageUser(m.sender, _user)
+	  User.counter(m.sender, {usage: 1})
   }break
   case 'unblock': {
 		if (!isCreator) return m.reply(myLang('global').owner)
 		let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 		await myBot.updateBlockStatus(users, 'unblock').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
-	  user.addUsageUser(m.sender, _user)
+	  User.counter(m.sender, {usage: 1})
   }break
   case 'bc': case 'broadcast': case 'bcall': {
     if (!isCreator) return m.reply(myLang('global').owner)
@@ -1251,7 +1276,8 @@ ${lineC}
     } catch {
       imgbc = global.thumb
     }
-    let anu = await Object.keys(_user).map(i => _user[i].phone )
+    dbOld = JSON.parse(fs.readFileSync("./src/people.json"))
+    let anu = await Object.keys(dbOld).map(i => dbOld[i].phone )
     m.reply(`Enviar difusión a ${anu.length} chat.\nTiempo de envio ${anu.length * 1.5} segundos.`)
     for (let i of anu) {
       await sleep(1500)
@@ -1259,11 +1285,16 @@ ${lineC}
       myBot.sendButtonLoc(i, imgbc, txt, myBot.user.name, 'MENU', 'menu')
     }
     m.reply('Difusion Enviada')
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'bgc': case 'bcgroup': {
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(`Que quieres enviar?\n\nEjemplo: ${prefix + command} text`)
+    try {
+      imgbc = await quoted.download()
+    } catch {
+      imgbc = global.thumb
+    }
     let getGroups = await myBot.groupFetchAllParticipating()
     let groups = Object.entries(getGroups).slice(0).map(entry => entry[1])
     let anu = groups.map(v => v.id)
@@ -1271,10 +1302,10 @@ ${lineC}
     for (let i of anu) {
       await sleep(1500)
       let txt = `「 Difusor Bot 」\n\n${text}`
-      myBot.sendButtonLoc(i, global.thumb, txt, myBot.user.name, 'MENU', 'menu')
+      myBot.sendButtonLoc(i, imgbc, txt, myBot.user.name, 'MENU', 'menu')
     }
     m.reply('Difusion Enviada')
-    user.addUsageUser(m.sender, _user)
+    User.counter(m.sender, {usage: 1})
   }break
   case 'ping': case 'status': {
 		if (!isCreator) return m.reply(myLang('global').owner)
@@ -1329,27 +1360,38 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
       m.reply(`*𝚃𝙸𝙴𝙼𝙿𝙾 𝙳𝙴 𝙴𝙹𝙴𝙲𝚄𝙲𝙸Ó𝙽*
 ${runtime(process.uptime())}`)
     }
-    user.addUsageUser(m.sender, _user)
   }break
 
+
+case 'test': {
+  if (!isCreator) return m.reply(myLang('global').owner)
+  /*
+    const ftroli ={key: {fromMe: false,"participant":"0@s.whatsapp.net", "remoteJid": "status@broadcast"}, "message": {orderMessage: {itemCount: 10,status: 200, thumbnail: await myBot.reSize(thumb, 100, 100), surface: 200, message: `${author}`, orderTitle: 'Dylan', sellerJid: 'https://github.com/GataNina-Li/GataBot-MD'}}, contextInfo: {"forwardingScore":999,"isForwarded":true},sendEphemeral: true}
+		const fdoc = {key : {participant : '0@s.whatsapp.net', ...(m.chat ? { remoteJid: `status@broadcast` } : {}) },message: {documentMessage: {title: `${author}`,jpegThumbnail: await myBot.reSize(thumb, 100, 100)}}}
+		const fvn = {key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {})},message: { "audioMessage": {"mimetype":"audio/ogg; codecs=opus","seconds":210,"ptt": "true"}} } 
+		const fgclink = {key: {participant: "0@s.whatsapp.net","remoteJid": "0@s.whatsapp.net"},"message": {"groupInviteMessage": {"groupJid": "573046793853@g.us","inviteCode": "K5zmLhri8aGIB8ieUCnsyJ","groupName": `${author}`, "caption": `${author}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
+		const ftextt = {key: {fromMe: false, participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {})}, message: { "extendedTextMessage": {"text":`${author}`, "title": `${botName}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
+    const ftoko = {key: {fromMe: false, participant: `0@s.whatsapp.net`, ...(m.chat ? {remoteJid: "status@broadcast" } : {})}, message: { "productMessage": { "product": { "productImage":{ "mimetype": "image/jpeg", "jpegThumbnail": await myBot.reSize(thumb, 100, 100)},"title": `${author}`, "description": `${botName}`, "currencyCode": "COP", "priceAmount1000": "1000000", "retailerId": `${author}`, "productImageCount": 1}, "businessOwnerJid": `0@s.whatsapp.net`}}} 
+		const fgif = {key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {})},message: {"videoMessage": { "title":`${author}`, "h": `Hmm`,'seconds': '359996400', 'gifPlayback': 'true', 'caption': `${author}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
+		const fvideo = {key: { fromMe: false,participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {}) },message: { "videoMessage": { "title":`${author}`, "h": `Hmm`,'seconds': '359996400', 'caption': `${author}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
+		const floc = {key : {participant : '0@s.whatsapp.net', ...(m.chat ? { remoteJid: `status@broadcast` } : {}) },message: {locationMessage: {name: `${author}`,jpegThumbnail: await myBot.reSize(thumb, 100, 100)}}}
+		const floc2 = {key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {}) }, message: { "liveLocationMessage": { "title": `${author}`,"h": `Hmm`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
+		
+    myBot.sendMessage(m.chat, { text: 'Test Context' }, { quoted: ftroli })
+*/
+
+let fkontak = {
+  key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: `status@broadcast` } : {}) },
+  message: { 'contactMessage': { 'displayName': `${author}`, 'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:XL;author,;;;\nFN:author\nitem1.TEL;waid=573508770421:573508770421\nitem1.X-ABLabel:Ponsel\nEND:VCARD`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100), thumbnail: await myBot.reSize(thumb, 100, 100),sendEphemeral: true}}
+}
+}break
+
+
+
+
+
+
   default:
-    if (budy.startsWith('=>')) {
-      if (!isCreator) return m.reply(myLang('global').owner)
-      function Return(sul) {
-        sat = JSON.stringify(sul, null, 2)
-        bang = util.format(sat)
-        if (sat == undefined) {
-          bang = util.format(sul)
-        }
-      return m.reply(bang)
-      }
-      try {
-        m.reply(util.format(eval(`(async () => { return ${budy.slice(3)} })()`)))
-      } catch (e) {
-        m.reply(String(e))
-      }
-    }
-    
     if (budy.startsWith('>')) {
       if (!isCreator) return m.reply(myLang('global').owner)
       try {
@@ -1368,31 +1410,12 @@ ${runtime(process.uptime())}`)
         if (stdout) return m.reply(stdout)
       })
     }
-		
-		if (m.chat.endsWith('@s.whatsapp.net') && isCmd) {
-      this.anonymous = this.anonymous ? this.anonymous : {}
-      let room = Object.values(this.anonymous).find(room => [room.a, room.b].includes(m.sender) && room.state === 'CHATTING')
-      if (room) {
-        if (/^.*(next|leave|start)/.test(m.text)) return
-        if (['.next', '.leave', '.stop', '.start', 'Cari Partner', 'Keluar', 'Lanjut', 'Stop'].includes(m.text)) return
-        let other = [room.a, room.b].find(user => user !== m.sender)
-        m.copyNForward(other, true, m.quoted && m.quoted.fromMe ? {
-          contextInfo: {
-            ...m.msg.contextInfo,
-            forwardingScore: 0,
-            isForwarded: true,
-            participant: other
-          }
-        } : {})
-      }
-      return !0
-    }
     
     if (isCmd && budy.toLowerCase() != undefined) {
       if (m.chat.endsWith('broadcast')) return
       if (m.isBaileys) return
       //let msgs = global.db.data.database
-      let msgs = _user
+      let msgs = checkUser
       if (!(budy.toLowerCase() in msgs)) return
       myBot.copyNForward(m.chat, msgs[budy.toLowerCase()], true)
 		}
@@ -1404,7 +1427,6 @@ ${runtime(process.uptime())}`)
       })
     }
 }
-
 
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {

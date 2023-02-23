@@ -22,6 +22,7 @@ const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
 const { smsg, getBuffer, getSizeMedia, await, sleep } = require('./lib/myfunc')
 const { log, pint } = require('./lib/colores');
+const { toAudio } = require('./lib/converter')
 
 //language
 const myLang = require('./language').getString
@@ -32,12 +33,13 @@ const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
 
+/*
 async function dbUser() {
   user.addUser(global.bot+'@s.whatsapp.net', global.author, _user)
   user.addUser(global.owner[0]+'@s.whatsapp.net', global.author, _user)
 }
 dbUser()
-
+*/
 async function startMybot() {
     const myBot = myBotConnect({
         logger: pino({ level: 'silent' }),
@@ -82,7 +84,7 @@ async function startMybot() {
 
     myBot.ev.on('group-participants.update', async (anu) => {
         try {
-            let metadata = await myBot.groupMetadata(anu.id)
+            let {subject} = await myBot.groupMetadata(anu.id)
             let participants = anu.participants
             for (let num of participants) {
                 // Get Profile Picture User
@@ -90,12 +92,6 @@ async function startMybot() {
                     ppuser = await myBot.profilePictureUrl(num, 'image')
                 } catch {
                     ppuser = fs.readFileSync('./lib/imgProfile.jpg')
-                }
-                // Get Profile Picture Group
-                try {
-                    ppgroup = await myBot.profilePictureUrl(anu.id, 'image')
-                } catch {
-                    ppgroup = fs.readFileSync('./lib/imgProfile.jpg')
                 }
 
                 if (anu.action == 'add') {
@@ -127,7 +123,7 @@ async function startMybot() {
         }
     })
 
-    myBot.getName = (jid, withoutContact  = false) => {
+    myBot.getName = (jid, withoutContact = false) => {
         id = myBot.decodeJid(jid)
         withoutContact = myBot.withoutContact || withoutContact 
         let v
@@ -191,9 +187,10 @@ async function startMybot() {
     myBot.serializeM = (m) => smsg(myBot, m, store)
 
     myBot.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect } = update	    
-        if (connection === 'close') {
-        let reason = new Boom(lastDisconnect?.error)?.output.statusCode
+      const { connection, lastDisconnect } = update
+        try {
+          if (connection === 'close') {
+            let reason = new Boom(lastDisconnect?.error)?.output.statusCode
             if (reason === DisconnectReason.badSession) { log(`Archivo de sesión corrupto, elimine la sesión y vuelva a escanear.`); myBot.logout(); }
             else if (reason === DisconnectReason.connectionClosed) { log("Conexión cerrada, reconectando...."); startMybot(); }
             else if (reason === DisconnectReason.connectionLost) { log("Conexión perdida del servidor, reconectando..."); startMybot(); }
@@ -201,12 +198,15 @@ async function startMybot() {
             else if (reason === DisconnectReason.loggedOut) { log(`Dispositivo cerrado, escanee nuevamente y ejecute.`); myBot.logout(); }
             else if (reason === DisconnectReason.restartRequired) { log("Reinicio requerido, reiniciando..."); startMybot(); }
             else if (reason === DisconnectReason.timedOut) { log("Se agotó el tiempo de espera de la conexión, reconectando..."); startMybot(); }
-            //else myBot.end(`Unknown DisconnectReason: ${reason}|${connection}`)
-            else {
-              log(`Unknown DisconnectReason: ${reason}|${connection}`); startMybot();
-            }
+            else { log(`Unknown DisconnectReason: ${reason}|${connection}`); startMybot(); }
+          }
+          if (update.connection == "open" || update.receivedPendingNotifications == "true") {
+            myBot.sendButtonLoc(global.owner+'@s.whatsapp.net', global.thumb, 'Bot Online', myBot.user.name, 'TEST', 'status')
+            log('Connected...', update)
+          }
+        } catch {
+          log('Connected...', update)
         }
-        log('Connected...', update)
     })
 
     myBot.ev.on('creds.update', saveState)
@@ -241,6 +241,18 @@ async function startMybot() {
       if(mime.split("/")[0] === "audio"){
         return myBot.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options}, { quoted: quoted, ...options })
       }
+    }
+    
+    /**
+     * Reply to a message
+     * @param {String} jid
+     * @param {String|Object} text
+     * @param {Object} quoted
+     * @param {Object} options
+     */
+    myBot.reply = (jid, text = '', quoted, options) => {
+        return Buffer.isBuffer(text) ? myBot.sendFile(jid, text, 'file', '', quoted, false, options) : myBot.sendMessage(jid, { contextInfo: { mentionedJid: myBot.parseMention(text)}, ...options, text }, { quoted, ...options })
+        //return Buffer.isBuffer(text) ? myBot.sendFile(jid, text, 'file', '', quoted, false, options) : myBot.sendMessage(jid, { ...options, text }, { quoted, ...options })
     }
      
      /** Send List Messaage
@@ -277,6 +289,10 @@ async function startMybot() {
         var kiyomasa = await oyy.resize(width, height).getBufferAsync(jimp.MIME_JPEG)
         return kiyomasa
       }
+      
+      myBot.sendMsg = async (jid, message = {}, options = {}) => {
+				return await myBot.sendMessage(jid, message, { ...options, ...ephemeral })
+			}
       
     /** Send Button 5 Message
      * 
@@ -341,6 +357,39 @@ async function startMybot() {
       let b = a[Math.floor(Math.random() * a.length)]
       myBot.sendMessage(jid, { video: gif, gifPlayback: true, gifAttribution: b, caption: text, footer: footer, jpegThumbnail: ahh, templateButtons: but, ...options })
     }
+    
+    myBot.sendButton = async (jid, text = '', footer = '', buffer, buttons, quoted, options) => {
+      let type
+      if (Array.isArray(buffer)) (options = quoted, quoted = buttons, buttons = buffer, buffer = null)
+      else if (buffer) try { (type = await myBot.getFile(buffer), buffer = type.data) } catch { buffer = null }
+      if (!Array.isArray(buttons[0]) && typeof buttons[0] === 'string') buttons = [buttons]
+      if (!options) options = {}
+      let message = {
+        ...options,
+        [buffer ? 'caption' : 'text']: text || '',
+        footer,
+        buttons: buttons.map(btn => ({
+          buttonId: btn[1] || btn[0] || '',
+          buttonText: {
+            displayText: btn[0] || btn[1] || ''
+          }
+        })),
+        ...(buffer ?
+          options.asLocation && /image/.test(type.mime) ? {
+            location: {
+              ...options,
+              jpegThumbnail: buffer
+            }
+          } : {
+            [/video/.test(type.mime) ? 'video' : /image/.test(type.mime) ? 'image' : 'document']: buffer
+          } : {})
+      }
+      return await myBot.sendMessage(jid, message, {
+        quoted,
+        upload: myBot.waUploadToServer,
+        ...options
+      })
+  }
 
     /**
      * 
@@ -393,12 +442,14 @@ async function startMybot() {
       let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
       let buttonMessage = {
         image: buffer,
+        fileLength: 8000000000,
         caption: text,
         footer: foot,
+        mentions: await myBot.parseMention(text + foot),
         buttons: but,
         headerType: 4
       }
-        return await myBot.sendMessage(jid, buttonMessage, { quoted, ...options })
+        return await myBot.sendMessage(jid, buttonMessage, { quoted, ephemeralExpiration: 86400,contextInfo: { mentionedJid: myBot.parseMention(text + foot) }, ...options })
     }
 
     /**
@@ -667,8 +718,63 @@ async function startMybot() {
             ...type,
             data
         }
-
     }
+    
+    myBot.sendFile = async (jid, path, filename = '', caption = '', quoted, ptt = false, options = {}) => {
+                let type = await myBot.getFile(path, true)
+                let { res, data: file, filename: pathFile } = type
+                if (res && res.status !== 200 || file.length <= 65536) {
+                    try { throw { json: JSON.parse(file.toString()) } }
+                    catch (e) { if (e.json) throw e.json }
+                }
+                //const fileSize = fs.statSync(pathFile).size / 1024 / 1024
+                //if (fileSize >= 100) throw new Error('File size is too big!')
+                let opt = {}
+                if (quoted) opt.quoted = quoted
+                if (!type) options.asDocument = true
+                let mtype = '', mimetype = options.mimetype || type.mime, convert
+                if (/webp/.test(type.mime) || (/image/.test(type.mime) && options.asSticker)) mtype = 'sticker'
+                else if (/image/.test(type.mime) || (/webp/.test(type.mime) && options.asImage)) mtype = 'image'
+                else if (/video/.test(type.mime)) mtype = 'video'
+                else if (/audio/.test(type.mime)) (
+                    convert = await toAudio(file, type.ext),
+                    file = convert.data,
+                    pathFile = convert.filename,
+                    mtype = 'audio',
+                    mimetype = options.mimetype || 'audio/ogg; codecs=opus'
+                )
+                else mtype = 'document'
+                if (options.asDocument) mtype = 'document'
+
+                delete options.asSticker
+                delete options.asLocation
+                delete options.asVideo
+                delete options.asDocument
+                delete options.asImage
+
+                let message = {
+                    ...options,
+                    caption,
+                    ptt,
+                    [mtype]: { url: pathFile },
+                    mimetype,
+                    fileName: filename || pathFile.split('/').pop()
+                }
+                /**
+                 * @type {import('@adiwajshing/baileys').proto.WebMessageInfo}
+                 */
+                let m
+                try {
+                    m = await myBot.sendMessage(jid, message, { ...opt, ...options })
+                } catch (e) {
+                    console.error(e)
+                    m = null
+                } finally {
+                    if (!m) m = await myBot.sendMessage(jid, { ...message, [mtype]: file }, { ...opt, ...options })
+                    file = null // releasing the memory
+                    return m
+                }
+            }
     
     /**
      * Parses string into mentionedJid(s)

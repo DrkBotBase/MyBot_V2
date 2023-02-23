@@ -1,5 +1,12 @@
+# myVariable
 config.env
+
+# Dependency directories
 node_modules/
+src/data.js.bak
+
+# data-auth
 package-lock.json
+yarn-error.log
 yarn.lock
 ian.js (2)

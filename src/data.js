@@ -1,136 +1,123 @@
-const fs = require("fs")
+const fs = require('fs')
 
-function randomId(length) {
-  var result           = ''
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  var characteresLength = characters.length
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * characteresLength))
+function randomId(size) {
+  let id = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const numCharacters = characters.length;
+  for (let i = 0; i < size; i++) {
+    id += characters.charAt(Math.floor(Math.random() * numCharacters));
   }
-  return result;
+  return id;
 }
 
-const addUser = (userId, name, _db) => {
-    let position = false
-    Object.keys(_db).forEach((i) => {
-        if (_db[i].phone === userId) {
-            position = true
-        }
-    })
-    if (position === false) {
-        const obj = { id: randomId(20), phone: userId, name: name, register: true, block: false, usage: 0, cash: 1000, fail: 0}
-        _db.push(obj)
-        fs.writeFileSync('./src/people.json', JSON.stringify(_db, null, 2))
-        return false
+
+const databaseFile = "./src/database.json";
+let database = {};
+
+try {
+  database = JSON.parse(fs.readFileSync(databaseFile));
+} catch (error) {
+  console.error(`No se pudo leer el archivo ${databaseFile}:`, error);
+  //fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+}
+
+function totalHit() {
+  let sum = 0;
+  for (let key in database) {
+    sum += database[key].usage;
+  }
+  return sum;
+}
+
+
+const keyUsageLimit = 3;
+
+class User {
+  constructor(phone, name) {
+    this.phone = phone;
+    this.name = name;
+
+    if (!database[this.phone]) {
+        database[this.phone] = { id: randomId(6), name: this.name, block: false, usage: 0, cash: 2000, report: 0, useKeys: {} }
     }
-}
+    fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+  }
 
-const chekUser = (userId, _db) => {
-   let status = false
-   Object.keys(_db).forEach((i) => {
-      if (_db[i].phone === userId) {
-         status = true
-      }
-   })
-   return status
-}
-const showData = (userId, _db) => {
-   let status = false
-   Object.keys(_db).forEach((i) => {
-      if (_db[i].phone === userId && _db[i].block === true) {
-         status = true
-      }
-   })
-   return status
-}
+  delete() {
+    if (database[this.phone]) {
+      delete database[this.phone];
+      fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+    } else {
+      console.error(`No se encontró el usuario "${this.phone}" en la base de datos`);
+    }
+  }
 
-const addBlockUser = (userId, _db) => {
-	let found = false
-	Object.keys(_db).forEach((i) => {
-		if (_db[i].phone === userId) {
-			found = i
-		}
-	})
-	if (found !== false) {
-		_db[found].block = true
-		fs.writeFileSync("./src/people.json", JSON.stringify(_db, null, 2))
-	}
-}
-const delBlockUser = (userId, _db) => {
-    let found = false
-    Object.keys(_db).forEach((i) => {
-        if (_db[i].phone === userId) {
-            found = i
+  static show(phone) {
+    if (database[phone]) {
+      //console.log(`Información del usuario "${phone}":`, database[phone]);
+      return {
+        number: phone,
+        id: database[phone].id,
+        name: database[phone].name,
+        block: database[phone].block,
+        use: database[phone].usage,
+        points: database[phone].cash,
+        report: database[phone].report,
+        keys: database[phone].useKeys
+      }
+    }
+  }
+
+  static check(phone) {
+    return database.hasOwnProperty(phone)
+  }
+
+  static counter(phone, properties) {
+    if (database[phone]) {
+      Object.keys(properties).forEach((prop) => {
+        if (database[phone].hasOwnProperty(prop)) {
+          database[phone][prop] += properties[prop]
+        } else {
+          console.log(`La propiedad "${prop}" que ingresó no existe en el objeto del usuario "${phone}"`);
         }
+      })
+      fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+    } else {
+      console.log(`El usuario "${phone}" no existe en la base de datos`);
+    }
+  }
+  
+  static change(phone, properties) {
+    Object.keys(properties).forEach((prop) => {
+      database[phone][prop] = properties[prop]
     })
-    if (found !== false) {
-		_user[found].block = false
-		fs.writeFileSync("./src/people.json", JSON.stringify(_user, null, 2))
-	}
+    fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+  }
 }
 
-const unreg = (userId, _db) => {
-    let found = false
-    Object.keys(_db).forEach((i) => {
-        if (_db[i].phone === userId) {
-            found = i
+const addUserKey = (userId, key) => {
+  try {
+    if (database.hasOwnProperty(userId)) {
+      const user = database[userId]
+      
+      if (user.useKeys.hasOwnProperty(key)) {
+        if (user.useKeys[key] < keyUsageLimit) {
+          user.useKeys[key]++
+        } else {
+          return false
         }
-    })
-    if (found !== false) {
-		_user[found].register = false
-		fs.writeFileSync("./src/people.json", JSON.stringify(_user, null, 2))
-	}
-}
-
-const addFailUser = (userId, _db) => {
-	Object.keys(_db).forEach((i) => {
-		if (_db[i].phone === userId) {
-		  _db[i].fail++
-		}
-    if (_db[i].phone === userId && _db[i].fail === 3) {
-        _db[i].block = true
-        return m.reply('Tienes 3 fallas, has sido bloqueado.')
+      } else {
+        user.useKeys[key] = 1
       }
-	})
-	fs.writeFileSync("./src/people.json", JSON.stringify(_db, null, 2))
+
+      fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2))
+    } else {
+      m.reply(`El usuario ${userId} no está registrado en la base de datos`)
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-const resetDataUsers = (_db) => {
-  Object.keys(_db).forEach((i) => {
-    _db[i].fail = 0
-    _db[i].block = false
-    //_db[i].cash = 1000
-  })
-  fs.writeFile('./src/people.json', JSON.stringify(_db, null, 2))
-}
 
-const addUsageUser = (userId, _db) => {
-	Object.keys(_db).forEach((i) => {
-		if (_db[i].phone === userId) {
-		  _db[i].usage++
-		}
-	})
-	fs.writeFileSync("./src/people.json", JSON.stringify(_db, null, 2))
-}
-
-const addCashUser = (userId, monei, _db) => {
-	Object.keys(_db).forEach((i) => {
-		if (_db[i].phone === userId) {
-		  _db[i].cash += monei
-		}
-	})
-	fs.writeFileSync("./src/people.json", JSON.stringify(_db, null, 2))
-}
-
-module.exports = {
-  addUser,
-  chekUser,
-  showData,
-  addBlockUser,
-  delBlockUser,
-  unreg,
-  addFailUser,
-  resetDataUsers,
-  addUsageUser,
-  addCashUser
-}
+module.exports = { User, addUserKey, totalHit }

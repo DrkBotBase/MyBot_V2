@@ -71,13 +71,13 @@
       "msg": "*Necesito el link.*\nEjemplo: {}song https://youtu.be/Z6L4u2i97Rw",
       "big_size": "🤖 Tamaño maximo de descarga excedido.\nDescargalo manual.\n\n*Link:* {}",
       "no_size": "🤖 No encuentro el tamaño de ese audio, intenta con otro :)",
-      "caption": "Título: {}\nTamaño: {}\nExt: {}"
+      "caption": "*Título:* {}\n*Tamaño:* {}\n*Ext:* {}"
     },
     "video": {
       "msg": "*Necesito el link.*\nEjemplo: {}video https://youtu.be/KRaWnd3LJfs",
       "big_size": "🤖 Tamaño maximo de descarga excedido.\nDescargalo manual.\n\n*Link:* {}",
       "no_size": "🤖 No encuentro el tamaño de ese video, intenta con otro :)",
-      "caption": "Título: {}"
+      "caption": "*Título:* {}"
     },
     "get_down": {
       "msg": "*Ejemplo:* {} 1",
@@ -104,7 +104,9 @@
     },
     "ia": {
       "msg": "🤖 *Si aquí estoy*",
-      "name": "mi nombre es {}"
+      "name": "mi nombre es {}",
+      "gpt_msg": "Que deseas buscar?",
+      "gpt_no_points": "Puntos insuficientes.\nTe hacen falta *{}* puntos."
     },
     "bin": {
       "msg": "Necesito el BIN"
@@ -162,7 +164,8 @@
       "wait": "Un momento...",
       "endLimit": "Su límite diario ha expirado, el límite se restablecerá cada 12 horas",
       "err": "🤖 Parece que tenemos un error.\nIntenta nuevamente.",
-      "noReg": "Para usar los comandos del BOT, necesitas registrarte. Escribe {}reg\n\n*EL REGISTRO SOLO SE PUEDE HACER EN CHAT PRIVADO*"
+      "noReg": "Para usar los comandos del BOT, necesitas registrarte. Escribe {}reg\n\n*PARA REGISTRARTE TOCA EL SIGUIENTE ENLACE*\nhttps://wa.me/573046793853?text=/reg",
+      "no_points": "No tienes puntos suficientes para usar este comando.\nObten puntos en los juegos."
     },
     "sc": {
       "msg": "No olvides dar estrellas"

@@ -20,22 +20,32 @@ global.bot = '573046793853'
 global.premium = []
 global.author = 'DrkBot'
 global.sessionName = 'sess304'
-global.sp = '╠❖'
-global.typeMenu = 'location'
+global.typeMenu = 'image'
 global.timeZone = 'America/Bogota'
 global.timeLocale = 'co'
-global.sourceCode = 'https://github.com'
+global.sourceCode = 'https://github.com/DrkBotBase/MyBot_V2'
 global.newFont = 'on'
 global.botFont = 'Math monospace'
 
-global.points = 10
+// LINE BOX
+
+global.BOX = {
+  ini: '╭━━〘 *{}* 〙━━',
+  med: '┊⇀',
+  end: '╰━━━━━━━━━━⬣',
+  medM: '┊',
+  endM: '╰━━〘 *{}* 〙━━⬣'
+}
 
 global.thumb = readFileSync('./lib/bot.jpg')
 global.nothing = readFileSync('./lib/nsp.webp')
-
+global.rulesImg = readFileSync('./lib/rules.jpg')
+global.miniRobot = readFileSync('./lib/musicRobot.jpg')
+global.maintenance = 'https://telegra.ph/file/fb1477894bdd05a7d9851.jpg'
+/*
 global.user = require("./src/data")
 global._user = JSON.parse(readFileSync("./src/people.json"))
-
+*/
 
 function convertToBool(text, fault = 'true') {
     return text === fault ? true : false;
