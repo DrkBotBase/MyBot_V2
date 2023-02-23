@@ -218,7 +218,7 @@ switch(command) {
     linkS = ['https://youtu.be/13aBcRrL0oE','https://youtu.be/e-fA-gBCkj0','https://youtu.be/CQLsdm1ZYAw','https://youtu.be/Bznxx12Ptl0','https://youtu.be/u9LH_y159sg','https://youtu.be/HhjHYkPQ8F0','https://youtu.be/nPvuNsRccVw','https://youtu.be/KRaWnd3LJfs','https://youtu.be/KBtk5FUeJbk','https://youtu.be/ZaflNU45bVY','https://youtu.be/D9G1VOjN_84']
     let enlace = {contextInfo: {externalAdReply: {title: 'MUSICA SELECCIONADA',body: 'Link :)',sourceUrl: linkS[Math.floor(linkS.length * Math.random())],thumbnail: global.miniRobot}}}
     if(global.typeMenu === 'image') {
-      myBot.sendButton(m.chat, anu, myBot.user.name, global.thumb, [['MENU','menu'],['OWNER','owner'],['GITHUB','github']], m, enlace)
+      myBot.sendButton(m.chat, anu, myBot.user.name, global.thumb, [['MENU','menu'],['OWNER','owner'],['GITHUB','sc']], m, enlace)
     } else if(global.typeMenu === 'template') {
       myBot.send5ButImg(m.chat, anu, myBot.user.name, global.thumb, butTemplate)
     } else if(global.typeMenu === 'location') {
