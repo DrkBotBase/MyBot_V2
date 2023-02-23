@@ -513,7 +513,7 @@ switch(command) {
     let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
     if(!down.dlink) return m.reply(myLang('global').err)
     if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendMessage(m.chat, {document: {url: down.dlink}, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})
+    await myBot.sendMessage(m.chat, { audio: { url: down.dlink }, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})
     User.counter(m.sender, {usage: 1})
   }break
   case 'video': {
