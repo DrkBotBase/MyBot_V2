@@ -66,6 +66,7 @@ ${p.med} ${prefix}tagall
 ${p.med} ${prefix}hdt
 ${p.end}
 ${p.ini.replace('{}',list_c)}
+${p.med} ${prefix}ttt
 ${p.med} ${prefix}dados
 ${p.med} ${prefix}ppt
 ${p.med} ${prefix}slot

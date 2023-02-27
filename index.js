@@ -6,7 +6,8 @@
 */
 
 require('./config')
-const { default: myBotConnect, DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
+//const { default: myBotConnect, DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
+const { DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
 const { useSingleFileAuthState } = require('./lib/s-auth-state')
 const Config = require('./config');
 const { state, saveState } = useSingleFileAuthState(`./${Config.SESSION}.json`)
@@ -20,7 +21,7 @@ const _ = require('lodash')
 const axios = require('axios')
 const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
-const { smsg, getBuffer, getSizeMedia, await, sleep } = require('./lib/myfunc')
+const { smsg, getBuffer, getSizeMedia, await, sleep, fetchBuffer, getFile, makeId } = require('./lib/myfunc')
 const { log, pint } = require('./lib/colores');
 const { toAudio } = require('./lib/converter')
 
@@ -33,6 +34,10 @@ const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
 
+global.component = new (require('@neoxr/neoxr-js'))
+const { Extra, Function} = component
+const { Socket } = Extra
+global.Func = Function
 /*
 async function dbUser() {
   user.addUser(global.bot+'@s.whatsapp.net', global.author, _user)
@@ -41,7 +46,8 @@ async function dbUser() {
 dbUser()
 */
 async function startMybot() {
-    const myBot = myBotConnect({
+    //const myBot = myBotConnect({
+    const myBot = Socket({
         logger: pino({ level: 'silent' }),
         printQRInTerminal: true,
         browser: ["DrkBot", "Safari", "13.0.0"],
@@ -95,11 +101,16 @@ async function startMybot() {
                 }
 
                 if (anu.action == 'add') {
-                  teks = `╔══✪〘 *NUEVO USUARIO* 〙✪══\n╠❖ *Nombre:* @${num.split('@')[0]}\n╚══✪〘 *DrkBot* 〙✪══`
-                  myBot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: teks })
+                  teks = `${BOX.ini.replace('{}','*NUEVO USUARIO*')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
+                  myBot.sendMessageModify(anu.id, teks, null, {
+                    title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
+                  })
+                  //myBot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: teks })
                 } else if (anu.action == 'remove') {
-                  teks = `╔══✪〘 *SE FUE* 〙✪══\n╠❖ *Nombre:* @${num.split('@')[0]}\n╚══✪〘 *DrkBot* 〙✪══`
-                  myBot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: teks })
+                  teks = `${BOX.ini.replace('{}','*SE FUE*')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
+                  myBot.sendMessageModify(anu.id, teks, null, {
+                    title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
+                  })
                 }
             }
         } catch (err) {
@@ -783,6 +794,104 @@ async function startMybot() {
     myBot.parseMention = (text = '') => {
         return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
     }
+    
+    //-------------------------------------
+ /*   myBot.generateMessage = async (
+  jid,
+  _0x459734,
+  _0x281363 = {},
+  _0x306fe5 = {}
+) => {
+  let prep = await generateWAMessage(jid, _0x459734, _0x281363)
+  const _0x5eb11f = getContentType(prep.message)
+  if ('contextInfo' in _0x459734) {
+    prep.message[_0x5eb11f].contextInfo = {
+      ...prep.message[_0x5eb11f].contextInfo,
+      ..._0x459734.contextInfo,
+    }
+  }
+  if ('contextInfo' in _0x306fe5) {
+    prep.message[_0x5eb11f].contextInfo = {
+      ...prep.message[_0x5eb11f].contextInfo,
+      ..._0x306fe5.contextInfo,
+    }
+  }
+  return await myBot
+    .relayMessage(jid, prep.message, {
+      messageId: prep.key.id })
+    .then(() => prep)
+}
+
+myBot.sendMessageModify = async (
+  _0x136c88,
+  _0x307c89,
+  //_0x1a6f89,
+  //_0x2cbc39,
+  _0x3c79f8 = {}
+) => {
+  //await myBot.sendPresenceUpdate('composing', _0x136c88)
+  /*if (_0x2cbc39.thumbnail) {
+    var { file: _0x56d278 } = await getFile(_0x2cbc39.thumbnail)
+  }
+  let aa = { quoted: m, userJid: myBot.user.id }
+  //var _0x2ca013 = { quoted: _0x1a6f89 }
+  return myBot.generateMessage(
+    _0x136c88,
+    {
+      text: _0x307c89,
+      ..._0x3c79f8,
+      contextInfo: {
+        mentionedJid: myBot.parseMention(_0x307c89),
+        externalAdReply: {
+          title: global.botname,
+          body: null,
+          mediaType: 1,
+          previewType: 0,
+          showAdAttribution: false,
+          renderLargerThumbnail: true,
+          thumbnail: await fetchBuffer(global.thumb),
+          thumbnailUrl: 'https://telegra.ph/?id=' + makeId(8),
+          sourceUrl: sourceCode,
+        },
+      },
+    },
+    aa
+    //_0x2ca013
+  )
+}
+myBot.deleteObj = async (_0xdac00, _0xc8e922) => {
+  if (_0xdac00.msg && _0xdac00.msg.type == 0) {
+    var _0x18a99e = await store.loadMessage(
+      _0xdac00.chat,
+      _0xdac00.key.id,
+      _0xc8e922
+    )
+    for (let _0xb902c2 = 0; _0xb902c2 < 5; _0xb902c2++) {
+      if (_0x18a99e.mtype == 'protocolMessage') {
+        var _0x18a99e = await store.loadMessage(
+          _0xdac00.chat,
+          _0xdac00.key.id,
+          _0xc8e922
+        )
+        await delay(1000)
+        if (_0x18a99e.mtype != 'protocolMessage') {
+          break
+        }
+      }
+    }
+    var _0x41f17d = {}
+    return (
+      (_0x41f17d.key = _0x18a99e.key),
+      (_0x41f17d.message = { [_0x18a99e.mtype]: _0x18a99e.msg }),
+      proto.WebMessageInfo.fromObject(_0x41f17d)
+    )
+  } else {
+    return null
+  }
+}*/
+//-------------------------------------
+    
+    
 
     return myBot
 }

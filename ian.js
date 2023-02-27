@@ -6,7 +6,7 @@
 */
 
 require('./config')
-const { proto, generateWAMessage, areJidsSameUser } = require('@adiwajshing/baileys')
+const { proto, generateWAMessage, areJidsSameUser, generateWAMessageFromContent, MessageType } = require('@adiwajshing/baileys')
 const fs = require('fs')
 const util = require('util')
 const { exec, spawn, execSync } = require("child_process")
@@ -23,7 +23,6 @@ const { formatp, isUrl, sleep, clockString, runtime, getBuffer, fetchJson, jsonf
 const { log, pint, bgPint } = require('./lib/colores');
 const { menu, butTemplate, rules } = require('./plugins/menu')
 const Config = require('./config');
-const yts = require('yt-search')
 const { youtubedlv2, youtubeSearch, tiktokdlv2, googleImage, savefrom } = require('@bochilteam/scraper')
 const { y1s, expandUrl, wallpaper } = require('./lib/scraper')
 
@@ -134,6 +133,93 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         myBot.ev.emit('messages.upsert', msg)
         }
 
+      this.game = this.game ? this.game : {}
+	    let room = Object.values(this.game).find(room => room.id && room.game && room.state && room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender) && room.state == 'PLAYING')
+	    if (room) {
+  	    let ok
+  	    let isWin = !1
+  	    let isTie = !1
+  	    let isSurrender = !1
+  	    if (!/^([1-9]|(me)?rendirse|off|siguiente)$/i.test(m.text)) return
+  	    isSurrender = !/^[1-9]$/.test(m.text)
+  	    if (m.sender !== room.game.currentTurn) {
+  	      if (!isSurrender) return !0
+  	    }
+	    if (!isSurrender && 1 > (ok = room.game.turn(m.sender === room.game.playerO, parseInt(m.text) - 1))) {
+  	    m.reply({
+    	    '-3': 'Juego Terminado',
+    	    '-2': 'Invalido',
+    	    '-1': 'Posición Invalida',
+    	    0: 'Posición Invalida',
+  	    }[ok])
+  	    return !0
+	    }
+	    if (m.sender === room.game.winner) isWin = true
+	    else if (room.game.board === 511) isTie = true
+	    let arr = room.game.render().map(v => {
+  	    return {
+  	    X: '❌',
+  	    O: '⭕',
+  	    1: '1️⃣',
+  	    2: '2️⃣',
+  	    3: '3️⃣',
+  	    4: '4️⃣',
+  	    5: '5️⃣',
+  	    6: '6️⃣',
+  	    7: '7️⃣',
+  	    8: '8️⃣',
+  	    9: '9️⃣',
+  	    }[v]
+	    })
+	    if (isSurrender) {
+	      room.game._currentTurn = m.sender === room.game.playerX
+	      isWin = true
+	    }
+	    let winner = isSurrender ? room.game.currentTurn : room.game.winner
+	    let str = `Sala ID: ${room.id}
+
+${BOX.ini.replace('{}','*JUGADORES')}
+❌: @${room.game.playerX.split('@')[0]}
+⭕: @${room.game.playerO.split('@')[0]}
+${BOX.end}
+
+${arr.slice(0, 3).join('')}
+${arr.slice(3, 6).join('')}
+${arr.slice(6).join('')}
+
+${isWin ? `El jugador @${winner.split('@')[0]} es el ganador.` 
+: isTie ? 'Empate.\nJuego Terminado' 
+: `Turno de: *${['❌', '⭕'][1 * room.game._currentTurn]} (@${room.game.currentTurn.split('@')[0]}*)`}
+
+Escriba *rendirse* para admitir la derrota.`.trim()
+  	    if ((room.game._currentTurn ^ isSurrender ? room.x : room.o) !== m.chat)
+  	    room[room.game._currentTurn ^ isSurrender ? 'x' : 'o'] = m.chat
+  	    if (room.x !== room.o) await myBot.sendText(room.x, str, m, { mentions: parseMention(str) } )
+  	    await myBot.sendText(room.o, str, m, { mentions: parseMention(str) } )
+  	    if (isTie || isWin) {
+  	      delete this.game[room.id]
+  	    }
+	    }
+	    
+	    // ACERTIJO
+	  let similarity = require('similarity')
+    let threshold = 0.72
+	  /*id = m.chat
+    if (!m.quoted || !m.quoted.fromMe || !m.quoted.isBaileys || !/^ⷮ/i.test(m.quoted.text)) return !0
+    this.mstekateki = this.mstekateki ? this.mstekateki : {}
+    if (!(id in this.mstekateki)) return m.reply('Ese acertijo ya ha terminado!')
+    if (m.quoted.id == this.mstekateki[id][0].id) {
+        let json = JSON.parse(JSON.stringify(this.mstekateki[id][1]))
+        // m.reply(JSON.stringify(json, null, '\t'))
+        if (m.text.toLowerCase() == json.response.toLowerCase().trim()) {
+            //global.db.data.users[m.sender].exp += this.tekateki[id][2]
+            m.reply(`*Respuesta correcta!*`)
+            clearTimeout(this.tekateki[id][2])
+            delete this.mstekateki[id]
+        } else if (similarity(m.text.toLowerCase(), json.response.toLowerCase().trim()) >= threshold) m.reply(`Casi lo logras!`)
+        else m.reply('Respuesta incorrecta!')
+    }*/
+	    
 
 // ======== INICIO COMANDOS ========
 switch(command) {
@@ -245,7 +331,10 @@ switch(command) {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
-    m.reply(`*${myLang('sc').msg}*\n\n*Script:* ${sourceCode}`)
+    let texto = `*@${m.sender.split`@`[0]}*\n\n*${myLang('sc').msg}*`
+    let aa = { quoted: m, userJid: myBot.user.id }
+    let prep = generateWAMessageFromContent(m.chat, { extendedTextMessage: { text: texto, contextInfo: { externalAdReply: { title: 'Official GitHub', body: null, thumbnail: thumb, sourceUrl: sourceCode }, mentionedJid: [m.sender]}}}, aa)    
+    myBot.relayMessage(m.chat, prep.message, { messageId: prep.key.id, mentions: [m.sender] })
     User.counter(m.sender, {usage: 1})
   }break
 // CONVERTER
@@ -463,15 +552,18 @@ switch(command) {
     if (!text) return m.reply(myLang('play').msg.replace('{}', prefix+command))
     myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
-      let ytm = await yts(text)
-      let { thumbnail, title, url } = ytm.all[0]
+      ytm = await youtubeSearch(text)
+      let { thumbnail, title, url } = ytm.video[0]
       let buttons = [
         { buttonId: `song ${url}`, buttonText: { displayText: 'AUDIO' }, type: 1 },
         { buttonId: `video ${url}`, buttonText: { displayText: 'VIDEO' }, type: 1 }
       ]
       myBot.sendButImage(m.chat, thumbnail, `*${title}*`, myBot.user.name, buttons)
       User.counter(m.sender, {usage: 1})
-    } catch (e) { m.reply(myLang('global').err) }
+    } catch (e) {
+      throw e
+      m.reply(myLang('global').err)
+    }
   }break
   case 'ttdl': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
@@ -483,7 +575,10 @@ switch(command) {
       let { video } = await tiktokdlv2(text)
       await myBot.sendMessage(m.chat, { video: { url: video.no_watermark }, mimetype: 'video/mp4', fileName: `tiktokdl.mp4`, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
       User.counter(m.sender, {usage: 1})
-    } catch (e) { m.reply(myLang('global').err) }
+    } catch (e) {
+      throw e
+      m.reply(myLang('global').err)
+    }
   }break
   case 'yts': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
@@ -492,14 +587,17 @@ switch(command) {
     if (!text) return m.reply(myLang('yts').msg.replace('{}', prefix+command))
     myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
     try {
-      let search = await yts(text)
+      search = await youtubeSearch(text)
       let teks = myLang('yts').res +' *'+text+'*\n\n'
-      search.all.map((video) => {
+      search.video.map((video) => {
         teks += '*' + video.title + '* - ' + video.url + '\n'
       });
-      myBot.sendImage(m.chat, search.all[0].thumbnail, teks)
+      myBot.sendImage(m.chat, search.video[0].thumbnail, teks)
       User.counter(m.sender, {usage: 1})
-    } catch (e) { m.reply(myLang('global').err) }
+    } catch (e) {
+      throw e
+      m.reply(myLang('global').err)
+    }
   }break
   case 'song': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
@@ -507,14 +605,22 @@ switch(command) {
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('song').msg.replace('{}', prefix))
     myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    let down = await y1s('mp3', await expandUrl(text))
+    /*let down = await y1s('mp3', await expandUrl(text))
     if(!down.status) return m.reply(myLang('global').err)
     let tsize = down.size.split(' ')[1]
     let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
     if(!down.dlink) return m.reply(myLang('global').err)
     if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendMessage(m.chat, { audio: { url: down.dlink }, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})
-    User.counter(m.sender, {usage: 1})
+    await myBot.sendMessage(m.chat, { audio: { url: down.dlink }, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})*/
+    try{
+      let ytm = await youtubedlv2(text)
+      let link = await ytm.audio['128kbps'].download()
+      await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
+      User.counter(m.sender, {usage: 1})
+    } catch (e) {
+      throw e
+      m.reply(myLang('global').err)
+    }
   }break
   case 'video': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
@@ -522,14 +628,22 @@ switch(command) {
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('video').msg.replace('{}', prefix))
     myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    let down = await y1s('mp4', await expandUrl(text))
+    /*let down = await y1s('mp4', await expandUrl(text))
     if(!down.status) return m.reply(myLang('global').err)
     let tsize = down.size.split(' ')[1]
     let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
     if(!down.dlink) return m.reply(myLang('global').err)
     if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})
-    User.counter(m.sender, {usage: 1})
+    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})*/
+    try {
+      const ytm = await youtubedlv2(text)
+      const link = await ytm.video['360p'].download()
+      await myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: myLang('video').caption.replace('{}', ytm.title) }, { quoted: m })
+      User.counter(m.sender, {usage: 1})
+    } catch (e) {
+      throw e
+      m.reply(myLang('global').err)
+    }
   }break
   case 'getmusic': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
@@ -541,15 +655,23 @@ switch(command) {
 		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
     if (!urls) return m.reply(myLang('get_down').quot)
     myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    let down = await y1s('mp3', urls[text - 1])
+    /*let down = await y1s('mp3', urls[text - 1])
     if(!down.status) return m.reply(myLang('global').err)
     let tsize = down.size.split(' ')[1]
     let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
     if(!down.dlink) return m.reply(myLang('global').err)
     if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
     await myBot.sendImage(m.chat, down.thumbnail, myLang('song').caption.replace('{}', down.title).replace('{}', down.size).replace('{}', down.fquality), m)
-    await myBot.sendMessage(m.chat, {document: {url: down.dlink}, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})
-    User.counter(m.sender, {usage: 1})
+    await myBot.sendMessage(m.chat, {document: {url: down.dlink}, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})*/
+    try {
+      let ytm = await youtubedlv2(urls[text - 1])
+      let link = await ytm.audio['128kbps'].download()
+      await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
+      User.counter(m.sender, {usage: 1})
+    } catch (e) {
+      throw e
+      m.reply(myLang('global').err)
+    }
   }break
   case 'getvideo': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
@@ -561,14 +683,21 @@ switch(command) {
 		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
     if (!urls) return m.reply(myLang('get_down').quot)
     myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    let down = await y1s('mp4', urls[text - 1])
+    /*let down = await y1s('mp4', urls[text - 1])
     if(!down.status) return m.reply(myLang('global').err)
     let tsize = down.size.split(' ')[1]
     let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
     if(!down.dlink) return m.reply(myLang('global').err)
     if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})
-    User.counter(m.sender, {usage: 1})
+    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})*/
+    try {
+      let ytm = await youtubedlv2(urls[text - 1])
+      let link = await ytm.video['360p'].download()
+      User.counter(m.sender, {usage: 1})
+    } catch (e) {
+      throw e
+      m.reply(myLang('global').err)
+    }
   }break
   case 'waifu': case 'neko': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
@@ -946,6 +1075,78 @@ ${lineC}
       myBot.sendMessage(m.sender, { text: pickRandom(keysAll) }, { quoted: m })
     }
   }break
+  case 'ttt': {
+    if (!m.isGroup) return m.reply(myLang('global').group)
+    if (!text) return m.reply('Necesitas un nombre para la sala.')
+    let TicTacToe = require("./lib/tictactoe")
+    this.game = this.game ? this.game : {}
+    if (Object.values(this.game).find(room => room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender))) return m.reply('Todavía estás en un juego.')
+    let room = Object.values(this.game).find(room => room.state === 'WAITING' && (text ? room.name === text : true))
+    if (room) {
+      //m.reply('Contrincante encontrado!')
+      room.o = m.chat
+      room.game.playerO = m.sender
+      room.state = 'PLAYING'
+      let arr = room.game.render().map(v => {
+        return {
+          X: '❌',
+          O: '⭕',
+          1: '1️⃣',
+          2: '2️⃣',
+          3: '3️⃣',
+          4: '4️⃣',
+          5: '5️⃣',
+          6: '6️⃣',
+          7: '7️⃣',
+          8: '8️⃣',
+          9: '9️⃣',
+        }[v]
+      })
+      let str = `Sala ID: ${room.id}
+
+${BOX.ini.replace('{}','*JUGADORES*')}
+❌: @${room.game.playerX.split('@')[0]}
+⭕: @${room.game.playerO.split('@')[0]}
+${BOX.end}
+
+${arr.slice(0, 3).join('')}
+${arr.slice(3, 6).join('')}
+${arr.slice(6).join('')}
+
+Turno de *@${room.game.currentTurn.split('@')[0]}*
+
+Escriba *rendirse* para admitir la derrota.`
+      if (room.x !== room.o) await myBot.sendText(room.x, str, m, { mentions: parseMention(str) } )
+      await myBot.sendText(room.o, str, m, { mentions: parseMention(str) } )
+    } else {
+      room = {
+        id: 'tictactoe-' + (+new Date),
+        x: m.chat,
+        o: '',
+        game: new TicTacToe(m.sender, 'o'),
+        state: 'WAITING'
+      }
+      if (text) room.name = text
+      //m.reply('Esperando contrincante\n\n' + (text ? `Para aceptar el reto escriba: *${prefix}${command} ${text}*` : ''))
+      imgLogo = 'https://store-images.s-microsoft.com/image/apps.2005.14057826194083709.67242c47-4fd7-4f1a-9dd6-5d93f6cc10df.f80f14c0-72ab-46ff-86cd-9d801c8e04e8?mode=scale&q=90&h=300&w=300'
+      anu = `Esperando contrincante.\n\nPara aceptar reto toca el boton de abajo.`
+      myBot.sendButtonLoc(m.chat, imgLogo, anu, 'Juego TicTacToe', 'ACEPTAR JUEGO', `${prefix}${command} ${text}`)
+      this.game[room.id] = room
+    }
+  }break
+  case 'delttt': {
+    this.game = this.game ? this.game : {}
+    try {
+      if (this.game) {
+        delete this.game
+        myBot.sendText(m.chat, 'Sesión de TicTacToe eliminada con éxito', m)
+      } else if (!this.game) {
+        m.reply('No hay session activa.')
+      } else return m.reply('?')
+    } catch (e) {
+      m.reply('Tenemos un error.')
+    }
+  }break
   case 'unlock': {
     if (!args[0]) return m.reply('Necesito la Key.')
     if (_unlock.includes(args[0])) {
@@ -1107,12 +1308,12 @@ ${lineC}
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
     if (!isAdmins) return m.reply(myLang('global').admin)
 
-    let ini = `╔═✪〘 *${myLang('group').tag.msg_a}* 〙✪═\n`
+    let ini = `${BOX.ini.replace('{}',myLang('group').tag.msg_a)}\n`
     let mesaj = `➲ *${myLang('group').tag.msg_b}:* ${q ? q : ''}\n\n`
-    let end = `╚═✪〘 *${botName}* 〙✪═`
+    let end = `${BOX.end.replace('{}', botName)}`
 
     for (let mem of participants) {
-      mesaj += `${global.sp} @${mem.id.split('@')[0]}\n`
+      mesaj += `${BOX.med} @${mem.id.split('@')[0]}\n`
       tga = `${ini}${mesaj}${end}`
     }
     myBot.sendMessage(m.chat, { text: tga, mentions: participants.map(a => a.id) }, { quoted: m })
@@ -1379,11 +1580,54 @@ case 'test': {
 		
     myBot.sendMessage(m.chat, { text: 'Test Context' }, { quoted: ftroli })
 */
+/*
+let texto = `*[❗] @${m.sender.split`@`[0]} 𝙰𝙶𝚄𝙰𝚁𝙳𝙴 𝚄𝙽 𝙼𝙾𝙼𝙴𝙽𝚃𝙾*`
+let aa = { quoted: m, userJid: myBot.user.id }
+let prep = generateWAMessageFromContent(m.chat, { extendedTextMessage: { text: texto, contextInfo: { externalAdReply: { title: 'DrkBot', body: null, thumbnail: thumb, sourceUrl: 'https://github.com/DrkBotBase' }, mentionedJid: [m.sender]}}}, aa)    
+myBot.relayMessage(m.chat, prep.message, { messageId: prep.key.id, mentions: [m.sender] })
+*/
+//let p = await fg.tiktok(args[0]) 
+//let buttons = [{ buttonText: { displayText: '♫ 𝙰𝚄𝙳𝙸𝙾 ♫' }, buttonId: `${usedPrefix}tomp3` }]
+//let te = `*𝚄𝚂𝙴𝚁𝙽𝙰𝙼𝙴:* ${p.author || 'Indefinido'}`
+//await myBot.sendMessage(m.chat, { text: 'Test Context' }, { quoted: m })
+//await myBot.sendMessage(m.chat, { text: { url: p.nowm}, caption: te, footer: wm, buttons }, { quoted: m })  
+/*
+let timeout = 60000
+let mstekateki = {}
+    let id = m.chat
+    if (id in mstekateki) {
+        myBot.sendText(m.chat, 'Todavía hay acertijos sin responder en este chat', mstekateki[id][0])
+        return false
+    }
+    let tekateki = JSON.parse(fs.readFileSync(`./src/game/acertijo.json`))
+    let json = tekateki[Math.floor(Math.random() * tekateki.length)]
+    let _clue = json.response
+    let clue = _clue.replace(/[A-Za-z]/g, '_')
+    let caption = `
+ⷮ *${json.question}*
 
-let fkontak = {
-  key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: `status@broadcast` } : {}) },
-  message: { 'contactMessage': { 'displayName': `${author}`, 'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:XL;author,;;;\nFN:author\nitem1.TEL;waid=573508770421:573508770421\nitem1.X-ABLabel:Ponsel\nEND:VCARD`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100), thumbnail: await myBot.reSize(thumb, 100, 100),sendEphemeral: true}}
+*• Tiempo:* ${(timeout / 1000).toFixed(2)} segundos`
+    mstekateki[id] = [
+       await myBot.sendText(m.chat, caption, m),
+        json,
+        setTimeout(async () => {
+            if (mstekateki[id]) await myBot.sendText(m.chat, `Se acabó el tiempo!\n*Respuesta:* ${json.response}`, mstekateki[id][0])
+            delete mstekateki[id]
+        }, timeout)
+    ]
+*/
+try {
+  imgbc = await quoted.download()
+} catch {
+  imgbc = global.thumb
 }
+myBot.sendMessageModify(m.chat, text ? text : '🤖 DrkBot el mejor', null, {
+   title: global.author,
+   largeThumb: true,
+   thumbnail: imgbc,
+   url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
+})
+
 }break
 
 
