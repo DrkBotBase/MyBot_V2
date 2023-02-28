@@ -221,7 +221,17 @@ async function startMybot() {
     })
 
     myBot.ev.on('creds.update', saveState)
-
+    
+    
+    myBot.sendReact = async (jid, emoji, keys = {}) => {
+      let reactionMessage = {
+         react: {
+            text: emoji,
+            key: keys
+         }
+      }
+      return await myBot.sendMessage(jid, reactionMessage)
+    };
 
     // Add Other
     /**

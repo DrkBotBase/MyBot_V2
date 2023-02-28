@@ -348,7 +348,7 @@ switch(command) {
     } else {
       name = botName
     }
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     if (/image|webp/.test(mime)) {
       let media = await quoted.download()
       let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, { packname: name, author: global.author })
@@ -369,7 +369,7 @@ switch(command) {
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_audio').quot)
     if (!/video/.test(mime) && !/audio/.test(mime)) return m.reply(myLang('to_audio').q_audio)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     let media = await quoted.download()
     let { toAudio } = require('./lib/converter')
     let audio = await toAudio(media, 'mp4')
@@ -382,7 +382,7 @@ switch(command) {
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_mp4').quot)
     if (!/webp/.test(mime)) return m.reply(myLang('to_mp4').q_video)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let webpToMp4 = await webp2mp4File(media)
@@ -396,7 +396,7 @@ switch(command) {
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_img').quot)
     if (!/webp/.test(mime)) return m.reply(myLang('to_img').q_img)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let ran = await getRandom('.png')
     exec(`ffmpeg -i ${media} ${ran}`, (err) => {
@@ -414,7 +414,7 @@ switch(command) {
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!quoted) return m.reply(myLang('to_gif').quot)
     if (!/webp/.test(mime) && !/video/.test(mime)) return m.reply(myLang('to_gif').q_gif)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
 		let { webp2mp4File } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     let webpToMp4 = await webp2mp4File(media)
@@ -426,7 +426,7 @@ switch(command) {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
 		let { UploadFileUgu, webp2mp4File, TelegraPh } = require('./lib/uploader')
     let media = await myBot.downloadAndSaveMediaMessage(quoted)
     if (/image|audio/.test(mime)) {
@@ -488,7 +488,7 @@ switch(command) {
     hmm = await './src/remobg-'+getRandom('')
     localFile = await myBot.downloadAndSaveMediaMessage(quoted, hmm)
     outputFile = await './src/hremo-'+getRandom('.png')
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     removeBackgroundFromImageFile({
       path: localFile,
       apiKey: apinobg,
@@ -513,7 +513,7 @@ switch(command) {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       let set
       if (/bass/.test(command)) set = '-af equalizer=f=54:width_type=o:width=2:g=20'
@@ -550,7 +550,7 @@ switch(command) {
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('play').msg.replace('{}', prefix+command))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       ytm = await youtubeSearch(text)
       let { thumbnail, title, url } = ytm.video[0]
@@ -570,7 +570,7 @@ switch(command) {
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('ttdl').msg.replace('{}', prefix+command))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       let { video } = await tiktokdlv2(text)
       await myBot.sendMessage(m.chat, { video: { url: video.no_watermark }, mimetype: 'video/mp4', fileName: `tiktokdl.mp4`, caption: myLang('global').by.replace('{}', botName) }, { quoted: m })
@@ -585,7 +585,7 @@ switch(command) {
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('yts').msg.replace('{}', prefix+command))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       search = await youtubeSearch(text)
       let teks = myLang('yts').res +' *'+text+'*\n\n'
@@ -604,18 +604,12 @@ switch(command) {
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('song').msg.replace('{}', prefix))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    /*let down = await y1s('mp3', await expandUrl(text))
-    if(!down.status) return m.reply(myLang('global').err)
-    let tsize = down.size.split(' ')[1]
-    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
-    if(!down.dlink) return m.reply(myLang('global').err)
-    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendMessage(m.chat, { audio: { url: down.dlink }, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})*/
+    myBot.sendReact(m.chat, '🕒', m.key)
     try{
-      let ytm = await youtubedlv2(text)
-      let link = await ytm.audio['128kbps'].download()
-      await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
+      /*let ytm = await youtubedlv2(text)
+      let link = await ytm.audio['128kbps'].download()*/
+      link = process.env.DOWN_YTA.replace('{}',text)
+      myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg' }, { quoted: m })
       User.counter(m.sender, {usage: 1})
     } catch (e) {
       throw e
@@ -627,18 +621,12 @@ switch(command) {
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('video').msg.replace('{}', prefix))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    /*let down = await y1s('mp4', await expandUrl(text))
-    if(!down.status) return m.reply(myLang('global').err)
-    let tsize = down.size.split(' ')[1]
-    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
-    if(!down.dlink) return m.reply(myLang('global').err)
-    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})*/
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
-      const ytm = await youtubedlv2(text)
-      const link = await ytm.video['360p'].download()
-      await myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', fileName: `${ytm.title}.mp4`, caption: myLang('video').caption.replace('{}', ytm.title) }, { quoted: m })
+      /*const ytm = await youtubedlv2(text)
+      const link = await ytm.video['360p'].download()*/
+      link = process.env.DOWN_YTV.replace('{}',text)
+      myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', caption: global.author }, { quoted: m })
       User.counter(m.sender, {usage: 1})
     } catch (e) {
       throw e
@@ -654,19 +642,12 @@ switch(command) {
     if (!m.quoted.isBaileys) return m.reply(myLang('get_down').no_me)
 		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
     if (!urls) return m.reply(myLang('get_down').quot)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    /*let down = await y1s('mp3', urls[text - 1])
-    if(!down.status) return m.reply(myLang('global').err)
-    let tsize = down.size.split(' ')[1]
-    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
-    if(!down.dlink) return m.reply(myLang('global').err)
-    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendImage(m.chat, down.thumbnail, myLang('song').caption.replace('{}', down.title).replace('{}', down.size).replace('{}', down.fquality), m)
-    await myBot.sendMessage(m.chat, {document: {url: down.dlink}, mimetype: 'audio/mpeg', fileName: `${down.title}.mp3`}, {quoted: m})*/
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
-      let ytm = await youtubedlv2(urls[text - 1])
-      let link = await ytm.audio['128kbps'].download()
-      await myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg', fileName: `${ytm.title}.mp3` }, { quoted: m })
+      /*let ytm = await youtubedlv2(urls[text - 1])
+      let link = await ytm.audio['128kbps'].download()*/
+      link = process.env.DOWN_YTA.replace('{}',[text-1])
+      myBot.sendMessage(m.chat, { audio: { url: link }, mimetype: 'audio/mpeg' }, { quoted: m })
       User.counter(m.sender, {usage: 1})
     } catch (e) {
       throw e
@@ -682,17 +663,12 @@ switch(command) {
     if (!m.quoted.isBaileys) return m.reply(myLang('get_down').no_me)
 		let urls = quoted.text.match(new RegExp(/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed|shorts)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]+)/, 'gi'))
     if (!urls) return m.reply(myLang('get_down').quot)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
-    /*let down = await y1s('mp4', urls[text - 1])
-    if(!down.status) return m.reply(myLang('global').err)
-    let tsize = down.size.split(' ')[1]
-    let tiny = await axios.get(`https://tinyurl.com/api-create.php?url=${down.dlink}`);
-    if(!down.dlink) return m.reply(myLang('global').err)
-    if(down.size.split('.')[0].split(' ')[0] > 150 && tsize != 'KB' || tsize == "GB") return myBot.sendImage(m.chat, down.thumbnail, myLang('video').big_size.replace('{}', tiny.data), m)
-    await myBot.sendMessage(m.chat, { video: { url: down.dlink }, mimetype: "video/mp4", fileName: down.title, caption: myLang('video').caption.replace('{}', down.title) }, {quoted: m})*/
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
-      let ytm = await youtubedlv2(urls[text - 1])
-      let link = await ytm.video['360p'].download()
+      /*let ytm = await youtubedlv2(urls[text - 1])
+      let link = await ytm.video['360p'].download()*/
+      link = process.env.DOWN_YTV.replace('{}',[text-1])
+      myBot.sendMessage(m.chat, { video: { url: link }, mimetype: 'video/mp4', caption: global.author }, { quoted: m })
       User.counter(m.sender, {usage: 1})
     } catch (e) {
       throw e
@@ -703,7 +679,7 @@ switch(command) {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       res = await fetchJson(`https://api.waifu.pics/nsfw/${command}`)
       let buttons = [
@@ -720,7 +696,7 @@ switch(command) {
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       anu = await wallpaper(text)
       result = anu[Math.floor(Math.random() * anu.length)]
@@ -743,7 +719,7 @@ switch(command) {
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!text) return m.reply(myLang('img').msg.replace('{}', prefix+command))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       let res = await googleImage(text);
       let rndImg = await res[Math.floor(Math.random() * res.length)]
@@ -769,7 +745,7 @@ switch(command) {
     if (!text) return m.reply('Necesito la url.')
     const regex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i
     if (!regex.test(text)) return m.reply('Necesito una url valida.')
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     let img = await fetchJson(`https://api.apiflash.com/v1/urltoimage?access_key=9260ae15ebae448692cae6a5809c6e85&full_page=true&format=png&response_type=json&url=${text}`)
     myBot.sendImage(m.chat, img.url, 'DrkBot', m)
     User.counter(m.sender, {usage: 1})
@@ -853,7 +829,7 @@ switch(command) {
     if (/video/.test(mime)) return m.reply(msg)
     if (!m.quoted && !text) return m.reply(myLang('ia').gpt_msg)
     
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       const { Configuration, OpenAIApi } = require("openai");
   
@@ -953,7 +929,7 @@ switch(command) {
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (/image/.test(mime)) return m.reply(myLang('shazam').image)
     if (/video/.test(mime)) return m.reply(myLang('shazam').video.replace('{}',prefix+command))
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try {
       const acrcloud = require("acrcloud")
       const acr = new acrcloud({ 
@@ -1335,7 +1311,7 @@ Escriba *rendirse* para admitir la derrota.`
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     if (!m.isGroup) return m.reply(myLang('global').group)
     if (!isBotAdmins) return m.reply(myLang('global').botAdmin)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     try { pp = await myBot.profilePictureUrl(m.chat, 'image') } catch (e) { pp = global.thumb }
     let groupAdmins = participants.filter(p => p.admin) 
     let { infoGroup } = require('./plugins/group_info')
@@ -1356,7 +1332,7 @@ Escriba *rendirse* para admitir la derrota.`
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(myLang('own').join.link)
     if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) m.reply(myLang('own').join.link_err)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     let code = await myBot.groupGetInviteInfo(result)
     try { pic = await myBot.profilePictureUrl(code.id, 'image') } catch (e) { pic = global.thumb }
@@ -1371,7 +1347,7 @@ Desc: ${!code.desc ? 'No hay descriction' : code.desc}`
     if (!isCreator) return m.reply(myLang('global').owner)
     if (!text) return m.reply(myLang('own').join.link)
     if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) m.reply(myLang('own').join.link_err)
-    myBot.sendMessage(m.chat, {react: {text: '⏱️', key: m.key}})
+    myBot.sendReact(m.chat, '🕒', m.key)
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     await myBot.groupAcceptInvite(result).then((res) => m.reply(myLang('own').join.ok)).catch((err) => m.reply(myLang('own').join.err))
     User.counter(m.sender, {usage: 1})

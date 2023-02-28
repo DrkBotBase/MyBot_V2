@@ -10,7 +10,7 @@
       "UPDATED_LOCAL": "*La actualización fue exitosa!"
     },
     "reg": {
-      "msg": "El registro solo se puede hacer por chat privado.",
+      "msg": "El registro solo se puede hacer por chat privado.\n\n*PARA REGISTRARTE TOCA EL SIGUIENTE ENLACE*\nhttps://wa.me/573046793853?text=/reg",
       "check": "Ya estas registrado.",
       "ok": "Te has registrado con exito."
     },

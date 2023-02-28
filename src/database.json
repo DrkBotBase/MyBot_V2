@@ -3,7 +3,7 @@
     "id": "j40ulC",
     "name": "DrkBot",
     "block": false,
-    "usage": 120,
+    "usage": 123,
     "cash": 100000,
     "report": 0,
     "useKeys": {}
@@ -12,7 +12,7 @@
     "id": "1qlB8L",
     "name": "Ian",
     "block": false,
-    "usage": 110,
+    "usage": 117,
     "cash": 99958,
     "report": 0,
     "useKeys": {
@@ -32,7 +32,7 @@
     "id": "6mfrMt",
     "name": "°♡°",
     "block": false,
-    "usage": 40,
+    "usage": 42,
     "cash": 2054,
     "report": 0,
     "useKeys": {
@@ -43,7 +43,7 @@
     "id": "oMocjT",
     "name": "Owo",
     "block": false,
-    "usage": 121,
+    "usage": 126,
     "cash": 2030,
     "report": 0,
     "useKeys": {}
@@ -115,7 +115,7 @@
     "id": "O1vEeX",
     "name": "JoseLuiZavD",
     "block": false,
-    "usage": 3,
+    "usage": 4,
     "cash": 2000,
     "report": 0,
     "useKeys": {}
@@ -124,7 +124,7 @@
     "id": "PoKJ2F",
     "name": "Juan",
     "block": false,
-    "usage": 83,
+    "usage": 90,
     "cash": 2060,
     "report": 0,
     "useKeys": {}
@@ -214,7 +214,7 @@
     "id": "uKEJUD",
     "name": "꧁Lauty ツ꧂",
     "block": false,
-    "usage": 15,
+    "usage": 17,
     "cash": 2040,
     "report": 0,
     "useKeys": {}
@@ -261,7 +261,7 @@
     "id": "c1DiAG",
     "name": "PROYECTO MENACHO",
     "block": false,
-    "usage": 7,
+    "usage": 15,
     "cash": 2000,
     "report": 0,
     "useKeys": {}
@@ -298,6 +298,15 @@
     "name": "Ema",
     "block": false,
     "usage": 3,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "50240286885@s.whatsapp.net": {
+    "id": "xGWXIG",
+    "name": "CARC3LT",
+    "block": false,
+    "usage": 4,
     "cash": 2000,
     "report": 0,
     "useKeys": {}
