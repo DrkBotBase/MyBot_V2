@@ -1,7 +1,17 @@
+const fs = require('fs')
+const { VERSION } = require('../config')
 const moment = require('moment-timezone');
 const p = global.BOX
 const more = String.fromCharCode(8206)
 const readMore = more.repeat(4001)
+
+let { runtime } = require('../lib/myfunc')
+let d = new Date(new Date + 3600000)
+let time = d.toLocaleTimeString('es', {
+hour: 'numeric',
+minute: 'numeric',
+second: 'numeric'
+})
 
 const { LANG } = require('../config');
 if(LANG == 'ES') {
@@ -29,6 +39,31 @@ else if(LANG == 'EN') {
   sal_d = 'good night'
 }
 
+const newMenu = (name, checkUser) => {
+return `*Hola* ${name}
+┏  BIENVENIDO AL MENU ┓
+┃ 
+┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
+┃ INFO DEL BOT
+┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
+┃➲ ⏱️ ${time} 
+┃➲ ⏰ ${runtime(process.uptime())}
+┃➲ 𓃠 ${VERSION}
+┃➲ 👥 No logro leer la Base de Datos
+┃➲ ♨️ Bot modo${global.wtMyBot}
+┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
+┃ INFO USUARIO
+┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
+┃➲ *ID:* ${checkUser.id}
+┃➲ *Número:* ${checkUser.number.split('@')[0]}
+┃➲ *Nombre:* ${checkUser.name}
+┃➲ *Puntos:* ${checkUser.points}
+┃➲ *Uso del Bot:* ${checkUser.use}
+┃➲ *Reportes:* ${checkUser.report}
+┗─━─━「 🌎 」━─━─┛
+*${global.author.toUpperCase()}*`
+}
+
 const menu = (prefix, pushname, botName, hit) => {
 	var time = moment().tz(global.timeZone).format('HH:mm:ss')
 	if(time < "05:00:00"){var saludo = sal_a}
@@ -41,8 +76,10 @@ const menu = (prefix, pushname, botName, hit) => {
 ${hi_lang} *${pushname}*, ${saludo}
 
 📈 *Total Hit:* ${hit}
+💽 *Total Users:*
 🪀 *Owner:* ${global.owner}
 🖊️ *Prefix:*〘 *${prefix}* 〙
+
 ${readMore}
 ${p.ini.replace('{}',list_a)}
 ${p.med} ${prefix}alive
@@ -93,6 +130,7 @@ ${p.med} ${prefix}attp
 ${p.med} ${prefix}trt
 ${p.med} ${prefix}waifu
 ${p.med} ${prefix}neko
+${p.med} ${prefix}yuri 🆕
 ${p.med} ${prefix}img
 ${p.med} ${prefix}wallpaper
 ${p.med} ${prefix}ssweb
@@ -183,4 +221,4 @@ const rules = `╔══✪〘 *𝙽𝚄𝙴𝚅𝙰𝚂 𝚁𝙴𝙶𝙻𝙰�
 𝙴𝚜𝚌𝚛𝚒𝚋𝚎 𝚔𝚎𝚢 𝚖𝚊𝚜 𝚎𝚕 𝚗𝚞́𝚖𝚎𝚛𝚘 𝚍𝚎 𝚕𝚊 𝚔𝚎𝚢 𝚘𝚋𝚝𝚎𝚗𝚒𝚍𝚘 𝚘 𝚜𝚘𝚕𝚘 𝚛𝚎𝚜𝚙𝚘𝚗𝚍𝚎 𝚕𝚊 𝚔𝚎𝚢 𝚘𝚋𝚝𝚎𝚗𝚒𝚍𝚊 𝚌𝚘𝚗 𝚎𝚕 𝚌𝚘𝚖𝚊𝚗𝚍𝚘.
 ╚════════════`
 
-module.exports = { menu, butTemplate, rules }
+module.exports = { menu, butTemplate, rules, newMenu }

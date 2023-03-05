@@ -18,10 +18,10 @@ const { performance } = require('perf_hooks')
 const simpleGit = require('simple-git')
 const fetch = require('node-fetch')
 const git = simpleGit()
-const { formatp, isUrl, sleep, clockString, runtime, getBuffer, fetchJson, jsonformat, format, parseMention, getRandom, pickRandom, modifyLetter } = require('./lib/myfunc')
+const { formatp, isUrl, sleep, clockString, runtime, getBuffer, fetchJson, jsonformat, format, parseMention, getRandom, pickRandom, modifyLetter, mediafireDl } = require('./lib/myfunc')
 //const { yta, ytv } = require('./lib/y2mate')
 const { log, pint, bgPint } = require('./lib/colores');
-const { menu, butTemplate, rules } = require('./plugins/menu')
+const { menu, butTemplate, rules, newMenu } = require('./plugins/menu')
 const Config = require('./config');
 const { youtubedlv2, youtubeSearch, tiktokdlv2, googleImage, savefrom } = require('@bochilteam/scraper')
 const { y1s, expandUrl, wallpaper } = require('./lib/scraper')
@@ -282,8 +282,7 @@ switch(command) {
             {title: "Menú Location", rowId: `setmenu location`, description: `Menú Pequeño`},
             {title: "Menú Template", rowId: `setmenu template`, description: `Menú Botones Template`}
             ]
-        },
-        ]
+        },]
       myBot.sendListMsg(m.chat, 'Selecciona el tipo de Munú del Bot', myBot.user.name, `Hola ${pushname}`, '⬆️', sections, m)
     }
     User.counter(m.sender, {usage: 1})
@@ -691,6 +690,23 @@ switch(command) {
       m.reply(myLang('global').msg.err);
     }
   }break
+  case 'yuri': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    myBot.sendReact(m.chat, '🕒', m.key)
+    try {
+      let res = await fetchJson(`https://raw.githubusercontent.com/GataNina-Li/GataBot-MD/master/src/JSON/yuri.json`)
+      let enlace = await res[Math.floor(res.length * Math.random())]
+      let buttons = [
+        { buttonId: command, buttonText: { displayText: '➡️' }, type: 1 }
+      ]
+      myBot.sendButImage(m.chat, enlace, myLang('global').by.replace('{}', botName), myBot.user.name, buttons)
+      User.counter(m.sender, {usage: 1})
+    } catch {
+      m.reply(myLang('global').msg.err);
+    }
+  }break
   case 'wallpaper': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
@@ -750,6 +766,12 @@ switch(command) {
     myBot.sendImage(m.chat, img.url, 'DrkBot', m)
     User.counter(m.sender, {usage: 1})
   }break
+  /*case 'mediafire': {
+    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+    if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+    //if (!text) return m.reply(myLang('calc').msg)
+  }break*/
   case 'calc': {
     if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
@@ -1336,10 +1358,10 @@ Escriba *rendirse* para admitir la derrota.`
     let result = args[0].split('https://chat.whatsapp.com/')[1]
     let code = await myBot.groupGetInviteInfo(result)
     try { pic = await myBot.profilePictureUrl(code.id, 'image') } catch (e) { pic = global.thumb }
-    msg = `Nombre: ${code.subject}
-Creador: ${code.owner.split('@')[0]}
-Tamaño: ${code.size}
-Desc: ${!code.desc ? 'No hay descriction' : code.desc}`
+    msg = `Nombre: ${code.subject}\n`
+    msg += `Creador: ${code.owner.split('@')[0]}\n`
+    msg += `Tamaño: ${code.size}\n`
+    msg += `Desc: ${!code.desc ? code.desc : 'No hay descripción.'}`
     myBot.sendImage(m.chat, pic, msg)
     User.counter(m.sender, {usage: 1})
   }break
@@ -1592,6 +1614,8 @@ let mstekateki = {}
         }, timeout)
     ]
 */
+
+/*
 try {
   imgbc = await quoted.download()
 } catch {
@@ -1603,7 +1627,16 @@ myBot.sendMessageModify(m.chat, text ? text : '🤖 DrkBot el mejor', null, {
    thumbnail: imgbc,
    url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
 })
-
+*/
+anu = newMenu(pushname, checkUser)
+let sections = [
+        { title: 'OPCIONES', rows: [
+            {title: "Menú 1", rowId: ``, description: `Desc 1`},
+            {title: "Menú 2", rowId: ``, description: `Desc 2`},
+            {title: "Menú 4", rowId: ``, description: `Desc 3`},
+            {title: "Menú 4", rowId: ``, description: `Desc 4`}
+        ]},]
+      myBot.sendListMsg(m.chat, anu, myBot.user.name, `Hola ${pushname}`, '⬆️', sections, m)
 }break
 
 

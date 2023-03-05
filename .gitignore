@@ -10,3 +10,6 @@ package-lock.json
 yarn-error.log
 yarn.lock
 ian.js (2)
+
+# session
+sess304.json

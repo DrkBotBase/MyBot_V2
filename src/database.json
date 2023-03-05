@@ -3,7 +3,7 @@
     "id": "j40ulC",
     "name": "DrkBot",
     "block": false,
-    "usage": 123,
+    "usage": 124,
     "cash": 100000,
     "report": 0,
     "useKeys": {}
@@ -12,7 +12,7 @@
     "id": "1qlB8L",
     "name": "Ian",
     "block": false,
-    "usage": 117,
+    "usage": 165,
     "cash": 99958,
     "report": 0,
     "useKeys": {
@@ -32,18 +32,20 @@
     "id": "6mfrMt",
     "name": "°♡°",
     "block": false,
-    "usage": 42,
-    "cash": 2054,
+    "usage": 52,
+    "cash": 2114,
     "report": 0,
     "useKeys": {
-      "373980": 3
+      "309528": 3,
+      "373980": 3,
+      "713506": 3
     }
   },
   "5217971189100@s.whatsapp.net": {
     "id": "oMocjT",
     "name": "Owo",
     "block": false,
-    "usage": 126,
+    "usage": 133,
     "cash": 2030,
     "report": 0,
     "useKeys": {}
@@ -52,7 +54,7 @@
     "id": "UBO9lS",
     "name": "StevenXd999",
     "block": false,
-    "usage": 35,
+    "usage": 41,
     "cash": 1904,
     "report": 0,
     "useKeys": {}
@@ -79,7 +81,7 @@
     "id": "48va5u",
     "name": "ORSLOK",
     "block": false,
-    "usage": 18,
+    "usage": 22,
     "cash": 2000,
     "report": 0,
     "useKeys": {}
@@ -124,7 +126,7 @@
     "id": "PoKJ2F",
     "name": "Juan",
     "block": false,
-    "usage": 90,
+    "usage": 119,
     "cash": 2060,
     "report": 0,
     "useKeys": {}
@@ -205,7 +207,7 @@
     "id": "T2WTv4",
     "name": "Ciro",
     "block": false,
-    "usage": 32,
+    "usage": 38,
     "cash": 2020,
     "report": 0,
     "useKeys": {}
@@ -232,7 +234,7 @@
     "id": "HVc9X7",
     "name": "Lucia💚",
     "block": false,
-    "usage": 179,
+    "usage": 183,
     "cash": 2000,
     "report": 0,
     "useKeys": {}
@@ -250,7 +252,7 @@
     "id": "u0gJy0",
     "name": "𝐴𝑛𝑜𝑛𝑦𝑧𝑎𝑟𝑑",
     "block": false,
-    "usage": 2,
+    "usage": 4,
     "cash": 1960,
     "report": 0,
     "useKeys": {
@@ -270,7 +272,7 @@
     "id": "yrBEb5",
     "name": "Pana ★...",
     "block": false,
-    "usage": 0,
+    "usage": 24,
     "cash": 2000,
     "report": 0,
     "useKeys": {}
@@ -305,8 +307,125 @@
   "50240286885@s.whatsapp.net": {
     "id": "xGWXIG",
     "name": "CARC3LT",
+    "block": true,
+    "usage": 5,
+    "cash": 1980,
+    "report": 0,
+    "useKeys": {}
+  },
+  "5217721256542@s.whatsapp.net": {
+    "id": "EMMqin",
+    "name": ".",
+    "block": false,
+    "usage": 0,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "5493417194929@s.whatsapp.net": {
+    "id": "7AQDWK",
+    "name": "Mario Almirón",
+    "block": false,
+    "usage": 7,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "5493875068406@s.whatsapp.net": {
+    "id": "BN6BOn",
+    "name": "♛. ⃟⃢ꦿ⃢☠️🔥David🔥⚔👑 ⃢ ⃟🐻",
+    "block": false,
+    "usage": 1,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "56937443498@s.whatsapp.net": {
+    "id": "edC6Ur",
+    "name": "Brianx",
+    "block": false,
+    "usage": 11,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "51994876747@s.whatsapp.net": {
+    "id": "gnt6k7",
+    "name": "☠︎︎𝙶𝙾𝙳 • 𝙼𝙰𝚇✞︎",
+    "block": false,
+    "usage": 9,
+    "cash": 2012,
+    "report": 0,
+    "useKeys": {}
+  },
+  "5492266613038@s.whatsapp.net": {
+    "id": "VbREaE",
+    "name": "Marito 😛",
+    "block": false,
+    "usage": 10,
+    "cash": 1980,
+    "report": 0,
+    "useKeys": {}
+  },
+  "5214531173598@s.whatsapp.net": {
+    "id": "Zpg13w",
+    "name": "A",
+    "block": false,
+    "usage": 6,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "51982260794@s.whatsapp.net": {
+    "id": "H4W32k",
+    "name": "𝑆𝑇𝑅𝐴𝑁𝐺𝐸𝐻𝑈𝑀𝐴𝑁 𝑁𝑂𝑉𝐴 👺",
+    "block": false,
+    "usage": 2,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "50763596565@s.whatsapp.net": {
+    "id": "wfUOzJ",
+    "name": "ī.am/ᴀɴᴛᴏɴɪᴏ",
+    "block": false,
+    "usage": 3,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "5217122015739@s.whatsapp.net": {
+    "id": "i1L9PF",
+    "name": "ACS",
+    "block": false,
+    "usage": 3,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "51938196819@s.whatsapp.net": {
+    "id": "n7c9c9",
+    "name": "Barderro$",
+    "block": false,
+    "usage": 2,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "6285822999107@s.whatsapp.net": {
+    "id": "s548z3",
+    "name": "Y̲A̲S̲I̲R̲~̲",
     "block": false,
     "usage": 4,
+    "cash": 2000,
+    "report": 0,
+    "useKeys": {}
+  },
+  "5212721228005@s.whatsapp.net": {
+    "id": "9WXxG5",
+    "name": "Erik",
+    "block": false,
+    "usage": 1,
     "cash": 2000,
     "report": 0,
     "useKeys": {}
