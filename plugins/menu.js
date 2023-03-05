@@ -1,46 +1,46 @@
-const fs = require('fs')
-const { VERSION } = require('../config')
-const moment = require('moment-timezone');
-const p = global.BOX
-const more = String.fromCharCode(8206)
-const readMore = more.repeat(4001)
+const fs = require("fs");
+const { VERSION } = require("../config");
+const moment = require("moment-timezone");
+const p = global.BOX;
+const more = String.fromCharCode(8206);
+const readMore = more.repeat(4001);
+const db = JSON.parse(fs.readFileSync("./src/database.json"))
 
-let { runtime } = require('../lib/myfunc')
-let d = new Date(new Date + 3600000)
-let time = d.toLocaleTimeString('es', {
-hour: 'numeric',
-minute: 'numeric',
-second: 'numeric'
-})
+let { runtime } = require("../lib/myfunc");
+let d = new Date(new Date() + 3600000);
+let time = d.toLocaleTimeString("es", {
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric",
+});
 
-const { LANG } = require('../config');
-if(LANG == 'ES') {
-  hi_lang = 'Hola'
-  list_a = 'MENU'
-  list_b = 'GRUPOS'
-  list_c = 'JUEGOS'
-  list_d = 'UTILIDADES'
-  list_e = 'PROPIETARIO'
-  sal_a = 'Es muy temprano, duerme un poco mas.'
-  sal_b = 'Buenos Dias'
-  sal_c = 'Buenas Tardes'
-  sal_d = 'Buenas Noches'
-}
-else if(LANG == 'EN') {
-  hi_lang = 'Hi'
-  list_a = 'MENU'
-  list_b = 'GROUPS'
-  list_c = 'GAMES'
-  list_d = 'UTILITIES'
-  list_e = 'OWNER'
-  sal_a = 'you do not sleep?. 😒'
-  sal_b = 'good morning'
-  sal_c = 'good afternoon'
-  sal_d = 'good night'
+const { LANG } = require("../config");
+if (LANG == "ES") {
+  hi_lang = "Hola";
+  list_a = "MENU";
+  list_b = "GRUPOS";
+  list_c = "JUEGOS";
+  list_d = "UTILIDADES";
+  list_e = "PROPIETARIO";
+  sal_a = "Es muy temprano, duerme un poco mas.";
+  sal_b = "Buenos Dias";
+  sal_c = "Buenas Tardes";
+  sal_d = "Buenas Noches";
+} else if (LANG == "EN") {
+  hi_lang = "Hi";
+  list_a = "MENU";
+  list_b = "GROUPS";
+  list_c = "GAMES";
+  list_d = "UTILITIES";
+  list_e = "OWNER";
+  sal_a = "you do not sleep?. 😒";
+  sal_b = "good morning";
+  sal_c = "good afternoon";
+  sal_d = "good night";
 }
 
 const newMenu = (name, checkUser) => {
-return `*Hola* ${name}
+  return `*Hola* ${name}
 ┏  BIENVENIDO AL MENU ┓
 ┃ 
 ┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
@@ -49,29 +49,34 @@ return `*Hola* ${name}
 ┃➲ ⏱️ ${time} 
 ┃➲ ⏰ ${runtime(process.uptime())}
 ┃➲ 𓃠 ${VERSION}
-┃➲ 👥 No logro leer la Base de Datos
+┃➲ 👥 ${Object.keys(db).map((i) => db[i].phone).length}
 ┃➲ ♨️ Bot modo${global.wtMyBot}
 ┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
 ┃ INFO USUARIO
 ┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
 ┃➲ *ID:* ${checkUser.id}
-┃➲ *Número:* ${checkUser.number.split('@')[0]}
+┃➲ *Número:* ${checkUser.number.split("@")[0]}
 ┃➲ *Nombre:* ${checkUser.name}
 ┃➲ *Puntos:* ${checkUser.points}
 ┃➲ *Uso del Bot:* ${checkUser.use}
 ┃➲ *Reportes:* ${checkUser.report}
 ┗─━─━「 🌎 」━─━─┛
-*${global.author.toUpperCase()}*`
-}
+*${global.author.toUpperCase()}*`;
+};
 
 const menu = (prefix, pushname, botName, hit) => {
-	var time = moment().tz(global.timeZone).format('HH:mm:ss')
-	if(time < "05:00:00"){var saludo = sal_a}
-	else if(time < "12:00:00"){var saludo = sal_b}
-	else if(time < "19:00:00"){var saludo = sal_c}
-	else if(time < "23:59:00"){var saludo = sal_d}
-	
-	return `══✪〘 *${botName}* 〙✪══
+  var time = moment().tz(global.timeZone).format("HH:mm:ss");
+  if (time < "05:00:00") {
+    var saludo = sal_a;
+  } else if (time < "12:00:00") {
+    var saludo = sal_b;
+  } else if (time < "19:00:00") {
+    var saludo = sal_c;
+  } else if (time < "23:59:00") {
+    var saludo = sal_d;
+  }
+
+  return `══✪〘 *${botName}* 〙✪══
 
 ${hi_lang} *${pushname}*, ${saludo}
 
@@ -81,7 +86,7 @@ ${hi_lang} *${pushname}*, ${saludo}
 🖊️ *Prefix:*〘 *${prefix}* 〙
 
 ${readMore}
-${p.ini.replace('{}',list_a)}
+${p.ini.replace("{}", list_a)}
 ${p.med} ${prefix}alive
 ${p.med} ${prefix}menu
 ${p.med} ${prefix}profile
@@ -91,7 +96,7 @@ ${p.med} ${prefix}unlock
 ${p.med} ${prefix}key
 ${p.med} ${prefix}gpt
 ${p.end}
-${p.ini.replace('{}',list_b)}
+${p.ini.replace("{}", list_b)}
 ${p.med} ${prefix}promote
 ${p.med} ${prefix}demote
 ${p.med} ${prefix}add
@@ -102,7 +107,7 @@ ${p.med} ${prefix}groupinfo
 ${p.med} ${prefix}tagall
 ${p.med} ${prefix}hdt
 ${p.end}
-${p.ini.replace('{}',list_c)}
+${p.ini.replace("{}", list_c)}
 ${p.med} ${prefix}ttt
 ${p.med} ${prefix}dados
 ${p.med} ${prefix}ppt
@@ -110,7 +115,7 @@ ${p.med} ${prefix}slot
 ${p.med} ${prefix}gay
 ${p.med} ${prefix}love
 ${p.end}
-${p.ini.replace('{}',list_d)}
+${p.ini.replace("{}", list_d)}
 ${p.med} ${prefix}play
 ${p.med} ${prefix}yts
 ${p.med} ${prefix}song
@@ -143,7 +148,7 @@ ${p.med} ${prefix}price
 ${p.med} ${prefix}shazam
 ${p.med} ${prefix}romevebg
 ${p.end}
-${p.ini.replace('{}',list_e)}
+${p.ini.replace("{}", list_e)}
 ${p.med} ${prefix}whatgroup
 ${p.med} ${prefix}join
 ${p.med} ${prefix}public
@@ -158,29 +163,41 @@ ${p.med} ${prefix}bgc
 ${p.med} ${prefix}ping|status
 ${p.med} ${prefix}py
 ${p.med} ${prefix}test
-${p.endM.replace('{}',global.author)}`
-}
+${p.endM.replace("{}", global.author)}`;
+};
 
-const butTemplate  = [
-      {urlButton: {
-        displayText: 'Source Code',
-        url: `${sourceCode}`
-      }},
-      {callButton: {
-        displayText: 'Number Phone Owner',
-        phoneNumber: `+${global.owner}`
-      }},
-      {quickReplyButton: {
-        displayText: 'Menu',
-        id: 'menu'
-      }},
-      {quickReplyButton: {
-        displayText: 'Contact Owner',
-        id: 'owner'}},
-      {quickReplyButton: {
-          displayText: 'GitHub',
-          id: 'sc'}}
-    ]
+const butTemplate = [
+  {
+    urlButton: {
+      displayText: "Source Code",
+      url: `${sourceCode}`,
+    },
+  },
+  {
+    callButton: {
+      displayText: "Number Phone Owner",
+      phoneNumber: `+${global.owner}`,
+    },
+  },
+  {
+    quickReplyButton: {
+      displayText: "Menu",
+      id: "menu",
+    },
+  },
+  {
+    quickReplyButton: {
+      displayText: "Contact Owner",
+      id: "owner",
+    },
+  },
+  {
+    quickReplyButton: {
+      displayText: "GitHub",
+      id: "sc",
+    },
+  },
+];
 
 const rules = `╔══✪〘 *𝙽𝚄𝙴𝚅𝙰𝚂 𝚁𝙴𝙶𝙻𝙰𝚂* 〙✪══
 𝙴𝙻 𝙱𝙾𝚃 𝚃𝙸𝙴𝙽𝙴 𝚄𝙽 𝚂𝙸𝚂𝚃𝙴𝙼𝙰 𝙳𝙴 𝚁𝙴𝙶𝙸𝚂𝚃𝚁𝙾 𝚀𝚄𝙴 𝙶𝙰𝚁𝙰𝙽𝚃𝙸𝚉𝙰 𝚂𝚄 𝚄𝚂𝙾, 𝙴𝚂 𝙲𝙾𝙽 𝙴𝙻 𝙵𝙸𝙽 𝙳𝙴 𝙲𝙾𝙽𝚃𝚁𝙾𝙻𝙰𝚁 𝙴𝙻 𝚂𝙿𝙰𝙼 𝚈 𝙻𝙰𝚂 𝙼𝙰𝙻𝙰𝚂 𝙿𝚁𝙰𝙲𝚃𝙸𝙲𝙰𝚂.
@@ -219,6 +236,6 @@ const rules = `╔══✪〘 *𝙽𝚄𝙴𝚅𝙰𝚂 𝚁𝙴𝙶𝙻𝙰�
 𝙿𝚊𝚛𝚊 𝚙𝚛𝚘𝚋𝚊𝚛 𝚕𝚊𝚜 𝙺𝚎𝚢𝚜 𝚎𝚜 𝚌𝚘𝚗 𝚎𝚕 𝚞𝚜𝚘 𝚍𝚎𝚕 𝚌𝚘𝚖𝚊𝚗𝚍𝚘 𝚔𝚎𝚢.
 *𝙼𝙾𝙳𝙾 𝙳𝙴 𝚄𝚂𝙾*
 𝙴𝚜𝚌𝚛𝚒𝚋𝚎 𝚔𝚎𝚢 𝚖𝚊𝚜 𝚎𝚕 𝚗𝚞́𝚖𝚎𝚛𝚘 𝚍𝚎 𝚕𝚊 𝚔𝚎𝚢 𝚘𝚋𝚝𝚎𝚗𝚒𝚍𝚘 𝚘 𝚜𝚘𝚕𝚘 𝚛𝚎𝚜𝚙𝚘𝚗𝚍𝚎 𝚕𝚊 𝚔𝚎𝚢 𝚘𝚋𝚝𝚎𝚗𝚒𝚍𝚊 𝚌𝚘𝚗 𝚎𝚕 𝚌𝚘𝚖𝚊𝚗𝚍𝚘.
-╚════════════`
+╚════════════`;
 
-module.exports = { menu, butTemplate, rules, newMenu }
+module.exports = { menu, butTemplate, rules, newMenu };

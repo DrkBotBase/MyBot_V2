@@ -1,15 +1,14 @@
-const fs = require('fs')
+const fs = require("fs");
 
 function randomId(size) {
-  let id = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let id = "";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const numCharacters = characters.length;
   for (let i = 0; i < size; i++) {
     id += characters.charAt(Math.floor(Math.random() * numCharacters));
   }
   return id;
 }
-
 
 const databaseFile = "./src/database.json";
 let database = {};
@@ -29,7 +28,6 @@ function totalHit() {
   return sum;
 }
 
-
 const keyUsageLimit = 3;
 
 class User {
@@ -38,7 +36,15 @@ class User {
     this.name = name;
 
     if (!database[this.phone]) {
-        database[this.phone] = { id: randomId(6), name: this.name, block: false, usage: 0, cash: 2000, report: 0, useKeys: {} }
+      database[this.phone] = {
+        id: randomId(6),
+        name: this.name,
+        block: false,
+        usage: 0,
+        cash: 2000,
+        report: 0,
+        useKeys: {},
+      };
     }
     fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
   }
@@ -48,7 +54,9 @@ class User {
       delete database[this.phone];
       fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
     } else {
-      console.error(`No se encontró el usuario "${this.phone}" en la base de datos`);
+      console.error(
+        `No se encontró el usuario "${this.phone}" en la base de datos`
+      );
     }
   }
 
@@ -63,34 +71,36 @@ class User {
         use: database[phone].usage,
         points: database[phone].cash,
         report: database[phone].report,
-        keys: database[phone].useKeys
-      }
+        keys: database[phone].useKeys,
+      };
     }
   }
 
   static check(phone) {
-    return database.hasOwnProperty(phone)
+    return database.hasOwnProperty(phone);
   }
 
   static counter(phone, properties) {
     if (database[phone]) {
       Object.keys(properties).forEach((prop) => {
         if (database[phone].hasOwnProperty(prop)) {
-          database[phone][prop] += properties[prop]
+          database[phone][prop] += properties[prop];
         } else {
-          console.log(`La propiedad "${prop}" que ingresó no existe en el objeto del usuario "${phone}"`);
+          console.log(
+            `La propiedad "${prop}" que ingresó no existe en el objeto del usuario "${phone}"`
+          );
         }
-      })
+      });
       fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
     } else {
       console.log(`El usuario "${phone}" no existe en la base de datos`);
     }
   }
-  
+
   static change(phone, properties) {
     Object.keys(properties).forEach((prop) => {
-      database[phone][prop] = properties[prop]
-    })
+      database[phone][prop] = properties[prop];
+    });
     fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
   }
 }
@@ -98,26 +108,25 @@ class User {
 const addUserKey = (userId, key) => {
   try {
     if (database.hasOwnProperty(userId)) {
-      const user = database[userId]
-      
+      const user = database[userId];
+
       if (user.useKeys.hasOwnProperty(key)) {
         if (user.useKeys[key] < keyUsageLimit) {
-          user.useKeys[key]++
+          user.useKeys[key]++;
         } else {
-          return false
+          return false;
         }
       } else {
-        user.useKeys[key] = 1
+        user.useKeys[key] = 1;
       }
 
-      fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2))
+      fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
     } else {
-      m.reply(`El usuario ${userId} no está registrado en la base de datos`)
+      m.reply(`El usuario ${userId} no está registrado en la base de datos`);
     }
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
 
-
-module.exports = { User, addUserKey, totalHit }
+module.exports = { User, addUserKey, totalHit };
