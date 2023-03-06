@@ -12,10 +12,9 @@ if (existsSync("config.env"))
 
 // Other
 global.owner = ["573508770421"];
-global.bot = "573046793853";
 global.premium = [];
 global.author = "DrkBot";
-global.sessionName = "sess304";
+global.sessionName = "session";
 global.typeMenu = "image";
 global.timeZone = "America/Bogota";
 global.timeLocale = "co";
@@ -26,11 +25,12 @@ global.botFont = "Math monospace";
 // LINE BOX
 
 global.BOX = {
-  ini: "╭━━〘 *{}* 〙━━",
-  med: "┊⇀",
+  ini: "╭━━━━━━━━━━⬣",
   end: "╰━━━━━━━━━━⬣",
-  medM: "┊",
+  iniM: "╭━━〘 *{}* 〙━━",
   endM: "╰━━〘 *{}* 〙━━⬣",
+  med: "┊",
+  medM: "┊⇀",
 };
 
 global.thumb = readFileSync("./lib/bot.jpg");

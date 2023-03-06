@@ -3,13 +3,12 @@ config.env
 
 # Dependency directories
 node_modules/
-src/data.js.bak
+src/database.json
 
 # data-auth
 package-lock.json
 yarn-error.log
 yarn.lock
-ian.js (2)
 
 # session
-sess304.json
+session.json

@@ -1,7 +1,6 @@
 const fs = require("fs");
 const { VERSION } = require("../config");
 const moment = require("moment-timezone");
-const p = global.BOX;
 const more = String.fromCharCode(8206);
 const readMore = more.repeat(4001);
 const db = JSON.parse(fs.readFileSync("./src/database.json"))
@@ -86,84 +85,84 @@ ${hi_lang} *${pushname}*, ${saludo}
 🖊️ *Prefix:*〘 *${prefix}* 〙
 
 ${readMore}
-${p.ini.replace("{}", list_a)}
-${p.med} ${prefix}alive
-${p.med} ${prefix}menu
-${p.med} ${prefix}profile
-${p.med} ${prefix}bot
-${p.med} ${prefix}donar
-${p.med} ${prefix}unlock
-${p.med} ${prefix}key
-${p.med} ${prefix}gpt
-${p.end}
-${p.ini.replace("{}", list_b)}
-${p.med} ${prefix}promote
-${p.med} ${prefix}demote
-${p.med} ${prefix}add
-${p.med} ${prefix}kick
-${p.med} ${prefix}mute
-${p.med} ${prefix}unmute
-${p.med} ${prefix}groupinfo
-${p.med} ${prefix}tagall
-${p.med} ${prefix}hdt
-${p.end}
-${p.ini.replace("{}", list_c)}
-${p.med} ${prefix}ttt
-${p.med} ${prefix}dados
-${p.med} ${prefix}ppt
-${p.med} ${prefix}slot
-${p.med} ${prefix}gay
-${p.med} ${prefix}love
-${p.end}
-${p.ini.replace("{}", list_d)}
-${p.med} ${prefix}play
-${p.med} ${prefix}yts
-${p.med} ${prefix}song
-${p.med} ${prefix}video
-${p.med} ${prefix}getmusic
-${p.med} ${prefix}getvideo
-${p.med} ${prefix}ttdl
-${p.med} ${prefix}sticker
-${p.med} ${prefix}toaudio
-${p.med} ${prefix}tomp4
-${p.med} ${prefix}toimg
-${p.med} ${prefix}togif
-${p.med} ${prefix}tourl
-${p.med} ${prefix}emojimix
-${p.med} ${prefix}ttp
-${p.med} ${prefix}attp
-${p.med} ${prefix}trt
-${p.med} ${prefix}waifu
-${p.med} ${prefix}neko
-${p.med} ${prefix}yuri 🆕
-${p.med} ${prefix}img
-${p.med} ${prefix}wallpaper
-${p.med} ${prefix}ssweb
-${p.med} ${prefix}ebinary
-${p.med} ${prefix}dbinary
-${p.med} ${prefix}calc
-${p.med} ${prefix}bin
-${p.med} ${prefix}cambio
-${p.med} ${prefix}price
-${p.med} ${prefix}shazam
-${p.med} ${prefix}romevebg
-${p.end}
-${p.ini.replace("{}", list_e)}
-${p.med} ${prefix}whatgroup
-${p.med} ${prefix}join
-${p.med} ${prefix}public
-${p.med} ${prefix}self
-${p.med} ${prefix}speedtest
-${p.med} ${prefix}update
-${p.med} ${prefix}actualizar
-${p.med} ${prefix}block
-${p.med} ${prefix}unblock
-${p.med} ${prefix}bc
-${p.med} ${prefix}bgc
-${p.med} ${prefix}ping|status
-${p.med} ${prefix}py
-${p.med} ${prefix}test
-${p.endM.replace("{}", global.author)}`;
+${BOX.iniM.replace("{}", list_a)}
+${BOX.medM} ${prefix}alive
+${BOX.medM} ${prefix}menu
+${BOX.medM} ${prefix}profile
+${BOX.medM} ${prefix}bot
+${BOX.medM} ${prefix}donar
+${BOX.medM} ${prefix}unlock
+${BOX.medM} ${prefix}key
+${BOX.medM} ${prefix}gpt
+${BOX.end}
+${BOX.iniM.replace("{}", list_b)}
+${BOX.medM} ${prefix}promote
+${BOX.medM} ${prefix}demote
+${BOX.medM} ${prefix}add
+${BOX.medM} ${prefix}kick
+${BOX.medM} ${prefix}mute
+${BOX.medM} ${prefix}unmute
+${BOX.medM} ${prefix}groupinfo
+${BOX.medM} ${prefix}tagall
+${BOX.medM} ${prefix}hdt
+${BOX.end}
+${BOX.iniM.replace("{}", list_c)}
+${BOX.medM} ${prefix}ttt
+${BOX.medM} ${prefix}dados
+${BOX.medM} ${prefix}ppt
+${BOX.medM} ${prefix}slot
+${BOX.medM} ${prefix}gay
+${BOX.medM} ${prefix}love
+${BOX.end}
+${BOX.iniM.replace("{}", list_d)}
+${BOX.medM} ${prefix}play
+${BOX.medM} ${prefix}yts
+${BOX.medM} ${prefix}song
+${BOX.medM} ${prefix}video
+${BOX.medM} ${prefix}getmusic
+${BOX.medM} ${prefix}getvideo
+${BOX.medM} ${prefix}ttdl
+${BOX.medM} ${prefix}sticker
+${BOX.medM} ${prefix}toaudio
+${BOX.medM} ${prefix}tomp4
+${BOX.medM} ${prefix}toimg
+${BOX.medM} ${prefix}togif
+${BOX.medM} ${prefix}tourl
+${BOX.medM} ${prefix}emojimix
+${BOX.medM} ${prefix}ttp
+${BOX.medM} ${prefix}attp
+${BOX.medM} ${prefix}trt
+${BOX.medM} ${prefix}waifu
+${BOX.medM} ${prefix}neko
+${BOX.medM} ${prefix}yuri 🆕
+${BOX.medM} ${prefix}img
+${BOX.medM} ${prefix}wallpaper
+${BOX.medM} ${prefix}ssweb
+${BOX.medM} ${prefix}ebinary
+${BOX.medM} ${prefix}dbinary
+${BOX.medM} ${prefix}calc
+${BOX.medM} ${prefix}bin
+${BOX.medM} ${prefix}cambio
+${BOX.medM} ${prefix}price
+${BOX.medM} ${prefix}shazam
+${BOX.medM} ${prefix}romevebg
+${BOX.end}
+${BOX.iniM.replace("{}", list_e)}
+${BOX.medM} ${prefix}whatgroup
+${BOX.medM} ${prefix}join
+${BOX.medM} ${prefix}public
+${BOX.medM} ${prefix}self
+${BOX.medM} ${prefix}speedtest
+${BOX.medM} ${prefix}update
+${BOX.medM} ${prefix}actualizar
+${BOX.medM} ${prefix}block
+${BOX.medM} ${prefix}unblock
+${BOX.medM} ${prefix}bc
+${BOX.medM} ${prefix}bgc
+${BOX.medM} ${prefix}ping|status
+${BOX.medM} ${prefix}py
+${BOX.medM} ${prefix}test
+${BOX.endM.replace("{}", global.author)}`;
 };
 
 const butTemplate = [

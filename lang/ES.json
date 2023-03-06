@@ -10,7 +10,7 @@
       "UPDATED_LOCAL": "*La actualización fue exitosa!"
     },
     "reg": {
-      "msg": "El registro solo se puede hacer por chat privado.\n\n*PARA REGISTRARTE TOCA EL SIGUIENTE ENLACE*\nhttps://wa.me/573046793853?text=/reg",
+      "msg": "El registro solo se puede hacer por chat privado.\n\n*PARA REGISTRARTE TOCA EL SIGUIENTE ENLACE*\nhttps://wa.me/573046793853?text=reg",
       "check": "Ya estas registrado.",
       "ok": "Te has registrado con exito."
     },
@@ -164,7 +164,7 @@
       "wait": "Un momento...",
       "endLimit": "Su límite diario ha expirado, el límite se restablecerá cada 12 horas",
       "err": "🤖 Parece que tenemos un error.\nIntenta nuevamente.",
-      "noReg": "Para usar los comandos del BOT, necesitas registrarte. Escribe {}reg\n\n*PARA REGISTRARTE TOCA EL SIGUIENTE ENLACE*\nhttps://wa.me/573046793853?text=/reg",
+      "noReg": "Para usar los comandos del BOT, necesitas registrarte. Escribe {}reg\n\n*PARA REGISTRARTE TOCA EL SIGUIENTE ENLACE*\nhttps://wa.me/573046793853?text=reg",
       "no_points": "No tienes puntos suficientes para usar este comando.\nObten puntos en los juegos."
     },
     "sc": {

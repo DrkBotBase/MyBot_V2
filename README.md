@@ -2,10 +2,6 @@
 
 ![My card name](https://cardivo.vercel.app/api?name=DrkBot%20-%20By:%20IAN&description=Hola%20a%20todos,%20Bienvenidos%20a%20DrkBot&image=https://raw.githubusercontent.com/DrkBotBase/MyBot_V2/master/lib/bot.jpg?q=tbn:ANd9GcR7aMC3bf4bg4l_nhYS2Un9FXbFYcB4T83Shjk8xSUZDh_D61LFpzbpeqLW&s=10?v=4&backgroundColor=%23ecf0f1&instagram=iand_tv&github=DrkBotBase&)
 
-### Redes Sociales..
-
-- [Instagram](https://www.instagram.com/iand_tv)
-
 <p align="center">
   <a href="https://github.com/DrkBotBase/MyBot_V2/fork">
     <img src="https://img.shields.io/github/forks/DrkBotBase/MyBot_V2?label=Fork&style=social">
@@ -71,12 +67,122 @@ is not responsible for the purpose and method of use of users.
     DrkBot project - Hace que usar WhatsApp sea fácil y divertido.
     <br>
         <a href="https://t.me/Dark1522">Telegram Channel</a> |
-        <a href="http://wa.me/573046793853?text=/alive">BOT WhatsApp</a> |
-        <a href="https://chat.whatsapp.com/IeRNuoNY1IQJS8JE02duW8">Grupo de Soprte</a> |
+        <a href="http://wa.me/573046793853?text=alive">BOT WhatsApp</a> |
+        <a href="https://chat.whatsapp.com/IeRNuoNY1IQJS8JE02duW8">Grupo de Soporte</a> |
     <br>
 </p>
 
 ----
+
+## INSTALACIÓN EN HEROKU
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/DrkBotBase/MyBot_V2)
+Añadir los siguentes parametros al Buildpack:
+```bash
+heroku/nodejs
+```
+```bash
+https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git
+```
+```bash
+https://github.com/clhuang/heroku-buildpack-webp-binaries.git
+```
+- [x] Resultado: <details><summary>Buildpack</summary><img src="https://i.imgur.com/t3Xzgnh.jpeg"></details>
+
+----
+
+## INSTALACIÓN EN BOXMINE
+<a href="https://boxmineworld.com"><img src="https://i.imgur.com/allAyd4.png" height="125px"></a>
+
+### Crar una cuenta en su pagina oficial
+- Turorial: Disponible pronto :(
+- Pagina Oficial: [`https://boxmineworld.com`](https://boxmineworld.com)
+- Dashboard: [`https://dash.boxmineworld.com`](https://dash.boxmineworld.com)
+- Panel: [`https://panel.boxmineworld.com`](https://panel.boxmineworld.com)
+- Dudas sobre el HOST: [`https://discord.gg/84qsr4v`](https://discord.gg/84qsr4v) (Preguntar por Vicemi)
+
+----
+
+## INSTALACIÓN EN REPLIT
+<a target="_blank" href="https://replit.com/github/DrkBotBase/MyBot_V2"><img alt="Run on Replit" src="https://binbashbanana.github.io/deploy-buttons/buttons/remade/replit.svg"></a>
+<a href="https://replit.com/github/DrkBotBase/MyBot_V2"> <img src="https://media0.giphy.com/media/lMwu8EJAnv9kmn51KQ/giphy.gif" height="29px"></a>
+
+----
+
+## INSTALACIÓN EN TERMUX
+### Siga cada uno de los pasos en orden
+```bash
+termux-setup-storage
+apt update
+pkg upgrade
+pkg install git -y
+pkg install nodejs -y
+pkg install ffmpeg -y
+pkg install imagemagick -y
+git clone https://github.com/DrkBotBase/MyBot_V2
+cd MyBot_V2
+
+npm i
+npm start
+```
+
+----
+
+## INSTALACIÓN WINDOWS/VPS/RDP
+- Descargar e instala Git [`Aquí`](https://git-scm.com/downloads)
+- Descargar e instala NodeJS [`Aquí`](https://nodejs.org/en/download)
+- Descargar e instala FFmpeg [`Aquí`](https://ffmpeg.org/download.html) (**Agregar FFmpeg a la variable de entorno PATH**)
+Instalación de FFmpeg para Windows 
+- Descarga cualquiera de las versiones de FFmpeg disponibles haciendo clic en [FFmpeg](https://www.gyan.dev/ffmpeg/builds/)
+- Extraer archivos a `C:\` path.
+- Cambie el nombre de la carpeta extraída a `ffmpeg`.
+- Ejecute el símbolo del sistema como administrador.
+- Ejecute el siguiente comando:
+```cmd
+> setx /m PATH "C:\ffmpeg\bin;%PATH%"
+```
+Si hizo los pasos correctamente le saldra un mensaje como: `SUCCESS: specified value was saved`.
+* Ya tendria FFmpeg instalado, verifique que funciona ejecutando el siguiente comando:
+```cmd
+> ffmpeg -version
+```
+Si está todo correcto le mostrará la version de FFmpeg instalada
+- Descargar e instala ImageMagick [`Aquí`](https://imagemagick.org/script/download.php)
+### Una vez instalado todo abres **Git** y escribes los siguentes codigos:
+```bash
+git clone https://github.com/DrkBotBase/MyBot_V2
+cd MyBot_V2
+npm i
+npm start
+```
+
+----
+
+## HACER CAMBIOS EN EL BOT
+### Entrar en la archivo `config.js` y solo modificar los siguentes valores:
+```js
+global.owner = ["573508770421"]; // Número de creador
+global.author = "DrkBot"; // Tu watermark
+global.typeMenu = "image"; // Estilo del menú disponibles [image, template, location]
+global.timeZone = "America/Bogota"; // TimeZone
+global.timeLocale = "co"; // Localidad
+```
+### Cambiar el nombre al archivo `example.config.env` por `config.env` y modificar los siguientes valores;
+`BOT_NAME=`Your_Name_BOT
+`HANDLER=`^[/]
+`LANGUAGE=`es
+`LOG_ERR=`true
+`MSG_CONSOLE=`
+`SEND_READ=`
+`SESSION=`
+`VERSION=`V2
+`WORKTYPE=`public
+`PASSWORD=`your_session_password
+```js
+BOT_NAME=mi_bot_name
+WORKTYPE=public or private
+PASSWORD=mi_password_session
+```
+
 
 ## F.A.Q
 Answer a few frequently asked questions;

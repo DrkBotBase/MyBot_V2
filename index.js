@@ -91,12 +91,12 @@ async function startMybot() {
                 }
 
                 if (anu.action == 'add') {
-                  teks = `${BOX.ini.replace('{}','NUEVO USUARIO')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
+                  teks = `${BOX.iniM.replace('{}','NUEVO USUARIO')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
                   myBot.sendMessageModify(anu.id, teks, null, {
                     title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
                   })
                 } else if (anu.action == 'remove') {
-                  teks = `${BOX.ini.replace('{}','SE FUE')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
+                  teks = `${BOX.iniM.replace('{}','SE FUE')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
                   myBot.sendMessageModify(anu.id, teks, null, {
                     title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
                   })

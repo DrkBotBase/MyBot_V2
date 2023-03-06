@@ -1,5 +1,4 @@
 const { LANG } = require("../config");
-const p = global.BOX;
 
 if (LANG == "ES") {
   ini = "INFORMACIÓN DEL GRUPO";
@@ -15,29 +14,29 @@ if (LANG == "ES") {
 const infoGroup = (a, b, c, d, e, f) => {
   return `*${ini}*
   
-${p.ini.replace("{}", link)}
+${BOX.iniM.replace("{}", link)}
 https://chat.whatsapp.com/${a}
-${p.end}
+${BOX.end}
 
-${p.ini.replace("{}", name)}
-${p.medM} ${b}
-${p.end}
+${BOX.iniM.replace("{}", name)}
+${BOX.medM} ${b}
+${BOX.end}
 
-${p.ini.replace("{}", des)}
-${c || ""}
-${p.end}
+${BOX.iniM.replace("{}", des)}
+${c || `${BOX.medM} El grupo no tiene descripción.`}
+${BOX.end}
 
-${p.ini.replace("{}", users)}
-${p.med} ${d} *Usuarios*
-${p.end}
+${BOX.iniM.replace("{}", users)}
+${BOX.med} ${d} *Usuarios*
+${BOX.end}
 
-${p.ini.replace("{}", creator)}
-${p.med} @${e}
-${p.end}
+${BOX.iniM.replace("{}", creator)}
+${BOX.med} @${e}
+${BOX.end}
 
-${p.ini.replace("{}", admins)}
+${BOX.iniM.replace("{}", admins)}
 ${f}
-${p.endM.replace("{}", global.author)}`.trim();
+${BOX.endM.replace("{}", global.author)}`.trim();
 };
 
 module.exports = { infoGroup };

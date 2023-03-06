@@ -44,14 +44,10 @@ const {
 const { log, pint, bgPint } = require("./lib/colores");
 const { menu, butTemplate, rules, newMenu } = require("./plugins/menu");
 const Config = require("./config");
-const {
-  youtubedlv2,
-  youtubeSearch,
-  tiktokdlv2,
-  googleImage,
-  savefrom,
-} = require("@bochilteam/scraper");
-const { y1s, expandUrl, wallpaper } = require("./lib/scraper");
+const { tiktokdlv2, googleImage } = require("@bochilteam/scraper");
+const Scraper = require('oto-scraper');
+const scraper = new Scraper();
+const { wallpaper } = require("./lib/scraper");
 
 // Language
 const myLang = require("./language").getString;
@@ -279,7 +275,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
       let winner = isSurrender ? room.game.currentTurn : room.game.winner;
       let str = `Sala ID: ${room.id}
 
-${BOX.ini.replace("{}", "*JUGADORES")}
+${BOX.iniM.replace("{}", "JUGADORES")}
 ❌: @${room.game.playerX.split("@")[0]}
 ⭕: @${room.game.playerO.split("@")[0]}
 ${BOX.end}
@@ -487,7 +483,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
                 title: "MUSICA SELECCIONADA",
                 body: "Link :)",
                 sourceUrl: linkS[Math.floor(linkS.length * Math.random())],
-                showAdAttribution: true,
+                showAdAttribution: false,
                 thumbnail: global.miniRobot,
               },
             },
@@ -949,8 +945,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             return m.reply(myLang("play").msg.replace("{}", prefix + command));
           myBot.sendReact(m.chat, "🕒", m.key);
           try {
-            ytm = await youtubeSearch(text);
-            let { thumbnail, title, url } = ytm.video[0];
+            const ytplay = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
+            let { url, title, thumbnail, timestamp, ago, views } = ytplay.result[0];
             let buttons = [
               {
                 buttonId: `song ${url}`,
@@ -963,10 +959,16 @@ Escriba *rendirse* para admitir la derrota.`.trim();
                 type: 1,
               },
             ];
+            let info = `
+╭━━━━━━━━━━⬣
+*${title}*
+🕒 *Duracion:* ${timestamp}
+📈 *Vistas:* ${views}
+╰━━━━━━━━━━⬣`.trim()
             myBot.sendButImage(
               m.chat,
               thumbnail,
-              `*${title}*`,
+              info,
               myBot.user.name,
               buttons
             );
@@ -1015,12 +1017,17 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             return m.reply(myLang("yts").msg.replace("{}", prefix + command));
           myBot.sendReact(m.chat, "🕒", m.key);
           try {
-            search = await youtubeSearch(text);
-            let teks = myLang("yts").res + " *" + text + "*\n\n";
-            search.video.map((video) => {
-              teks += "*" + video.title + "* - " + video.url + "\n";
-            });
-            myBot.sendImage(m.chat, search.video[0].thumbnail, teks);
+            const yts = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
+            let teks = text + "\n\n";
+            yts.result.map((i) => {
+              teks += `
+╭━━━━━━━━━━⬣
+*${i.title}*
+📌 *Link:* ${i.url}
+🕒 *Duracion:* ${i.timestamp}
+📈 *Vistas:* ${i.views}
+╰━━━━━━━━━━⬣`}).join("\n")
+            myBot.sendImage(m.chat, yts.result[0].thumbnail, teks);
             User.counter(m.sender, { usage: 1 });
           } catch (e) {
             throw e;
@@ -1039,7 +1046,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           try {
             /*let ytm = await youtubedlv2(text)
       let link = await ytm.audio['128kbps'].download()*/
-            link = process.env.DOWN_YTA.replace("{}", text);
+            link = `https://ytdl.tiodevhost.my.id/?url=${text}&filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
             myBot.sendMessage(
               m.chat,
               { audio: { url: link }, mimetype: "audio/mpeg" },
@@ -1063,13 +1070,21 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           try {
             /*const ytm = await youtubedlv2(text)
       const link = await ytm.video['360p'].download()*/
-            link = process.env.DOWN_YTV.replace("{}", text);
+            link = `https://ytdl.tiodevhost.my.id/?url=${text}&filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
+            let yts = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
+            let { title, timestamp, ago, views } = yts.result[0];
+            let info = `
+╭━━━━━━━━━━⬣
+*${title}*
+🕒 *Duracion:* ${timestamp}
+📈 *Vistas:* ${views}
+╰━━━━━━━━━━⬣`.trim()
             myBot.sendMessage(
               m.chat,
               {
                 video: { url: link },
                 mimetype: "video/mp4",
-                caption: global.author,
+                caption: info,
               },
               { quoted: m }
             );
@@ -1103,7 +1118,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           try {
             /*let ytm = await youtubedlv2(urls[text - 1])
       let link = await ytm.audio['128kbps'].download()*/
-            link = process.env.DOWN_YTA.replace("{}", [text - 1]);
+            link = `https://ytdl.tiodevhost.my.id/?url=${urls[text - 1]}&filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
             myBot.sendMessage(
               m.chat,
               { audio: { url: link }, mimetype: "audio/mpeg" },
@@ -1139,13 +1154,21 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           try {
             /*let ytm = await youtubedlv2(urls[text - 1])
       let link = await ytm.video['360p'].download()*/
-            link = process.env.DOWN_YTV.replace("{}", [text - 1]);
+            link = `https://ytdl.tiodevhost.my.id/?url=${urls[text -1]}&filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
+            let url = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${urls[text -1]}`)
+            let { title, timestamp, ago, views } = url.result[0];
+            let info = `
+╭━━━━━━━━━━⬣
+*${title}*
+🕒 *Duracion:* ${timestamp}
+📈 *Vistas:* ${views}
+╰━━━━━━━━━━⬣`.trim()
             myBot.sendMessage(
               m.chat,
               {
                 video: { url: link },
                 mimetype: "video/mp4",
-                caption: global.author,
+                caption: info,
               },
               { quoted: m }
             );
@@ -1561,9 +1584,9 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             acr.identify(sampleq).then(async (res) => {
               m.reply(
                 `🎶 ${res.metadata.music[0].title}\n` +
-                  `🎤 ${res.metadata.music[0].artists[0].name}\n` +
-                  `💽 ${res.metadata.music[0].album.name}\n` +
-                  `📆 ${res.metadata.music[0].release_date}`
+                `🎤 ${res.metadata.music[0].artists[0].name}\n` +
+                `💽 ${res.metadata.music[0].album.name}\n` +
+                `📆 ${res.metadata.music[0].release_date}`
               );
             });
             User.counter(m.sender, { usage: 1 });
@@ -1764,7 +1787,7 @@ ${lineC}
             });
             let str = `Sala ID: ${room.id}
 
-${BOX.ini.replace("{}", "*JUGADORES*")}
+${BOX.iniM.replace("{}", "JUGADORES")}
 ❌: @${room.game.playerX.split("@")[0]}
 ⭕: @${room.game.playerO.split("@")[0]}
 ${BOX.end}
@@ -2013,7 +2036,7 @@ Escriba *rendirse* para admitir la derrota.`;
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
           if (!isBotAdmins) return m.reply(myLang("global").botAdmin);
-          if (!isAdmins || !isCreator) return m.reply(myLang("global").admin);
+          if (!isAdmins) return m.reply(myLang("global").admin);
           let users = m.quoted
             ? m.quoted.sender
             : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
@@ -2105,12 +2128,12 @@ Escriba *rendirse* para admitir la derrota.`;
           if (!isBotAdmins) return m.reply(myLang("global").botAdmin);
           if (!isAdmins) return m.reply(myLang("global").admin);
 
-          let ini = `${BOX.ini.replace("{}", myLang("group").tag.msg_a)}\n`;
+          let ini = `${BOX.iniM.replace("{}", myLang("group").tag.msg_a)}\n`;
           let mesaj = `➲ *${myLang("group").tag.msg_b}:* ${q ? q : ""}\n\n`;
-          let end = `${BOX.end.replace("{}", botName)}`;
+          let end = `${BOX.endM.replace("{}", botName)}`;
 
           for (let mem of participants) {
-            mesaj += `${BOX.med} @${mem.id.split("@")[0]}\n`;
+            mesaj += `${BOX.medM} @${mem.id.split("@")[0]}\n`;
             tga = `${ini}${mesaj}${end}`;
           }
           myBot.sendMessage(
@@ -2161,7 +2184,7 @@ Escriba *rendirse* para admitir la derrota.`;
             participants.length, // groupParticipants
             groupOwner.split("@")[0], // groupCreator
             groupAdmins
-              .map((v, i) => `${global.BOX.med} @${v.id.split("@")[0]}`)
+              .map((v, i) => `${global.BOX.medM} @${v.id.split("@")[0]}`)
               .join("\n") // groupAdmins
           );
           await myBot.sendButton(
@@ -2192,10 +2215,10 @@ Escriba *rendirse* para admitir la derrota.`;
           } catch (e) {
             pic = global.thumb;
           }
-          msg = `Nombre: ${code.subject}\n`;
-          msg += `Creador: ${code.owner.split("@")[0]}\n`;
-          msg += `Tamaño: ${code.size}\n`;
-          msg += `Desc: ${!code.desc ? code.desc : "No hay descripción."}`;
+          msg = `*Nombre:* ${code.subject}\n`;
+          msg += `*Creador:* ${code.owner.split("@")[0]}\n`;
+          msg += `*Tamaño:* ${code.size}\n`;
+          msg += `*Desc:* ${code.desc || "El grupo no tiene descripción."}`;
           myBot.sendImage(m.chat, pic, msg);
           User.counter(m.sender, { usage: 1 });
         }
@@ -2578,7 +2601,7 @@ myBot.sendMessageModify(m.chat, text ? text : '🤖 DrkBot el mejor', null, {
    url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
 })
 */
-let fkontak = { key: { participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: `status@broadcast` } : {}) }, message: { 'contactMessage': { 'displayName': `${myBot.user.id}`, 'vcard': `BEGIN:VCARD\nVERSION:3.0\n N:${myBot.user.id}\nFN:${myBot.user.id}\nitem1.TEL;waid=${botNumber}:${botNumber}\nitem1.X-ABLabel:Tel\nEND:VCARD`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100), thumbnail: await myBot.reSize(thumb, 100, 100),sendEphemeral: true}}}
+let fkontak = { key: { participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: `status@broadcast` } : {}) }, message: { 'contactMessage': { 'displayName': `${myBot.user.id}`, 'vcard': `BEGIN:VCARD\nVERSION:3.0\n N:${myBot.user.id}\nFN:${myBot.user.id}\nitem1.TEL;waid=${botNumber}:${botNumber}\nitem1.X-ABLabel:Tel\nEND:VCARD`, 'jpegThumbnail': await myBot.reSize(global.thumb, 100, 100), thumbnail: await myBot.reSize(global.thumb, 100, 100),sendEphemeral: true}}}
 
           anu = newMenu(pushname, checkUser);
           let sections = [
@@ -2592,7 +2615,7 @@ let fkontak = { key: { participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid
               ],
             },
           ];
-          myBot.sendListMsg(m.chat, anu, myBot.user.name, `Hola ${pushname}`, "⬆️", sections, fkontak);
+          myBot.sendListMsg(m.chat, anu, null, null, "⬆️", sections, fkontak);
         }
         break;
 

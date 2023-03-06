@@ -16,8 +16,8 @@ let database = {};
 try {
   database = JSON.parse(fs.readFileSync(databaseFile));
 } catch (error) {
-  console.error(`No se pudo leer el archivo ${databaseFile}:`, error);
-  //fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+  fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+  //console.error(`No se pudo leer el archivo ${databaseFile}:`, error);
 }
 
 function totalHit() {
