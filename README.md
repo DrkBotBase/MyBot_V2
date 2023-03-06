@@ -167,16 +167,16 @@ global.timeZone = "America/Bogota"; // TimeZone
 global.timeLocale = "co"; // Localidad
 ```
 ### Cambiar el nombre al archivo `example.config.env` por `config.env` y modificar los siguientes valores;
-`BOT_NAME=`Your_Name_BOT
-`HANDLER=`^[/]
-`LANGUAGE=`es
-`LOG_ERR=`true
-`MSG_CONSOLE=`
-`SEND_READ=`
-`SESSION=`
-`VERSION=`V2
-`WORKTYPE=`public
-`PASSWORD=`your_session_password
+- `BOT_NAME=`Your_Name_BOT
+- `HANDLER=`^[/]
+- `LANGUAGE=`es
+- `LOG_ERR=`true
+- `MSG_CONSOLE=`
+- `SEND_READ=`
+- `SESSION=`
+- `VERSION=`V2
+-`WORKTYPE=`public
+- `PASSWORD=`your_session_password
 ```js
 BOT_NAME=mi_bot_name
 WORKTYPE=public or private
