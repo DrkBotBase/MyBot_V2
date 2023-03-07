@@ -46,8 +46,6 @@ const { log, pint, bgPint } = require("./lib/colores");
 const { menu, butTemplate, rules } = require("./plugins/menu");
 const Config = require("./config");
 const { tiktokdlv2, googleImage } = require("@bochilteam/scraper");
-const Scraper = require('oto-scraper');
-const scraper = new Scraper();
 const { wallpaper } = require("./lib/scraper");
 
 // Language
@@ -1325,13 +1323,28 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           User.counter(m.sender, { usage: 1 });
         }
         break;
-      /*case 'mediafire':
-      {
-        //if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
-        if (checkUser.block === true) return m.reply('Estas Bloqueado.')
-        if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
-      }
-      break*/
+        case 'mediafire':
+          {
+            //if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+            if (checkUser.block === true) return m.reply('Estas Bloqueado.')
+            if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
+            if (!text) return m.reply("Necesito la url!")
+            try {
+              let { name, size, date, mime, link } = await mediafireDl(text)
+              msg = `
+*Nombre:* ${name}
+*Peso:* ${size}
+*Tipo:* ${mime}
+    
+*Espera un momento mientras se envia tu archivo.*`.trim()
+              await m.reply(msg)
+              await myBot.sendFile(m.chat, link, name, "", m, null, {mimetype: mime, asDocument: true})
+            } catch (e) {
+              throw e;
+              m.reply(myLang("global").err);
+            }
+          }
+          break
       case "calc":
         {
           //if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
