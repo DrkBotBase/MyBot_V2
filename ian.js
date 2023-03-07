@@ -42,7 +42,7 @@ const {
 } = require("./lib/myfunc");
 //const { yta, ytv } = require('./lib/y2mate')
 const { log, pint, bgPint } = require("./lib/colores");
-const { menu, butTemplate, rules, newMenu } = require("./plugins/menu");
+const { menu, butTemplate, rules } = require("./plugins/menu");
 const Config = require("./config");
 const { tiktokdlv2, googleImage } = require("@bochilteam/scraper");
 const Scraper = require('oto-scraper');
@@ -75,7 +75,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
           m.text
         : "";
     var budy = typeof m.text == "string" ? m.text : "";
-    var botName = Config.BOT_NAME;
+    global.botName = Config.BOT_NAME;
     const prefix = Config.HANDLER.match(/\[(\W*)\]/)[1][0];
     const isCmd = body.startsWith(prefix);
     const command = body
@@ -97,6 +97,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     const isMedia = /image|video|sticker|audio/.test(mime);
 
     // New Functions BD
+    const db = JSON.parse(fs.readFileSync("./src/database.json"))
     const { User, addUserKey, totalHit } = require("./src/data");
     const regUser = User.check(m.sender);
     const checkUser = User.show(m.sender);
@@ -316,7 +317,6 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         let json = JSON.parse(JSON.stringify(this.mstekateki[id][1]))
         // m.reply(JSON.stringify(json, null, '\t'))
         if (m.text.toLowerCase() == json.response.toLowerCase().trim()) {
-            //global.db.data.users[m.sender].exp += this.tekateki[id][2]
             m.reply(`*Respuesta correcta!*`)
             clearTimeout(this.tekateki[id][2])
             delete this.mstekateki[id]
@@ -327,18 +327,18 @@ Escriba *rendirse* para admitir la derrota.`.trim();
     // ======== INICIO COMANDOS ========
     switch (command) {
       // ======== REGISTRO DB ========
-      case "reg":
+      /*case "reg":
         {
           if (m.isGroup) return m.reply(myLang("reg").msg);
           if (regUser === true) return m.reply(myLang("reg").check);
           new User(m.sender, pushname);
           m.reply(myLang("reg").ok);
         }
-        break;
+        break;*/
       case "profile":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           let message =
             "*ID: " +
             checkUser.id +
@@ -367,8 +367,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "rules":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           myBot.sendImage(m.chat, rulesImg, rules);
           User.counter(m.sender, { usage: 1 });
@@ -441,8 +441,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "alive":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           anu = await modifyLetter(myLang("alive").msg);
@@ -459,11 +459,12 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "menu":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          anu = menu(prefix, pushname, botName, totalHit());
+          users = await Object.keys(db).map((i) => db[i].phone)
+          anu = menu(prefix, pushname, users.length, totalHit());
           linkS = [
             "https://youtu.be/13aBcRrL0oE",
             "https://youtu.be/e-fA-gBCkj0",
@@ -525,8 +526,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "donar":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           txtt = `Hola *${pushname}*\nVEO QUE QUIERES DONAR\nPuedes hacerlo por medio de las siguientes formas disponibles`;
@@ -555,8 +556,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "sc":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           let texto = `*@${m.sender.split`@`[0]}*\n\n*${myLang("sc").msg}*`;
@@ -589,8 +590,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
       // CONVERTER
       case "sticker":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!quoted)
@@ -600,14 +601,14 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           if (text.length > 0) {
             name = text;
           } else {
-            name = botName;
+            name = "Sticker by";
           }
           myBot.sendReact(m.chat, "🕒", m.key);
           if (/image|webp/.test(mime)) {
             let media = await quoted.download();
             let encmedia = await myBot.sendImageAsSticker(m.chat, media, m, {
               packname: name,
-              author: global.author,
+              author: botName,
             });
             await fs.unlinkSync(encmedia);
           } else if (/video/.test(mime)) {
@@ -616,7 +617,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             let media = await quoted.download();
             let encmedia = await myBot.sendVideoAsSticker(m.chat, media, m, {
               packname: name,
-              author: global.author,
+              author: botName,
             });
             await fs.unlinkSync(encmedia);
           } else {
@@ -627,8 +628,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "toaudio":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!quoted) return m.reply(myLang("to_audio").quot);
@@ -648,8 +649,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "tomp4":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!quoted) return m.reply(myLang("to_mp4").quot);
@@ -674,8 +675,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "toimg":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!quoted) return m.reply(myLang("to_img").quot);
@@ -695,8 +696,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "togif":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!quoted) return m.reply(myLang("to_gif").quot);
@@ -723,8 +724,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "tourl":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           myBot.sendReact(m.chat, "🕒", m.key);
@@ -751,8 +752,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "emojimix":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -768,7 +769,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           for (let res of anu.results) {
             let encmedia = await myBot.sendImageAsSticker(m.chat, res.url, m, {
               packname: botName,
-              author: global.author,
+              author: botName,
               categories: res.tags,
             });
             await fs.unlinkSync(encmedia);
@@ -778,8 +779,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "trt":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.quoted && !text) return m.reply(myLang("trt").quot);
@@ -818,8 +819,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "removebg":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!/image/.test(mime))
@@ -885,8 +886,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
       case "slow":
       case "smooth":
       case "tupai":
-        if (regUser === false)
-          return m.reply(myLang("global").noReg.replace("{}", prefix));
+        //if (regUser === false)
+          //return m.reply(myLang("global").noReg.replace("{}", prefix));
         if (checkUser.block === true) return m.reply("Estas Bloqueado.");
         if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
         myBot.sendReact(m.chat, "🕒", m.key);
@@ -937,8 +938,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
       // DOWNLOADS
       case "play":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -981,8 +982,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "ttdl":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -1009,8 +1010,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "yts":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -1037,8 +1038,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "song":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text) return m.reply(myLang("song").msg.replace("{}", prefix));
@@ -1061,8 +1062,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "video":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text) return m.reply(myLang("video").msg.replace("{}", prefix));
@@ -1097,8 +1098,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "getmusic":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -1133,8 +1134,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "getvideo":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -1182,8 +1183,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
       case "waifu":
       case "neko":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           myBot.sendReact(m.chat, "🕒", m.key);
@@ -1207,8 +1208,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "yuri":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           myBot.sendReact(m.chat, "🕒", m.key);
@@ -1235,8 +1236,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "wallpaper":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -1268,8 +1269,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "img":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -1302,8 +1303,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "ssweb":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text) return m.reply("Necesito la url.");
@@ -1319,15 +1320,15 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         }
         break;
       /*case 'mediafire': {
-    if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
+    //if (regUser === false) return m.reply(myLang('global').noReg.replace('{}', prefix))
     if (checkUser.block === true) return m.reply('Estas Bloqueado.')
     if (checkUser.points <= 0) return m.reply(myLang('global').no_points)
     //if (!text) return m.reply(myLang('calc').msg)
   }break*/
       case "calc":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text) return m.reply(myLang("calc").msg);
@@ -1358,8 +1359,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
       // TOOLS
       case "ebinary":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.quoted && !text)
@@ -1374,8 +1375,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "dbinary":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.quoted)
@@ -1389,8 +1390,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "bot":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (!text) return m.reply(myLang("ia").msg);
           let lang = Config.LANG.toLowerCase();
@@ -1420,8 +1421,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         {
           //myBot.sendMessage(m.chat, {react: {text: '🚧', key: m.key}})
           //return myBot.sendImage(m.chat, global.maintenance, '⚠️', m)
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (checkUser.points < 3000)
@@ -1440,7 +1441,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             const { Configuration, OpenAIApi } = require("openai");
 
             const configuration = new Configuration({
-              apiKey: process.env.OPEN_AI_KEY,
+              apiKey: Config.OPEN_AI_KEY || log('Err ApikEy'),
             });
             const openai = new OpenAIApi(configuration);
 
@@ -1467,8 +1468,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "bin":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text) return m.reply(myLang("bin").msg);
@@ -1501,8 +1502,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "cambio":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text) return m.reply(myLang("exchange").msg);
@@ -1541,8 +1542,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "price":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text) return m.reply("Token?");
@@ -1563,8 +1564,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "shazam":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (/image/.test(mime)) return m.reply(myLang("shazam").image);
@@ -1599,8 +1600,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
       // GAMES
       case "dados":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           let da = [
             "./src/media/1.webp",
@@ -1646,8 +1647,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "ppt":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!text)
@@ -1684,8 +1685,8 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         break;
       case "slot":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           const suits = ["💎", "♠️", "♣️", "❤️", "💤"];
@@ -1903,8 +1904,8 @@ Escriba *rendirse* para admitir la derrota.`;
       // END GAMES
       case "gay":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -1926,8 +1927,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "love":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -1952,8 +1953,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "mute":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -1991,18 +1992,16 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "antilink":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
           if (!isBotAdmins) return m.reply(myLang("global").botAdmin);
           if (!isAdmins) return m.reply(myLang("global").admin);
           if (args[0] === "on") {
-            //db.data.chats[m.chat].antilink = true
             m.reply(myLang("antilink").on);
           } else if (args[0] === "off") {
-            //db.data.chats[m.chat].antilink = false
             m.reply(myLang("antilink").off);
           } else {
             let buttons = [
@@ -2030,8 +2029,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "add":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -2051,8 +2050,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "kick":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -2074,8 +2073,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "promote":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -2097,8 +2096,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "demote":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -2120,8 +2119,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "tagall":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -2146,8 +2145,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "hdt":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -2163,8 +2162,8 @@ Escriba *rendirse* para admitir la derrota.`;
         break;
       case "groupinfo":
         {
-          if (regUser === false)
-            return m.reply(myLang("global").noReg.replace("{}", prefix));
+          //if (regUser === false)
+            //return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
@@ -2388,11 +2387,10 @@ Escriba *rendirse* para admitir la derrota.`;
           } catch {
             imgbc = global.thumb;
           }
-          dbOld = JSON.parse(fs.readFileSync("./src/people.json"));
-          let anu = await Object.keys(dbOld).map((i) => dbOld[i].phone);
+          let anu = await Object.keys(db).map((i) => db[i].phone)
           m.reply(
             `Enviar difusión a ${anu.length} chat.\nTiempo de envio ${
-              anu.length * 1.5
+              db.length * 1.5
             } segundos.`
           );
           for (let i of anu) {
@@ -2529,7 +2527,13 @@ ${cpus
             m.reply(respon);
           } else if (command === "status") {
             m.reply(`*𝚃𝙸𝙴𝙼𝙿𝙾 𝙳𝙴 𝙴𝙹𝙴𝙲𝚄𝙲𝙸Ó𝙽*
-${runtime(process.uptime())}`);
+${BOX.iniM.replace("{}", global.botName)}
+${BOX.medM} ⏱️ ${global.time} 
+${BOX.medM} ⏰ ${runtime(process.uptime())}
+${BOX.medM} 🔰 ${Config.VERSION}
+${BOX.medM} 👥 ${await Object.keys(db).map((i) => db[i].phone).length}
+${BOX.medM} ♨️ Bot modo${global.wtMyBot}
+${BOX.end}`);
           }
         }
         break;
@@ -2537,89 +2541,15 @@ ${runtime(process.uptime())}`);
       case "test":
         {
           if (!isCreator) return m.reply(myLang("global").owner);
-          /*
-    const ftroli ={key: {fromMe: false,"participant":"0@s.whatsapp.net", "remoteJid": "status@broadcast"}, "message": {orderMessage: {itemCount: 10,status: 200, thumbnail: await myBot.reSize(thumb, 100, 100), surface: 200, message: `${author}`, orderTitle: 'Dylan', sellerJid: 'https://github.com/GataNina-Li/GataBot-MD'}}, contextInfo: {"forwardingScore":999,"isForwarded":true},sendEphemeral: true}
-		const fdoc = {key : {participant : '0@s.whatsapp.net', ...(m.chat ? { remoteJid: `status@broadcast` } : {}) },message: {documentMessage: {title: `${author}`,jpegThumbnail: await myBot.reSize(thumb, 100, 100)}}}
-		const fvn = {key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {})},message: { "audioMessage": {"mimetype":"audio/ogg; codecs=opus","seconds":210,"ptt": "true"}} } 
-		const fgclink = {key: {participant: "0@s.whatsapp.net","remoteJid": "0@s.whatsapp.net"},"message": {"groupInviteMessage": {"groupJid": "573046793853@g.us","inviteCode": "K5zmLhri8aGIB8ieUCnsyJ","groupName": `${author}`, "caption": `${author}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
-		const ftextt = {key: {fromMe: false, participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {})}, message: { "extendedTextMessage": {"text":`${author}`, "title": `${botName}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
-    const ftoko = {key: {fromMe: false, participant: `0@s.whatsapp.net`, ...(m.chat ? {remoteJid: "status@broadcast" } : {})}, message: { "productMessage": { "product": { "productImage":{ "mimetype": "image/jpeg", "jpegThumbnail": await myBot.reSize(thumb, 100, 100)},"title": `${author}`, "description": `${botName}`, "currencyCode": "COP", "priceAmount1000": "1000000", "retailerId": `${author}`, "productImageCount": 1}, "businessOwnerJid": `0@s.whatsapp.net`}}} 
-		const fgif = {key: {participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {})},message: {"videoMessage": { "title":`${author}`, "h": `Hmm`,'seconds': '359996400', 'gifPlayback': 'true', 'caption': `${author}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
-		const fvideo = {key: { fromMe: false,participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {}) },message: { "videoMessage": { "title":`${author}`, "h": `Hmm`,'seconds': '359996400', 'caption': `${author}`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
-		const floc = {key : {participant : '0@s.whatsapp.net', ...(m.chat ? { remoteJid: `status@broadcast` } : {}) },message: {locationMessage: {name: `${author}`,jpegThumbnail: await myBot.reSize(thumb, 100, 100)}}}
-		const floc2 = {key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: "status@broadcast" } : {}) }, message: { "liveLocationMessage": { "title": `${author}`,"h": `Hmm`, 'jpegThumbnail': await myBot.reSize(thumb, 100, 100)}}}
-		
-    myBot.sendMessage(m.chat, { text: 'Test Context' }, { quoted: ftroli })
-*/
-          /*
-let texto = `*[❗] @${m.sender.split`@`[0]} 𝙰𝙶𝚄𝙰𝚁𝙳𝙴 𝚄𝙽 𝙼𝙾𝙼𝙴𝙽𝚃𝙾*`
-let aa = { quoted: m, userJid: myBot.user.id }
-let prep = generateWAMessageFromContent(m.chat, { extendedTextMessage: { text: texto, contextInfo: { externalAdReply: { title: 'DrkBot', body: null, thumbnail: thumb, sourceUrl: 'https://github.com/DrkBotBase' }, mentionedJid: [m.sender]}}}, aa)    
-myBot.relayMessage(m.chat, prep.message, { messageId: prep.key.id, mentions: [m.sender] })
-*/
-          //let p = await fg.tiktok(args[0])
-          //let buttons = [{ buttonText: { displayText: '♫ 𝙰𝚄𝙳𝙸𝙾 ♫' }, buttonId: `${usedPrefix}tomp3` }]
-          //let te = `*𝚄𝚂𝙴𝚁𝙽𝙰𝙼𝙴:* ${p.author || 'Indefinido'}`
-          //await myBot.sendMessage(m.chat, { text: 'Test Context' }, { quoted: m })
-          //await myBot.sendMessage(m.chat, { text: { url: p.nowm}, caption: te, footer: wm, buttons }, { quoted: m })
-          /*
-let timeout = 60000
-let mstekateki = {}
-    let id = m.chat
-    if (id in mstekateki) {
-        myBot.sendText(m.chat, 'Todavía hay acertijos sin responder en este chat', mstekateki[id][0])
-        return false
-    }
-    let tekateki = JSON.parse(fs.readFileSync(`./src/game/acertijo.json`))
-    let json = tekateki[Math.floor(Math.random() * tekateki.length)]
-    let _clue = json.response
-    let clue = _clue.replace(/[A-Za-z]/g, '_')
-    let caption = `
-ⷮ *${json.question}*
-
-*• Tiempo:* ${(timeout / 1000).toFixed(2)} segundos`
-    mstekateki[id] = [
-       await myBot.sendText(m.chat, caption, m),
-        json,
-        setTimeout(async () => {
-            if (mstekateki[id]) await myBot.sendText(m.chat, `Se acabó el tiempo!\n*Respuesta:* ${json.response}`, mstekateki[id][0])
-            delete mstekateki[id]
-        }, timeout)
-    ]
-*/
-
-          /*
-try {
-  imgbc = await quoted.download()
-} catch {
-  imgbc = global.thumb
-}
-myBot.sendMessageModify(m.chat, text ? text : '🤖 DrkBot el mejor', null, {
-   title: global.author,
-   largeThumb: true,
-   thumbnail: imgbc,
-   url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
-})
-*/
-let fkontak = { key: { participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid: `status@broadcast` } : {}) }, message: { 'contactMessage': { 'displayName': `${myBot.user.id}`, 'vcard': `BEGIN:VCARD\nVERSION:3.0\n N:${myBot.user.id}\nFN:${myBot.user.id}\nitem1.TEL;waid=${botNumber}:${botNumber}\nitem1.X-ABLabel:Tel\nEND:VCARD`, 'jpegThumbnail': await myBot.reSize(global.thumb, 100, 100), thumbnail: await myBot.reSize(global.thumb, 100, 100),sendEphemeral: true}}}
-
-          anu = newMenu(pushname, checkUser);
-          let sections = [
-            {
-              title: "OPCIONES",
-              rows: [
-                { title: "Menú 1", rowId: ``, description: `Desc 1` },
-                { title: "Menú 2", rowId: ``, description: `Desc 2` },
-                { title: "Menú 4", rowId: ``, description: `Desc 3` },
-                { title: "Menú 4", rowId: ``, description: `Desc 4` },
-              ],
-            },
-          ];
-          myBot.sendListMsg(m.chat, anu, null, null, "⬆️", sections, fkontak);
         }
         break;
 
       default:
+      if (budy) {
+        if (regUser === false) {
+          new User(m.sender, pushname);
+        }
+      }
         if (budy.startsWith(">")) {
           if (!isCreator) return m.reply(myLang("global").owner);
           try {
@@ -2643,7 +2573,6 @@ let fkontak = { key: { participant: `0@s.whatsapp.net`, ...(m.chat ? { remoteJid
         if (isCmd && budy.toLowerCase() != undefined) {
           if (m.chat.endsWith("broadcast")) return;
           if (m.isBaileys) return;
-          //let msgs = global.db.data.database
           let msgs = checkUser;
           if (!(budy.toLowerCase() in msgs)) return;
           myBot.copyNForward(m.chat, msgs[budy.toLowerCase()], true);

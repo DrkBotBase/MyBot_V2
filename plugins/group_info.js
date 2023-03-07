@@ -36,7 +36,7 @@ ${BOX.end}
 
 ${BOX.iniM.replace("{}", admins)}
 ${f}
-${BOX.endM.replace("{}", global.author)}`.trim();
+${BOX.endM.replace("{}", global.botName)}`.trim();
 };
 
 module.exports = { infoGroup };

@@ -161,7 +161,6 @@ npm start
 ### Entrar en la archivo `config.js` y solo modificar los siguentes valores:
 ```js
 global.owner = ["573508770421"]; // Número de creador
-global.author = "DrkBot"; // Tu watermark
 global.typeMenu = "image"; // Estilo del menú disponibles [image, template, location]
 global.timeZone = "America/Bogota"; // TimeZone
 global.timeLocale = "co"; // Localidad
@@ -175,12 +174,15 @@ global.timeLocale = "co"; // Localidad
 - `SEND_READ=`
 - `SESSION=`
 - `VERSION=`V2
--`WORKTYPE=`public
+- `ONLINE=`true
+- `WORKTYPE=`public
 - `PASSWORD=`your_session_password
+- `OPEN_AI_KEY=`your_key
 ```js
 BOT_NAME=mi_bot_name
 WORKTYPE=public or private
 PASSWORD=mi_password_session
+OPEN_AI_KEY=mi_key
 ```
 
 

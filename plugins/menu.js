@@ -1,17 +1,7 @@
 const fs = require("fs");
-const { VERSION } = require("../config");
 const moment = require("moment-timezone");
 const more = String.fromCharCode(8206);
 const readMore = more.repeat(4001);
-const db = JSON.parse(fs.readFileSync("./src/database.json"))
-
-let { runtime } = require("../lib/myfunc");
-let d = new Date(new Date() + 3600000);
-let time = d.toLocaleTimeString("es", {
-  hour: "numeric",
-  minute: "numeric",
-  second: "numeric",
-});
 
 const { LANG } = require("../config");
 if (LANG == "ES") {
@@ -38,32 +28,7 @@ if (LANG == "ES") {
   sal_d = "good night";
 }
 
-const newMenu = (name, checkUser) => {
-  return `*Hola* ${name}
-┏  BIENVENIDO AL MENU ┓
-┃ 
-┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
-┃ INFO DEL BOT
-┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
-┃➲ ⏱️ ${time} 
-┃➲ ⏰ ${runtime(process.uptime())}
-┃➲ 𓃠 ${VERSION}
-┃➲ 👥 ${Object.keys(db).map((i) => db[i].phone).length}
-┃➲ ♨️ Bot modo${global.wtMyBot}
-┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
-┃ INFO USUARIO
-┃◤━━━━━ ☆. ∆ .☆ ━━━━━◥
-┃➲ *ID:* ${checkUser.id}
-┃➲ *Número:* ${checkUser.number.split("@")[0]}
-┃➲ *Nombre:* ${checkUser.name}
-┃➲ *Puntos:* ${checkUser.points}
-┃➲ *Uso del Bot:* ${checkUser.use}
-┃➲ *Reportes:* ${checkUser.report}
-┗─━─━「 🌎 」━─━─┛
-*${global.author.toUpperCase()}*`;
-};
-
-const menu = (prefix, pushname, botName, hit) => {
+const menu = (prefix, pushname, length, hit) => {
   var time = moment().tz(global.timeZone).format("HH:mm:ss");
   if (time < "05:00:00") {
     var saludo = sal_a;
@@ -75,12 +40,12 @@ const menu = (prefix, pushname, botName, hit) => {
     var saludo = sal_d;
   }
 
-  return `══✪〘 *${botName}* 〙✪══
+  return `══✪〘 *${global.botName}* 〙✪══
 
 ${hi_lang} *${pushname}*, ${saludo}
 
 📈 *Total Hit:* ${hit}
-💽 *Total Users:*
+💽 *Total Users:* ${length}
 🪀 *Owner:* ${global.owner}
 🖊️ *Prefix:*〘 *${prefix}* 〙
 
@@ -162,7 +127,7 @@ ${BOX.medM} ${prefix}bgc
 ${BOX.medM} ${prefix}ping|status
 ${BOX.medM} ${prefix}py
 ${BOX.medM} ${prefix}test
-${BOX.endM.replace("{}", global.author)}`;
+${BOX.endM.replace("{}", global.botName)}`;
 };
 
 const butTemplate = [
@@ -237,4 +202,4 @@ const rules = `╔══✪〘 *𝙽𝚄𝙴𝚅𝙰𝚂 𝚁𝙴𝙶𝙻𝙰�
 𝙴𝚜𝚌𝚛𝚒𝚋𝚎 𝚔𝚎𝚢 𝚖𝚊𝚜 𝚎𝚕 𝚗𝚞́𝚖𝚎𝚛𝚘 𝚍𝚎 𝚕𝚊 𝚔𝚎𝚢 𝚘𝚋𝚝𝚎𝚗𝚒𝚍𝚘 𝚘 𝚜𝚘𝚕𝚘 𝚛𝚎𝚜𝚙𝚘𝚗𝚍𝚎 𝚕𝚊 𝚔𝚎𝚢 𝚘𝚋𝚝𝚎𝚗𝚒𝚍𝚊 𝚌𝚘𝚗 𝚎𝚕 𝚌𝚘𝚖𝚊𝚗𝚍𝚘.
 ╚════════════`;
 
-module.exports = { menu, butTemplate, rules, newMenu };
+module.exports = { menu, butTemplate, rules };

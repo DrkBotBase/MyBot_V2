@@ -13,7 +13,6 @@ if (existsSync("config.env"))
 // Other
 global.owner = ["573508770421"];
 global.premium = [];
-global.author = "DrkBot";
 global.sessionName = "session";
 global.typeMenu = "image";
 global.timeZone = "America/Bogota";
@@ -22,8 +21,14 @@ global.sourceCode = "https://github.com/DrkBotBase/MyBot_V2";
 global.newFont = "on";
 global.botFont = "Math monospace";
 
-// LINE BOX
+let d = new Date(new Date() + 3600000);
+global.time = d.toLocaleTimeString("es", {
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric",
+});
 
+// Line BOX
 global.BOX = {
   ini: "╭━━━━━━━━━━⬣",
   end: "╰━━━━━━━━━━⬣",
@@ -33,15 +38,12 @@ global.BOX = {
   medM: "┊⇀",
 };
 
+// Global Images
 global.thumb = readFileSync("./lib/bot.jpg");
 global.nothing = readFileSync("./lib/nsp.webp");
 global.rulesImg = readFileSync("./lib/rules.jpg");
 global.miniRobot = readFileSync("./lib/musicRobot.jpg");
 global.maintenance = "https://telegra.ph/file/fb1477894bdd05a7d9851.jpg";
-/*
-global.user = require("./src/data")
-global._user = JSON.parse(readFileSync("./src/people.json"))
-*/
 
 function convertToBool(text, fault = "true") {
   return text === fault ? true : false;
@@ -60,7 +62,7 @@ module.exports = {
   LOG: process.env.LOG_ERR === undefined ? "true" : process.env.LOG_ERR,
   MSG_CONSOLE:
     process.env.MSG_CONSOLE === undefined ? "" : process.env.MSG_CONSOLE,
-  ONLINE: process.env.ONLINE === undefined ? "online" : process.env.ONLINE,
+  ONLINE: process.env.ONLINE === undefined ? "true" : process.env.ONLINE,
   READ: process.env.SEND_READ === undefined ? "" : process.env.SEND_READ,
   SESSION:
     process.env.SESSION === undefined
@@ -72,6 +74,8 @@ module.exports = {
       : process.env.VERSION,
   WORKTYPE:
     process.env.WORKTYPE === undefined ? "public" : process.env.WORKTYPE,
+  OPEN_AI_KEY:
+    process.env.OPEN_AI_KEY === undefined ? "" : process.env.OPEN_AI_KEY,
 };
 // end env
 

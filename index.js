@@ -66,9 +66,9 @@ async function startMybot() {
           if (mek.key && mek.key.remoteJid === 'status@broadcast') return
           if (!myBot.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
           if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
-          if (Config.ONLINE === 'online'){
+          if (Config.ONLINE === 'true'){
             await myBot.sendPresenceUpdate('available', mek.key.id);
-          } else if (Config.ONLINE === 'offline'){
+          } else if (Config.ONLINE === 'false'){
             await myBot.sendPresenceUpdate('unavailable', mek.key.id);
           }
           m = smsg(myBot, mek, store)
@@ -91,12 +91,12 @@ async function startMybot() {
                 }
 
                 if (anu.action == 'add') {
-                  teks = `${BOX.iniM.replace('{}','NUEVO USUARIO')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
+                  teks = `${BOX.iniM.replace('{}','NUEVO USUARIO')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.botName)}`
                   myBot.sendMessageModify(anu.id, teks, null, {
                     title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
                   })
                 } else if (anu.action == 'remove') {
-                  teks = `${BOX.iniM.replace('{}','SE FUE')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.author)}`
+                  teks = `${BOX.iniM.replace('{}','SE FUE')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',global.botName)}`
                   myBot.sendMessageModify(anu.id, teks, null, {
                     title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
                   })
@@ -201,7 +201,7 @@ async function startMybot() {
             else { log(`Unknown DisconnectReason: ${reason}|${connection}`); startMybot(); }
           }
           if (update.connection == "open" || update.receivedPendingNotifications == "true") {
-            myBot.sendButtonLoc(global.owner+'@s.whatsapp.net', global.thumb, 'Bot Online', myBot.user.name, 'TEST', 'status')
+            myBot.sendButtonLoc(myBot.user.id, global.thumb, 'Bot Online', myBot.user.name, 'TEST', 'status')
             log('Connected...', update)
           }
         } catch {

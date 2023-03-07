@@ -1,7 +1,7 @@
 {
   "name": "MyBot_V2",
   "description": "DarkBot project - Makes it easy and fun to use Whatsapp..",
-  "logo": "https://raw.githubusercontent.com/DrkBotBase/MyBot_V1/master/media/gif/PicsArt_07-18-06.46.26.jpg",
+  "logo": "https://raw.githubusercontent.com/DrkBotBase/MyBot_V2/master/lib/bot.jpg",
   "repository": "https://github.com/DrkBotBase",
   "keywords": ["whatsapp", "userbot", "DrkBox-MD", "bot", "api", "ai"],
   "stack": "container",
@@ -19,7 +19,7 @@
     "VERSION": {
       "description": "Version Global By: Ian",
       "required": false,
-      "value": "V1-MD"
+      "value": ""
     },
     "SEND_READ": {
       "description": "Parte de lectura de mensaje, ponga true o false si quiere que el mensaje salga leido o no.",
@@ -36,6 +36,11 @@
       "required": false,
       "value": "false"
     },
+    "ONLINE": {
+      "description": "true o false si quiere o no aparecer disponible.",
+      "required": false,
+      "value": "true"
+    },
     "WORKTYPE": {
       "description": "Forma de usar el BOT. Si usa public los demas pueden usar el BOT, si usa private solo usted podra usarlo",
       "required": true,
@@ -44,10 +49,10 @@
     "HANDLER": {
       "description": "Indicativo para activar los comandos.",
       "required": true,
-      "value": "^[/]"
+      "value": "^[.]"
     },
     "LANGUAGE": {
-      "description": "Bot language.  Español => ES, English => en",
+      "description": "Bot language.  Español => ES, English => EN",
       "required": true,
       "value": "ES"
     }
