@@ -1298,7 +1298,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
 *Posting:* ${post}
 *Link:* https://instagram.com/${username.replace(/^@/, '')}
 *Bio:* ${bio}`.trim()
-            myBot.sendButImage(m.chat, profile, msg, m)
+            myBot.sendImage(m.chat, profile, msg, m)
             User.counter(m.sender, { usage: 1 });
           } catch (e) {
             throw e;
