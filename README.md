@@ -76,7 +76,7 @@ is not responsible for the purpose and method of use of users.
 
 ## INSTALACIÓN EN HEROKU
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/DrkBotBase/MyBot_V2)
-Añadir los siguentes parametros al Buildpack:
+### Añadir los siguentes parametros al Buildpack:
 ```bash
 heroku/nodejs
 ```
