@@ -79,7 +79,8 @@ async function startMybot() {
     })
 
     myBot.ev.on('group-participants.update', async (room) => {
-        try {
+        if (Config.WELCOME === 'true'){
+          try {
             let {subject} = await myBot.groupMetadata(room.id)
             let participants = room.participants
             for (let num of participants) {
@@ -102,8 +103,9 @@ async function startMybot() {
                   })
                 }
             }
-        } catch (err) {
-            log(pint(err, 'red.'))
+          } catch (err) {
+              log(pint(err, 'red.'))
+          }
         }
     })
 	

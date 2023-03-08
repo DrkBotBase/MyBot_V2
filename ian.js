@@ -388,6 +388,28 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           User.counter(m.sender, { usage: 1 });
         }
         break;
+      case "setwelcome":
+        {
+          if (!isCreator) return m.reply(myLang("global").owner);
+          if (args[0] === "on") {
+            Config.WELCOME = "true";
+            m.reply(myLang("global").success);
+          } else if (args[0] === "off") {
+            Config.WELCOME = "false";
+            m.reply(myLang("global").success);
+          } else {
+            let sections = [
+              {title: "SWITCH WELCOME",
+                rows: [
+                  {title: "On",rowId: `setwelcome on`,description: `Enciende Mensaje de Bienvenida.`,},
+                  {title: "Off",rowId: `setwelcome off`,description: `Apaga Mensaje de Bienvenida.`,},
+                ],
+              },
+            ];
+            myBot.sendListMsg(m.chat, "Switch Welcome", Config.BOT_NAME, `Hola ${pushname}`, "⬆️", sections, m);
+          }
+        }
+        break;
       case "setmenu":
         {
           if (!isCreator) return m.reply(myLang("global").owner);
@@ -2529,6 +2551,7 @@ ${BOX.medM} ⏰ ${runtime(process.uptime())}
 ${BOX.medM} 🔰 ${Config.VERSION}
 ${BOX.medM} 👥 ${await Object.keys(db).map((i) => db[i].phone).length}
 ${BOX.medM} ♨️ Bot modo${global.wtMyBot}
+${BOX.medM} 👋🏻 ${Config.WELCOME === 'true' ? 'Welcome Encendido' : 'Welcome Apagado'}
 ${BOX.end}`);
           }
         }

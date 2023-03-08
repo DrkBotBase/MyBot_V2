@@ -99,7 +99,7 @@ ${BOX.medM} ${prefix}attp
 ${BOX.medM} ${prefix}trt
 ${BOX.medM} ${prefix}waifu
 ${BOX.medM} ${prefix}neko
-${BOX.medM} ${prefix}yuri 🆕
+${BOX.medM} ${prefix}yuri
 ${BOX.medM} ${prefix}img
 ${BOX.medM} ${prefix}wallpaper
 ${BOX.medM} ${prefix}ssweb
@@ -127,6 +127,8 @@ ${BOX.medM} ${prefix}bgc
 ${BOX.medM} ${prefix}ping|status
 ${BOX.medM} ${prefix}py
 ${BOX.medM} ${prefix}test
+${BOX.medM} ${prefix}setmenu
+${BOX.medM} ${prefix}setwelcome
 ${BOX.endM.replace("{}", global.botName)}`;
 };
 

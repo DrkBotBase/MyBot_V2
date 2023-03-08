@@ -54,6 +54,7 @@ module.exports = {
   BOT_NAME: process.env.BOT_NAME === undefined ? "🤖 Bot-MD" : process.env.BOT_NAME,
   BRANCH: "master",
   HANDLER: process.env.HANDLER === undefined ? "^[.]" : process.env.HANDLER,
+  WELCOME: process.env.WELCOME === undefined ? "true" : process.env.WELCOME,
   LANG: process.env.LANGUAGE === undefined ? "ES" : process.env.LANGUAGE.toUpperCase(),
   LOG: process.env.LOG_ERR === undefined ? "true" : process.env.LOG_ERR,
   MSG_CONSOLE: process.env.MSG_CONSOLE === undefined ? "" : process.env.MSG_CONSOLE,
