@@ -51,31 +51,18 @@ function convertToBool(text, fault = "true") {
 
 // env ## not modify ##
 module.exports = {
-  BOT_NAME:
-    process.env.BOT_NAME === undefined ? "🤖 Bot-MD" : process.env.BOT_NAME,
+  BOT_NAME: process.env.BOT_NAME === undefined ? "🤖 Bot-MD" : process.env.BOT_NAME,
   BRANCH: "master",
   HANDLER: process.env.HANDLER === undefined ? "^[.]" : process.env.HANDLER,
-  LANG:
-    process.env.LANGUAGE === undefined
-      ? "ES"
-      : process.env.LANGUAGE.toUpperCase(),
+  LANG: process.env.LANGUAGE === undefined ? "ES" : process.env.LANGUAGE.toUpperCase(),
   LOG: process.env.LOG_ERR === undefined ? "true" : process.env.LOG_ERR,
-  MSG_CONSOLE:
-    process.env.MSG_CONSOLE === undefined ? "" : process.env.MSG_CONSOLE,
+  MSG_CONSOLE: process.env.MSG_CONSOLE === undefined ? "" : process.env.MSG_CONSOLE,
   ONLINE: process.env.ONLINE === undefined ? "true" : process.env.ONLINE,
   READ: process.env.SEND_READ === undefined ? "" : process.env.SEND_READ,
-  SESSION:
-    process.env.SESSION === undefined
-      ? global.sessionName
-      : process.env.SESSION,
-  VERSION:
-    process.env.VERSION === undefined
-      ? JSON.parse(readFileSync("./package.json")).version
-      : process.env.VERSION,
-  WORKTYPE:
-    process.env.WORKTYPE === undefined ? "public" : process.env.WORKTYPE,
-  OPEN_AI_KEY:
-    process.env.OPEN_AI_KEY === undefined ? "" : process.env.OPEN_AI_KEY,
+  SESSION: process.env.SESSION === undefined ? global.sessionName : process.env.SESSION,
+  VERSION: process.env.VERSION === undefined ? JSON.parse(readFileSync("./package.json")).version : process.env.VERSION,
+  WORKTYPE: process.env.WORKTYPE === undefined ? "public" : process.env.WORKTYPE,
+  OPEN_AI_KEY: process.env.OPEN_AI_KEY === undefined ? "" : process.env.OPEN_AI_KEY,
 };
 // end env
 

@@ -3,9 +3,9 @@ config.env
 
 # Dependency directories
 node_modules/
-src/database.json
 
 # data-auth
+src/database.json
 package-lock.json
 yarn-error.log
 yarn.lock

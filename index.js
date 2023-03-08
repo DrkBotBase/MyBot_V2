@@ -78,10 +78,10 @@ async function startMybot() {
         }
     })
 
-    myBot.ev.on('group-participants.update', async (anu) => {
+    myBot.ev.on('group-participants.update', async (room) => {
         try {
-            let {subject} = await myBot.groupMetadata(anu.id)
-            let participants = anu.participants
+            let {subject} = await myBot.groupMetadata(room.id)
+            let participants = room.participants
             for (let num of participants) {
                 // Get Profile Picture User
                 try {
@@ -90,14 +90,14 @@ async function startMybot() {
                     ppuser = fs.readFileSync('./lib/imgProfile.jpg')
                 }
 
-                if (anu.action == 'add') {
-                  teks = `${BOX.iniM.replace('{}','NUEVO USUARIO')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',Config.BOT_NAME)}`
-                  myBot.sendMessageModify(anu.id, teks, null, {
+                if (room.action == 'add') {
+                  teks = `${BOX.iniM.replace('{}','NUEVO USUARIO')}\n👋🏻 Hola @${num.split('@')[0]} bienvenido(a) a ${subject}. Si desea usar el bot escriba *menu* para ver la lista de comandos.\n${BOX.endM.replace('{}',Config.BOT_NAME)}`
+                  myBot.sendMessageModify(room.id, teks, null, {
                     title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
                   })
-                } else if (anu.action == 'remove') {
-                  teks = `${BOX.iniM.replace('{}','SE FUE')}\n${BOX.med.replace('{}','*Nombre:*')}@${num.split('@')[0]}\n${BOX.endM.replace('{}',Config.BOT_NAME)}`
-                  myBot.sendMessageModify(anu.id, teks, null, {
+                } else if (room.action == 'remove') {
+                  teks = `${BOX.iniM.replace('{}','SE FUE')}\n${BOX.med} @${num.split('@')[0]}\n${BOX.endM.replace('{}',Config.BOT_NAME)}`
+                  myBot.sendMessageModify(room.id, teks, null, {
                     title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
                   })
                 }

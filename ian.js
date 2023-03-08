@@ -426,7 +426,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             myBot.sendListMsg(
               m.chat,
               "Selecciona el tipo de Munú del Bot",
-              myBot.user.name,
+              Config.BOT_NAME,
               `Hola ${pushname}`,
               "⬆️",
               sections,
@@ -446,7 +446,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             m.chat,
             global.thumb,
             anu,
-            myBot.user.name,
+            Config.BOT_NAME,
             "MENU",
             "menu"
           );
@@ -488,7 +488,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             myBot.sendButton(
               m.chat,
               anu,
-              myBot.user.name,
+              Config.BOT_NAME,
               global.thumb,
               [
                 ["MENU", "menu"],
@@ -502,7 +502,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             myBot.send5ButImg(
               m.chat,
               anu,
-              myBot.user.name,
+              Config.BOT_NAME,
               global.thumb,
               butTemplate
             );
@@ -511,7 +511,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
               m.chat,
               global.thumb,
               anu,
-              myBot.user.name,
+              Config.BOT_NAME,
               "REGLAS",
               "rules"
             );
@@ -953,7 +953,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
               m.chat,
               thumbnail,
               info,
-              myBot.user.name,
+              Config.BOT_NAME,
               buttons
             );
             User.counter(m.sender, { usage: 1 });
@@ -1180,7 +1180,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
               m.chat,
               res.url,
               myLang("global").by.replace("{}", botName),
-              myBot.user.name,
+              Config.BOT_NAME,
               buttons
             );
             User.counter(m.sender, { usage: 1 });
@@ -1207,7 +1207,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
               m.chat,
               enlace,
               myLang("global").by.replace("{}", botName),
-              myBot.user.name,
+              Config.BOT_NAME,
               buttons
             );
             User.counter(m.sender, { usage: 1 });
@@ -1237,7 +1237,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             let buttonMessage = {
               image: { url: result.image[0] },
               caption: `*-----「 ${botName} 」-----*`,
-              footer: myBot.user.name,
+              footer: Config.BOT_NAME,
               buttons: buttons,
               headerType: 4,
             };
@@ -1270,7 +1270,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
             let buttonMessage = {
               image: { url: rndImg },
               caption: `*-----「 ${botName} 」-----*`,
-              footer: myBot.user.name,
+              footer: Config.BOT_NAME,
               buttons: buttons,
               headerType: 4,
             };
@@ -1950,7 +1950,7 @@ Escriba *rendirse* para admitir la derrota.`;
             m.chat,
             buttons,
             jawab,
-            myBot.user.name,
+            Config.BOT_NAME,
             m,
             { mentions: ments }
           );
@@ -1988,7 +1988,7 @@ Escriba *rendirse* para admitir la derrota.`;
               m.chat,
               buttons,
               `${botName}`,
-              myBot.user.name,
+              Config.BOT_NAME,
               m
             );
           }
@@ -2024,7 +2024,7 @@ Escriba *rendirse* para admitir la derrota.`;
               m.chat,
               buttons,
               `MOD ANTILINK`,
-              myBot.user.name,
+              Config.BOT_NAME,
               m
             );
           }
@@ -2392,7 +2392,7 @@ Escriba *rendirse* para admitir la derrota.`;
           for (let i of anu) {
             await sleep(1500);
             let txt = `「 Difusor Bot 」\n\n${text}`;
-            myBot.sendButtonLoc(i, imgbc, txt, myBot.user.name, "MENU", "menu");
+            myBot.sendButtonLoc(i, imgbc, txt, Config.BOT_NAME, "MENU", "menu");
           }
           m.reply("Difusion Enviada");
           User.counter(m.sender, { usage: 1 });
@@ -2424,7 +2424,7 @@ Escriba *rendirse* para admitir la derrota.`;
           for (let i of anu) {
             await sleep(1500);
             let txt = `「 Difusor Bot 」\n\n${text}`;
-            myBot.sendButtonLoc(i, imgbc, txt, myBot.user.name, "MENU", "menu");
+            myBot.sendButtonLoc(i, imgbc, txt, Config.BOT_NAME, "MENU", "menu");
           }
           m.reply("Difusion Enviada");
           User.counter(m.sender, { usage: 1 });
