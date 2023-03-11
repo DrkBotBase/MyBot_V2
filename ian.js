@@ -1963,12 +1963,14 @@ Escriba *rendirse* para admitir la derrota.`;
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
           if (!m.isGroup) return m.reply(myLang("global").group);
           if (!m.quoted) return m.reply(myLang("gay").quot);
+          let ment = m.quoted ? m.quoted.sender : m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? myBot.user.jid : m.sender
+          let userName = myBot.getName(ment)
           await myBot.sendMessage(
             m.chat,
             {
               video: fs.readFileSync("./src/media/gay.mp4"),
               caption: myLang("gay")
-                .msg.replace("{}", "+" + m.quoted.sender.split("@")[0])
+                .msg.replace("{}", userName)
                 .replace("{}", Math.floor(100 * Math.random())),
               gifPlayback: true,
               mentions: m.quoted.sender,
