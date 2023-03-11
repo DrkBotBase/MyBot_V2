@@ -54,11 +54,12 @@ ${BOX.iniM.replace("{}", list_a)}
 ${BOX.medM} ${prefix}alive
 ${BOX.medM} ${prefix}menu
 ${BOX.medM} ${prefix}profile
-${BOX.medM} ${prefix}bot
 ${BOX.medM} ${prefix}donar
 ${BOX.medM} ${prefix}unlock
 ${BOX.medM} ${prefix}key
+${BOX.medM} ${prefix}bot
 ${BOX.medM} ${prefix}gpt
+${BOX.medM} ${prefix}dalle
 ${BOX.end}
 ${BOX.iniM.replace("{}", list_b)}
 ${BOX.medM} ${prefix}promote

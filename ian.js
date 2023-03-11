@@ -1462,10 +1462,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
           //if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
           if (checkUser.block === true) return m.reply("Estas Bloqueado.");
           if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          if (checkUser.points < 3000)
-            return m.reply(
-              myLang("ia").gpt_no_points.replace("{}", 3000 - checkUser.points)
-            );
+          if (checkUser.points < 3000) return m.reply(myLang("ia").gpt_no_points.replace("{}", 3000 - checkUser.points));
 
           msg = "Ingrese o responda solo texto.";
           if (/audio/.test(mime)) return m.reply(msg);
@@ -1498,7 +1495,34 @@ Escriba *rendirse* para admitir la derrota.`.trim();
               { quoted: m }
             );
             User.counter(m.sender, { usage: 1 });
-          } catch {
+          } catch (e) {
+            log(e)
+            m.reply(myLang("global").msg.err);
+          }
+        }
+        break;
+      case "dalle":
+        {
+          if (checkUser.block === true) return m.reply("Estas Bloqueado.");
+          if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
+          if (checkUser.points < 3000) return m.reply(myLang("ia").gpt_no_points.replace("{}", 3000 - checkUser.points));
+          myBot.sendReact(m.chat, "🕒", m.key);
+          try {
+            const response = await axios.post('https://api.openai.com/v1/images/generations', {
+              "model": "image-alpha-001",
+              "prompt": text,
+              "num_images": 1,
+              "size": "512x512",
+              "response_format": "url"
+            }, {
+              headers: {
+                'Authorization': `Bearer ${Config.OPEN_AI_KEY}`
+              }
+            });
+            await myBot.sendImage(m.chat, response.data.data[0].url, Config.BOT_NAME)
+            User.counter(m.sender, { usage: 1 });
+          } catch (e) {
+            log(e)
             m.reply(myLang("global").msg.err);
           }
         }
@@ -2269,6 +2293,16 @@ Escriba *rendirse* para admitir la derrota.`;
           myBot.public = false;
           m.reply(myLang("own").self);
           User.counter(m.sender, { usage: 1 });
+        }
+        break;
+      case 'reset':
+        {
+          if (!isCreator) return m.reply(myLang("global").owner);
+          const appProcess = spawn('npm', ['start']);
+          m.reply('🔄 Reiniciando Bot...\nEspere un momento.')
+          appProcess.kill();
+          log('Starting application...');
+          spawn('npm', ['start']);
         }
         break;
       case "py":
