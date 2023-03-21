@@ -71,7 +71,7 @@ async function startMybot() {
       }
     })
 
-    myBot.ev.on('messages.upsert', async chatUpdate => {
+        /*myBot.ev.on('messages.upsert', async chatUpdate => {
         try {
           mek = chatUpdate.messages[0]
           if (!mek.message) return
@@ -89,7 +89,32 @@ async function startMybot() {
         } catch (err) {
           log(pint(err, 'red.'))
         }
-    })
+    })*/
+    myBot.ev.on('messages.upsert', async chatUpdate => {
+      try {
+        mek = chatUpdate.messages[0]
+        if (!mek.message) return
+        mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+        if (mek.key && mek.key.remoteJid === 'status@broadcast') return
+        if (!myBot.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
+        if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
+        if (Config.ONLINE === 'true'){
+          await myBot.sendPresenceUpdate('available', mek.key.id);
+        } else if (Config.ONLINE === 'false'){
+          await myBot.sendPresenceUpdate('unavailable', mek.key.id);
+        }
+        m = smsg(myBot, mek, store)
+        require("./ian")(myBot, m, chatUpdate, store)
+
+let dir = path.join(__dirname, "./plugins")
+let readDir = fs.readdirSync(dir)
+let files = fs.readdirSync(readDir).filter((file) => file.endsWith(".js"))
+require(files)
+
+      } catch (err) {
+        log(pint(err, 'red.'))
+      }
+  })
 
     myBot.ev.on('group-participants.update', async (room) => {
         if (Config.WELCOME === 'true'){
