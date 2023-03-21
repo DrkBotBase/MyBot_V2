@@ -10,16 +10,6 @@ function randomId(size) {
   return id;
 }
 
-const databaseFile = "./src/database.json";
-let database = {};
-
-try {
-  database = JSON.parse(fs.readFileSync(databaseFile));
-} catch (error) {
-  fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
-  //console.error(`No se pudo leer el archivo ${databaseFile}:`, error);
-}
-
 function totalHit() {
   let sum = 0;
   for (let key in database) {
