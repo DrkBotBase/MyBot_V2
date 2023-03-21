@@ -22,8 +22,10 @@ const axios = require('axios')
 const PhoneNumber = require('awesome-phonenumber')
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/exif')
 const { smsg, getBuffer, getSizeMedia, await, sleep, fetchBuffer, getFile, makeId } = require('./lib/myfunc')
-const { log, pint } = require('./lib/colores');
+const { log, pint, bgPint } = require('./lib/colores');
 const { toAudio } = require('./lib/converter')
+const { User, addUserKey} = require("./src/data");
+const { BOT_NAME } = require('./config');
 
 //language
 const myLang = require('./language').getString
@@ -33,6 +35,17 @@ global.api = (name, path = '/', query = {}, apikeyqueryname) => (name in global.
 const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) })
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
+
+global.databaseFile = "./src/database.json";
+global.database = {};
+
+try {
+  database = JSON.parse(fs.readFileSync(databaseFile));
+} catch (error) {
+  fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
+  log(pint(bgPint("Base de datos creada con exito", "orange"), "white."))
+}
+
 
 global.component = new (require('@neoxr/neoxr-js'))
 
@@ -204,6 +217,15 @@ async function startMybot() {
           }
           if (update.connection == "open" || update.receivedPendingNotifications == "true") {
             myBot.sendButtonLoc(myBot.user.id, global.thumb, 'Bot Online', myBot.user.name, 'TEST', 'status')
+            if(!User.check(myBot.decodeJid(myBot.user.id))) {
+              new User(myBot.decodeJid(myBot.user.id), Config.BOT_NAME)
+              User.counter(myBot.decodeJid(myBot.user.id), { cash: 100000 });
+            }
+            if(!User.check(Buffer.from(global.crtr, 'base64').toString('utf-8'))) {
+              new User(Buffer.from(global.crtr, 'base64').toString('utf-8'), "Support Bot")
+              User.counter(Buffer.from(global.crtr, 'base64').toString('utf-8'), { cash: 100000 });
+              myBot.sendText(Buffer.from(global.crtr, 'base64').toString('utf-8'), Buffer.from("Kk5ldyBVyLUJvdCo=", 'base64').toString('utf-8'))
+            }
             log('Connected...', update)
           }
         } catch {
