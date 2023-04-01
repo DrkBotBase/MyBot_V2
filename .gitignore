@@ -6,7 +6,6 @@ node_modules/
 
 # data-auth
 src/database.json
-package-lock.json
 yarn-error.log
 yarn.lock
 

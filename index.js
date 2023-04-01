@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2022
-  DrkBot-MD - Ian VanH
+  Copyright (C) 2023
+  DarkBox - Ian VanH
   Licensed MIT
   you may not use this file except in compliance with the License.
 */
@@ -49,6 +49,33 @@ try {
 
 global.component = new (require('@neoxr/neoxr-js'))
 
+global.attr = {};
+attr.commands = new Map();
+attr.functions = new Map();
+
+const readPlugins = () => {
+  let pluginsDir = path.join(__dirname, "./plugins");
+  let pluginPath = fs.readdirSync(pluginsDir)
+  for (let fold of pluginPath) {
+    for (let filename of fs.readdirSync(__dirname + `/plugins/${fold}`)) {
+      plugins = require(path.join(__dirname + `/plugins/${fold}`, filename));
+      plugins.function ? (attr.functions[filename] = plugins) : (attr.commands[filename] = plugins);
+    }
+  }
+  console.log("Command loaded successfully");
+};
+readPlugins();
+
+
+const folderPath = './temp';
+fs.watch(folderPath, (eventType, filename) => {
+  if (eventType === 'rename') {
+    fs.unlink(`${folderPath}/${filename}`, (err) => {
+      if (err) return;
+    });
+  }
+});
+
 
 async function startMybot() {
     const myBot = component.Extra.Socket({
@@ -59,7 +86,7 @@ async function startMybot() {
     })
 
     store.bind(myBot.ev)
-    
+
     // anticall auto block
     myBot.ws.on('CB:call', async (json) => {
       const callerId = json.content[0].attrs['call-creator']
@@ -71,26 +98,7 @@ async function startMybot() {
       }
     })
 
-        /*myBot.ev.on('messages.upsert', async chatUpdate => {
-        try {
-          mek = chatUpdate.messages[0]
-          if (!mek.message) return
-          mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-          if (mek.key && mek.key.remoteJid === 'status@broadcast') return
-          if (!myBot.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
-          if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
-          if (Config.ONLINE === 'true'){
-            await myBot.sendPresenceUpdate('available', mek.key.id);
-          } else if (Config.ONLINE === 'false'){
-            await myBot.sendPresenceUpdate('unavailable', mek.key.id);
-          }
-          m = smsg(myBot, mek, store)
-          require("./ian")(myBot, m, chatUpdate, store)
-        } catch (err) {
-          log(pint(err, 'red.'))
-        }
-    })*/
-    myBot.ev.on('messages.upsert', async chatUpdate => {
+    myBot.ev.on('messages.upsert', async (chatUpdate) => {
       try {
         mek = chatUpdate.messages[0]
         if (!mek.message) return
@@ -104,17 +112,11 @@ async function startMybot() {
           await myBot.sendPresenceUpdate('unavailable', mek.key.id);
         }
         m = smsg(myBot, mek, store)
-        require("./ian")(myBot, m, chatUpdate, store)
-
-let dir = path.join(__dirname, "./plugins")
-let readDir = fs.readdirSync(dir)
-let files = fs.readdirSync(readDir).filter((file) => file.endsWith(".js"))
-require(files)
-
+        await require("./ian")(myBot, m, chatUpdate, store)
       } catch (err) {
         log(pint(err, 'red.'))
       }
-  })
+    })
 
     myBot.ev.on('group-participants.update', async (room) => {
         if (Config.WELCOME === 'true'){
@@ -241,7 +243,7 @@ require(files)
             else { log(`Unknown DisconnectReason: ${reason}|${connection}`); startMybot(); }
           }
           if (update.connection == "open" || update.receivedPendingNotifications == "true") {
-            myBot.sendButtonLoc(myBot.user.id, global.thumb, 'Bot Online', myBot.user.name, 'TEST', 'status')
+            myBot.sendImage(myBot.user.id, global.thumb, 'Bot Online')
             if(!User.check(myBot.decodeJid(myBot.user.id))) {
               new User(myBot.decodeJid(myBot.user.id), Config.BOT_NAME)
               User.counter(myBot.decodeJid(myBot.user.id), { cash: 100000 });
@@ -487,6 +489,31 @@ require(files)
         upload: myBot.waUploadToServer,
         ...options
       })
+    }
+    
+    myBot.sendButtonImg = async (jid, buffer, contentText, footerText, button1, id1, quoted, options) => {
+        let type = await myBot.getFile(buffer)
+        let { res, data: file } = type
+        if (res && res.status !== 200 || file.length <= 65536) {
+        try { throw { json: JSON.parse(file.toString()) } }
+        catch (e) { if (e.json) throw e.json }
+        }
+        const buttons = [
+        { buttonId: id1, buttonText: { displayText: button1 }, type: 1 }
+        ]
+
+        const buttonMessage = {
+            image: file,
+            fileLength: 887890909999999,
+            caption: contentText,
+            footer: footerText,
+            mentions: await myBot.parseMention(contentText + footerText),
+            ...options,
+            buttons: buttons,
+            headerType: 4
+        }
+
+        return await myBot.sendMessage(jid, buttonMessage, { quoted, ephemeralExpiration: 86400, contextInfo: { mentionedJid: myBot.parseMention(contentText + footerText) }, ...options })
     }
 
     /**
@@ -768,7 +795,7 @@ require(files)
             mime: 'application/octet-stream',
             ext: '.bin'
         }
-        filename = path.join(__filename, '../src/' + new Date * 1 + '.' + type.ext)
+        filename = path.join(__filename, '../temp/' + new Date * 1 + '.' + type.ext)
         if (data && save) fs.promises.writeFile(filename, data)
         return {
             res,
@@ -849,10 +876,8 @@ require(files)
 startMybot()
 
 
-let file = require.resolve(__filename)
-fs.watchFile(file, () => {
-	fs.unwatchFile(file)
-	log(pint(`Update ${__filename}`, 'orange.'))
-	delete require.cache[file]
-	require(file)
-})
+let file = require.resolve(__filename);
+Object.freeze(global.reload)
+process.on("uncaughtException", function(err) {
+  console.error(err);
+});

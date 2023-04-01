@@ -5,13 +5,15 @@
   you may not use this file except in compliance with the License.
 */
 
+const syntaxerror = require("syntax-error");
+const pathh = require("path")
 const { existsSync, readFileSync, watchFile, unwatchFile } = require("fs");
 const { log, pint } = require("./lib/colores");
 if (existsSync("config.env"))
   require("dotenv").config({ path: "./config.env" });
 
 // Other
-global.owner = ["573508770421"];
+global.owner = ['573508770421'];
 global.premium = [];
 global.sessionName = "session";
 global.typeMenu = "image";
@@ -20,6 +22,8 @@ global.timeLocale = "co";
 global.sourceCode = "https://github.com/DrkBotBase/MyBot_V2";
 global.newFont = "on";
 global.botFont = "Math monospace";
+global.plugins = {};
+global.restKey = "IanVanh"
 
 let d = new Date(new Date() + 3600000);
 global.time = d.toLocaleTimeString("es", {
@@ -45,13 +49,48 @@ global.rulesImg = readFileSync("./lib/rules.jpg");
 global.miniRobot = readFileSync("./lib/musicRobot.jpg");
 global.maintenance = "https://telegra.ph/file/fb1477894bdd05a7d9851.jpg";
 
-function convertToBool(text, fault = "true") {
-  return text === fault ? true : false;
-}
+let pluginFilter = (filename) => /\.js$/.test(filename);
+let pluginFolder = pathh.join(__dirname, "./plugins");
+global.reload = (path) => {
+	path = `./${path.replace(/\\/g, '/')}`
+	filename = path.split("/")[3]
+	if (pluginFilter(filename)) {
+		let dir = pathh.join(pluginFolder, './' + path.split('/')[2] + '/' + path.split('/')[3])
+		isi = require(path)
+		if (dir in require.cache) {
+			delete require.cache[dir];
+			if (existsSync(dir)) console.info(`re - require plugin '${path}'`);
+			else {
+				console.log(`deleted plugin '${path}'`);
+				return isi.function
+					? delete attr.functions[filename]
+					: delete attr.commands[filename];
+			}
+		} else console.info(`requiring new plugin '${filename}'`);
+		let err = syntaxerror(readFileSync(dir), filename);
+		if (err) console.log(`syntax error while loading '${filename}'\n${err}`);
+		else
+			try {
+				isi.function
+					? (attr.functions[filename] = require(dir))
+					: (attr.commands[filename] = require(dir));
+			} catch (e) {
+				console.log(e);
+			} finally {
+				isi.function
+					? (attr.functions = Object.fromEntries(
+							Object.entries(attr.functions).sort(([a], [b]) => a.localeCompare(b))
+					  ))
+					: (attr.commands = Object.fromEntries(
+							Object.entries(attr.commands).sort(([a], [b]) => a.localeCompare(b))
+					  ));
+			}
+	}
+};
 
 // env ## not modify ##
 module.exports = {
-  BOT_NAME: process.env.BOT_NAME === undefined ? "🤖 Bot-MD" : process.env.BOT_NAME,
+  BOT_NAME: process.env.BOT_NAME === undefined ? "🤖 DarkBox" : process.env.BOT_NAME,
   BRANCH: "master",
   HANDLER: process.env.HANDLER === undefined ? "^[.]" : process.env.HANDLER,
   WELCOME: process.env.WELCOME === undefined ? "true" : process.env.WELCOME,

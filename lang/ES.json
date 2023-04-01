@@ -17,6 +17,11 @@
     "alive": {
       "msg": "✪〘 *FUNCIONANDO* 〙✪"
     },
+    "xnxx": {
+      "q_s": "Que deseas buscar?\n*Ejemplo:* {} step sister",
+      "q_dl": "Necesito la url",
+      "dl_invalid": "La url ingresada no es valida.\n*Ejemplo:* https://www.xnxx.com/video-uhg2j98/step_brother_gets_caught_by_his_sister"
+    },
     "sticker": {
       "quot": "Responder video/imagen\n{} nombre sticker",
       "time_wait": "Máximo 10 segundos!",
@@ -24,7 +29,7 @@
     },
     "to_audio": {
       "quot": "*Responde un video*",
-      "q_audio": "*Solo responde a videos y audios*"
+      "q_audio": "*Solo responde videos*"
     },
     "to_mp4": {
       "quot": "*Responde un sticker*",
@@ -32,7 +37,8 @@
     },
     "to_img": {
       "quot": "*Responde un sticker*",
-      "q_img": "*Solo responde a stickers*"
+      "q_img": "*Solo responde a stickers*",
+      "err": "*Para sticker en movimiento usa el comando {}togif*"
     },
     "to_gif": {
       "quot": "*Responder Video/Sticker*",
@@ -45,7 +51,7 @@
       "msg": "*Ejemplo:* {} texto"
     },
     "trt": {
-      "quot": "*Reeponde un texto*",
+      "quot": "*Responde un texto*",
       "from": "*Idioma:* ",
       "to": "*Idioma traducido:* ",
       "res": "*Resultado:* "
@@ -116,6 +122,8 @@
       "err": "Hay un error, Ejemplo: *usd,cop,1*"
     },
     "shazam": {
+      "quot": "*Responde el audio que deseas analizar.*",
+      "err": "*No se encontraron datos sobre el audio. Intenta con otro :(*",
       "image": "*No se pueden analizar imagenes, solo audio!*",
       "video": "*No se pueden analizar videos, solo audio!*\nSi quieres analizar el audio de este video primero conviertelo con el comando *toaudio* y despues si puedes usar *{}*"
     },
