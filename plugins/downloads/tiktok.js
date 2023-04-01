@@ -6,7 +6,7 @@ module.exports = {
   desc: 'descarga videos de TikTok.',
   register: true,
   check: { pts: 0 },
-  async handler(m, {myBot, myLang, text, User}) {
+  async handler(m, {myBot, myLang, text, prefix, command, User}) {
     if (!text) return m.reply(myLang("ttdl").msg.replace("{}", prefix + command));
     if (!/(?:https:?\/{2})?(?:w{3}|vm|vt|t)?\.?tiktok.com\/([^\s&]+)/gi.test(text)) return m.reply(myLang("global").link_err)
     try {
