@@ -7,7 +7,7 @@ module.exports = {
   desc: 'remueve fondo a imagenes.',
   register: true,
   check: { pts: 0 },
-  async handler(m, {myBot, myLang, prefix, command}) {
+  async handler(m, {myBot, myLang, mime, prefix, command}) {
     if(!/image/.test(mime)) return m.reply(myLang("removebg").msg.replace("{}", prefix + command));
     let keyBg = ["HBbdxnge4BVXJwqhcAHqVC", "uHUYM1Wo4QcrFsqGbWoMr2zi", "qySfrLUKRQejaMoJ54LHpShB"];
     let apinobg = keyBg[Math.floor(Math.random() * keyBg.length)];

@@ -1,7 +1,7 @@
 let Config = require("../../config");
 let { tiktokdlv2 } = require("@bochilteam/scraper");
 module.exports = {
-  cmd: ['tiktok', 'tt'],
+  cmd: ['tiktok'],
   category: 'downloader',
   desc: 'descarga videos de TikTok.',
   register: true,
