@@ -284,7 +284,7 @@ Escriba *rendirse* para admitir la derrota.`.trim();
     }*/
 
     // ======== INICIO COMANDOS ========
-    /*switch (command) {
+    switch (command) {
       // ======== REGISTRO DB ========
       case "reg":
         {
@@ -527,52 +527,6 @@ Escriba *rendirse* para admitir la derrota.`.trim();
         }
         break;
       // TOOLS
-      case "gpt":
-        {
-          //myBot.sendMessage(m.chat, {react: {text: '🚧', key: m.key}})
-          //return myBot.sendImage(m.chat, global.maintenance, '⚠️', m)
-          if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
-          if (checkUser.block === true) return m.reply("Estas Bloqueado.");
-          if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          if (checkUser.points < 3000) return m.reply(myLang("ia").gpt_no_points.replace("{}", 3000 - checkUser.points));
-
-          msg = "Ingrese o responda solo texto.";
-          if (/audio/.test(mime)) return m.reply(msg);
-          if (/image/.test(mime)) return m.reply(msg);
-          if (/video/.test(mime)) return m.reply(msg);
-          if (!m.quoted && !text) return m.reply(myLang("ia").gpt_msg);
-
-          myBot.sendReact(m.chat, "🕒", m.key);
-          try {
-            const { Configuration, OpenAIApi } = require("openai");
-
-            const configuration = new Configuration({
-              apiKey: Config.OPEN_AI_KEY || log('Err ApikEy'),
-            });
-            const openai = new OpenAIApi(configuration);
-
-            const response = await openai.createCompletion({
-              model: "text-davinci-003",
-              prompt: text ? text : m.quoted.text,
-              temperature: 0.5,
-              max_tokens: 500,
-              top_p: 1.0,
-              frequency_penalty: 0.5,
-              presence_penalty: 0.0,
-              stop: ["You:"],
-            });
-            myBot.sendMessage(
-              m.chat,
-              { text: response.data.choices[0].text.trim() },
-              { quoted: m }
-            );
-            User.counter(m.sender, { usage: 1 });
-          } catch (e) {
-            log(e)
-            m.reply(myLang("global").msg.err);
-          }
-        }
-        break;
       case "cambio":
         {
           if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
@@ -998,26 +952,6 @@ Escriba *rendirse* para admitir la derrota.`;
           User.counter(m.sender, { usage: 1 });
         }
         break;
-      case "groupinfo":
-        {
-          if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
-          if (checkUser.block === true) return m.reply("Estas Bloqueado.");
-          if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          if (!m.isGroup) return m.reply(myLang("global").group);
-          if (!isBotAdmins) return m.reply(myLang("global").botAdmin);
-          
-          await myBot.sendButton(
-            m.chat,
-            " ",
-            anu,
-            pp,
-            [["𝗠 𝗘 𝗡 𝗨", "menu"]],
-            m,
-            { mentions: [...groupAdmins.map((v) => v.id), owner] }
-          );
-          User.counter(m.sender, { usage: 1 });
-        }
-        break;
       // END GROUPS
       // FOR OWNER
       case "whatgroup":
@@ -1099,7 +1033,7 @@ Escriba *rendirse* para admitir la derrota.`;
           if (!(budy.toLowerCase() in msgs)) return;
           myBot.copyNForward(m.chat, msgs[budy.toLowerCase()], true);
         }
-    }*/
+    }
     await cmd.handler(m, exports);
   } catch (err) {
     if (Config.LOG == "false") return;
