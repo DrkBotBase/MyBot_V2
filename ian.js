@@ -9,23 +9,17 @@ require("./config");
 const {
   proto,
   generateWAMessage,
-  areJidsSameUser,
-  generateWAMessageFromContent,
-  MessageType,
+  areJidsSameUser
 } = require("@adiwajshing/baileys");
 const fs = require("fs");
 const similarity = require("similarity");
 const { exec, spawn, execSync } = require("child_process");
 const axios = require("axios");
-const path = require("path");
 const {
   sleep,
   isUrl,
   fetchJson,
-  jsonformat,
   parseMention,
-  getRandom,
-  pickRandom,
   modifyLetter,
 } = require("./lib/myfunc");
 const { log, pint, bgPint } = require("./lib/colores");
@@ -228,16 +222,16 @@ Escriba *rendirse* para admitir la derrota.`.trim();
 
 const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includes(command) && !cmn.disabled)
   if(!cmd) return
-  if (cmd.owner && !isCreator) return m.reply(myLang("global").owner);
-  else if (cmd.register && !regUser) return m.reply(myLang("global").noReg.replace("{}", prefix));
-  else if(checkUser.block == true) return m.reply("Estas Bloqueado.");
+  if (cmd.owner && !isCreator) return myBot.sendError(m.chat, myLang("global").owner);
+  else if (cmd.register && !regUser) return myBot.sendError(m.chat, myLang("global").noReg.replace("{}", prefix));
+  else if(checkUser.block == true) return myBot.sendError(m.chat, "Estas Bloqueado.");
   else if (checkUser.points < cmd.check.pts ) {
-    if(!isCreator) return m.reply(myLang('ia').gpt_no_points.replace("{}", cmd.check.pts - checkUser.points)) }
-  else if(cmd.group && !m.isGroup) return m.reply(myLang("global").group);
-  else if(cmd.isPrivate && m.isGroup) return m.reply(myLang("global").private);
-  else if(cmd.admin && !isAdmins) return m.reply(myLang("global").admin);
-  else if(cmd.botAdmin && !isBotAdmins) return m.reply(myLang("global").botAdmin);
-    
+    if(!isCreator) return myBot.sendError(m.chat, myLang('ia').gpt_no_points.replace("{}", cmd.check.pts - checkUser.points)) }
+  else if(cmd.group && !m.isGroup) return myBot.sendError(m.chat, myLang("global").group)
+  else if(cmd.isPrivate && m.isGroup) return myBot.sendError(m.chat, myLang("global").private);
+  else if(cmd.admin && !isAdmins) return myBot.sendError(m.chat, myLang("global").admin);
+  else if(cmd.botAdmin && !isBotAdmins) return myBot.sendError(m.chat, myLang("global").botAdmin);
+
     // reset users every 12 hours
     let cron = require("node-cron");
     cron.schedule("00 12 * * *", () => {
@@ -302,150 +296,7 @@ const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includ
           User.counter(m.sender, { usage: 1 });
         }
         break;
-      case "menu":
-        {
-          if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
-          if (checkUser.block === true) return m.reply("Estas Bloqueado.");
-          if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          users = await Object.keys(db).map((i) => db[i].phone)
-          anu = menu(prefix, pushname, users.length, totalHit());
-          linkS = [
-            "https://youtu.be/13aBcRrL0oE",
-            "https://youtu.be/e-fA-gBCkj0",
-            "https://youtu.be/CQLsdm1ZYAw",
-            "https://youtu.be/Bznxx12Ptl0",
-            "https://youtu.be/u9LH_y159sg",
-            "https://youtu.be/HhjHYkPQ8F0",
-            "https://youtu.be/nPvuNsRccVw",
-            "https://youtu.be/KRaWnd3LJfs",
-            "https://youtu.be/KBtk5FUeJbk",
-            "https://youtu.be/ZaflNU45bVY",
-            "https://youtu.be/D9G1VOjN_84",
-          ];
-          let enlace = {
-            contextInfo: {
-              externalAdReply: {
-                title: "MUSICA SELECCIONADA",
-                body: "Link :)",
-                sourceUrl: linkS[Math.floor(linkS.length * Math.random())],
-                showAdAttribution: false,
-                thumbnail: global.miniRobot,
-              },
-            },
-          };
-          if (global.typeMenu === "image") {
-            myBot.sendImage(m.chat, anu, m);
-          } else if (global.typeMenu === "template") {
-            myBot.send5ButImg(
-              m.chat,
-              anu,
-              Config.BOT_NAME,
-              global.thumb,
-              butTemplate
-            );
-          } else if (global.typeMenu === "location") {
-            myBot.sendButtonLoc(
-              m.chat,
-              global.thumb,
-              anu,
-              Config.BOT_NAME,
-              "REGLAS",
-              "rules"
-            );
-          }
-          User.counter(m.sender, { usage: 1 });
-        }
-        break;
-      // CONVERTER
-      case "bass":
-      case "blown":
-      case "deep":
-      case "earrape":
-      case "fast":
-      case "fat":
-      case "nightcore":
-      case "reverse":
-      case "robot":
-      case "slow":
-      case "smooth":
-      case "tupai":
-        {
-          if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
-          if (checkUser.block === true) return m.reply("Estas Bloqueado.");
-          if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          myBot.sendReact(m.chat, "🕒", m.key);
-          try {
-            let set;
-            if (/bass/.test(command))
-              set = "-af equalizer=f=54:width_type=o:width=2:g=20";
-            if (/blown/.test(command)) set = "-af acrusher=.1:1:64:0:log";
-            if (/deep/.test(command)) set = "-af atempo=4/4,asetrate=44500*2/3";
-            if (/earrape/.test(command)) set = "-af volume=12";
-            if (/fast/.test(command))
-              set = '-filter:a "atempo=1.63,asetrate=44100"';
-            if (/fat/.test(command))
-              set = '-filter:a "atempo=1.6,asetrate=22100"';
-            if (/nightcore/.test(command))
-              set = "-filter:a atempo=1.06,asetrate=44100*1.25";
-            if (/reverse/.test(command)) set = '-filter_complex "areverse"';
-            if (/robot/.test(command))
-              set =
-                "-filter_complex \"afftfilt=real='hypot(re,im)*sin(0)':imag='hypot(re,im)*cos(0)':win_size=512:overlap=0.75\"";
-            if (/slow/.test(command))
-              set = '-filter:a "atempo=0.7,asetrate=44100"';
-            if (/smooth/.test(command))
-              set =
-                "-filter:v \"minterpolate='mi_mode=mci:mc_mode=aobmc:vsbmc=1:fps=120'\"";
-            if (/tupai/.test(command))
-              set = '-filter:a "atempo=0.5,asetrate=65100"';
-            if (/audio/.test(mime)) {
-              let media = await myBot.downloadAndSaveMediaMessage(quoted);
-              let ran = getRandom(".mp3");
-              exec(`ffmpeg -i ${media} ${set} ${ran}`, (err, stderr, stdout) => {
-                fs.unlinkSync(media);
-                if (err) return m.reply(err);
-                let buff = fs.readFileSync(ran);
-                myBot.sendMessage(
-                  m.chat,
-                  { audio: buff, mimetype: "audio/mpeg" },
-                  { quoted: m }
-                );
-                User.counter(m.sender, { usage: 1 });
-                fs.unlinkSync(ran);
-              });
-            } else m.reply(myLang("voz_modify").msg);
-          } catch (e) {
-            throw e;
-          }
-        }
-        break;
       // DOWNLOADS
-      case "yts":
-        {
-          if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
-          if (checkUser.block === true) return m.reply("Estas Bloqueado.");
-          if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          if (!text) return m.reply(myLang("yts").msg.replace("{}", prefix + command));
-          myBot.sendReact(m.chat, "🕒", m.key);
-          try {
-            const yts = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
-            let teks = text + "\n\n";
-            yts.result.map((i) => {
-              teks += `
-╭━━━━━━━━━━⬣
-*${i.title}*
-📌 *Link:* ${i.url}
-🕒 *Duracion:* ${i.timestamp}
-📈 *Vistas:* ${i.views}
-╰━━━━━━━━━━⬣`}).join("\n")
-            myBot.sendImage(m.chat, yts.result[0].thumbnail, teks);
-            User.counter(m.sender, { usage: 1 });
-          } catch (e) {
-            throw e;
-            m.reply(myLang("global").err);
-          }
-        }
-        break;
       case "getmusic":
         {
           if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
@@ -616,31 +467,6 @@ const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includ
         }
         break;
       // END GAMES
-      case "love":
-        {
-          if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
-          if (checkUser.block === true) return m.reply("Estas Bloqueado.");
-          if (checkUser.points <= 0) return m.reply(myLang("global").no_points);
-          if (!m.isGroup) return m.reply(myLang("global").group);
-          let member = participants.map((u) => u.id);
-          let me = m.sender;
-          let rnd = member[Math.floor(Math.random() * member.length)];
-          let jawab = `👫 \n@${me.split("@")[0]} ❤️ @${rnd.split("@")[0]}`;
-          let ments = [me, rnd];
-          let buttons = [
-            { buttonId: "love", buttonText: { displayText: "👩‍❤️‍👨" }, type: 1 },
-          ];
-          await myBot.sendButtonText(
-            m.chat,
-            buttons,
-            jawab,
-            Config.BOT_NAME,
-            m,
-            { mentions: ments }
-          );
-          User.counter(m.sender, { usage: 1 });
-        }
-        break;
       case "antilink":
         {
           if (regUser === false) return m.reply(myLang("global").noReg.replace("{}", prefix));
@@ -717,16 +543,6 @@ const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includ
           pythonProcess.stdin.write(text);
           pythonProcess.stdin.end();
           User.counter(m.sender, { usage: 1 });
-        }
-        break;
-      case "test":
-        {
-          if (!isCreator) return m.reply(myLang("global").owner);
-          miLog = await myBot.sendMessageModify(m.chat, "mi mensaje", null, {
-                    title: 'Grupo Oficial', largeThumb: true, thumbnail: thumb, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
-                  })
-          log(miLog)
-          log(m.chat)
         }
         break;
 

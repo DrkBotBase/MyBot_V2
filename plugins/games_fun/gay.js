@@ -1,5 +1,4 @@
 const fs = require("fs");
-let { parseMention } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['gay'],
   category: 'games',
@@ -16,7 +15,7 @@ module.exports = {
         .msg.replace("{}", userName)
         .replace("{}", Math.floor(100 * Math.random())),
       gifPlayback: true,
-      mentions: parseMention(ment),
+      mentions: ment,
     }, { quoted: m });
     User.counter(m.sender, { usage: 1 });
   }

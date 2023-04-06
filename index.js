@@ -135,12 +135,12 @@ async function startMybot() {
                 if (room.action == 'add') {
                   teks = `${BOX.iniM.replace('{}','NUEVO USUARIO')}\n👋🏻 Hola @${num.split('@')[0]} bienvenido(a) a ${subject}. Si desea usar el bot escriba *menu* para ver la lista de comandos.\n${BOX.endM.replace('{}',Config.BOT_NAME)}`
                   myBot.sendMessageModify(room.id, teks, null, {
-                    title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
+                    title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: groupBot
                   })
                 } else if (room.action == 'remove') {
                   teks = `${BOX.iniM.replace('{}','SE FUE')}\n${BOX.med} @${num.split('@')[0]}\n${BOX.endM.replace('{}',Config.BOT_NAME)}`
                   myBot.sendMessageModify(room.id, teks, null, {
-                    title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: 'https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg'
+                    title: 'Grupo Oficial', largeThumb: true, thumbnail: ppuser, url: groupBot
                   })
                 }
             }
@@ -515,6 +515,26 @@ async function startMybot() {
         }
 
         return await myBot.sendMessage(jid, buttonMessage, { quoted, ephemeralExpiration: 86400, contextInfo: { mentionedJid: myBot.parseMention(contentText + footerText) }, ...options })
+    }
+    
+    myBot.sendError = async (jid, text) => {
+      let aa = { quoted: m, userJid: myBot.user.id };
+      let prep = await generateWAMessageFromContent(jid, {
+        extendedTextMessage: {
+          text: text,
+          contextInfo: {
+            externalAdReply: {
+              title: "Official Group",
+              body: null,
+              thumbnail: global.thumb,
+              sourceUrl: groupBot,
+            }
+          }
+        }
+      }, aa);
+      return myBot.relayMessage(jid, prep.message, {
+        messageId: prep.key.id,
+      });
     }
 
     /**

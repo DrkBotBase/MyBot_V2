@@ -20,6 +20,7 @@ global.typeMenu = "image";
 global.timeZone = "America/Bogota";
 global.timeLocale = "co";
 global.sourceCode = "https://github.com/DrkBotBase/MyBot_V2";
+global.groupBot = "https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg";
 global.newFont = "on";
 global.botFont = "Math monospace";
 global.plugins = {};
