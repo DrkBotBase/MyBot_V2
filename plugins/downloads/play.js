@@ -13,11 +13,26 @@ module.exports = {
     if(command == "play") {
       try {
         myBot.sendReact(m.chat, "🕒", m.key);
-        link = `https://ytdl.tiodevhost.my.id/?url=${url}&filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
-        myBot.sendMessage(m.chat, {
+        let link = `https://ytdl.tiodevhost.my.id/?url=${url}&filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
+        var tmb = thumbnail
+        var myCapt = myBot.sendMessage(m.chat, {
+          text: `*Play Download Music by:*\n${Config.BOT_NAME}`
+        })
+        await myBot.sendMessage(m.chat, {
           audio: { url: link },
-          mimetype: "audio/mpeg"
-        }, { quoted: m });
+          mimetype: "audio/mpeg",
+          contextInfo: {
+            externalAdReply: {
+              title: title,
+              body: "",
+              thumbnailUrl: tmb,
+              sourceUrl: sourceCode,
+              mediaType: 1,
+              showAdAttribution: true,
+              renderLargerThumbnail: true
+            }
+          }
+        }, { quoted: myCapt });
         User.counter(m.sender, { usage: 1 });
       } catch (e) {
         throw e;

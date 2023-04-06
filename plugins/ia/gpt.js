@@ -26,17 +26,19 @@ module.exports = {
       });
       const openai = new OpenAIApi(configuration);
       const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: text ? text : m.quoted.text,
+        model: "gpt-3.5-turbo" || "text-davinci-003",
+        messages: [{role: "user", content: text ? text : m.quoted.text}],
+        /*prompt: text ? text : m.quoted.text,
         temperature: 0.5,
         max_tokens: 500,
         top_p: 1.0,
         frequency_penalty: 0.5,
         presence_penalty: 0.0,
-        stop: ["AI:"],
+        stop: ["AI:"],*/
       });
       myBot.sendMessage(m.chat, {
-        text: response.data.choices[0].text.trim()
+        text: response.data.choices[0].message.content.trim()
+        //text: response.data.choices[0].text.trim()
       }, { quoted: m });
       User.counter(m.sender, { usage: 1 });
     }

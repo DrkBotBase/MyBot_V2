@@ -62,7 +62,7 @@ const readPlugins = () => {
       plugins.function ? (attr.functions[filename] = plugins) : (attr.commands[filename] = plugins);
     }
   }
-  console.log("Command loaded successfully");
+  log("Command loaded successfully");
 };
 readPlugins();
 
@@ -72,6 +72,7 @@ fs.watch(folderPath, (eventType, filename) => {
   if (eventType === 'rename') {
     fs.unlink(`${folderPath}/${filename}`, (err) => {
       if (err) return;
+      log(`Archivo ${filename} eliminado`);
     });
   }
 });
