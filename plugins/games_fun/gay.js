@@ -2,6 +2,8 @@ const fs = require("fs");
 let { parseMention } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['gay'],
+  category: 'games',
+  desc: 'nivel de gay de un usuario.',
   register: true,
   group: true,
   check: { pts: 0 },
