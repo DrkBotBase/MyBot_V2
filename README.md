@@ -1,6 +1,6 @@
-## DrkBot es Supremo 💪 
+## DarkBox es Supremo 💪 
 
-![My card name](https://cardivo.vercel.app/api?name=DrkBot%20-%20By:%20IAN&description=Hola%20a%20todos,%20Bienvenidos%20a%20DrkBot&image=https://raw.githubusercontent.com/DrkBotBase/MyBot_V2/master/lib/bot.jpg?q=tbn:ANd9GcR7aMC3bf4bg4l_nhYS2Un9FXbFYcB4T83Shjk8xSUZDh_D61LFpzbpeqLW&s=10?v=4&backgroundColor=%23ecf0f1&instagram=iand_tv&github=DrkBotBase&)
+![My card name](https://cardivo.vercel.app/api?name=DarkBox%20-%20By:%20IAN&description=Hola%20a%20todos,%20Bienvenidos%20a%20DarkBox&image=https://raw.githubusercontent.com/DrkBotBase/MyBot_V2/master/lib/bot.jpg?q=tbn:ANd9GcR7aMC3bf4bg4l_nhYS2Un9FXbFYcB4T83Shjk8xSUZDh_D61LFpzbpeqLW&s=10?v=4&backgroundColor=%23ecf0f1&instagram=iand_tv&github=DrkBotBase&)
 
 <p align="center">
   <a href="https://github.com/DrkBotBase/MyBot_V2/fork">
@@ -38,33 +38,33 @@
 </p>
 
 ```
-DrkBot es un software de código abierto.
+DarkBox es un software de código abierto.
 El usuario es responsable de todas las consecuencias que pudieran derivarse de un uso incorrecto o indebido.
 Dado que es un proyecto de código abierto, cualquiera puede copiar el software, agregarlo y eliminarlo,
 y utilícelo de forma personalizada.
 Además, la compatibilidad con complementos permite a los usuarios
 instale sus propios complementos en el software original y utilícelos como desee.
 El uso es responsabilidad del usuario, así como el sistema operativo no es responsable
-por el trabajo realizado con los programas que se instalan posteriormente, DrkBot
+por el trabajo realizado con los programas que se instalan posteriormente, DarkBox
 no es responsable del propósito y método de uso de los usuarios.
 
-DrkBot it is open source software.
+DarkBox it is open source software.
 The user is responsible for all consequences that may arise from incorrect or improper use.
 Since it is an open source project, anyone can copy the software, add it and remove it,
 and use it in a personalized way.
 Additionally, plug-in support allows users to
 install your own plugins in the original software and use them as you like.
 The use is the responsibility of the user, just as the operating system is not responsible
-for the work done with the programs that are installed later, DrkBot
+for the work done with the programs that are installed later, DarkBox
 is not responsible for the purpose and method of use of users.
 ```
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/DrkBotBase/MyBot_V2/master/lib/bot.jpg" width="200" height="200">
-  <h1>☢️ DrkBot ☢️</h1>
+  <h1>☢️ DarkBox ☢️</h1>
 </div>
 <p align="center">
-    DrkBot project - Hace que usar WhatsApp sea fácil y divertido.
+    DarkBox project - Hace que usar WhatsApp sea fácil y divertido.
     <br>
         <a href="https://t.me/Dark1522">Telegram Channel</a> |
         <a href="http://wa.me/573046793853?text=alive">BOT WhatsApp</a> |
@@ -204,10 +204,10 @@ If you are concerned about security, you can install it on your own computer. If
 
 ### ⚠️ Warning! 
 ```
-Due to DrkBot, your WhatsApp account could be banned.
+Due to DarkBox, your WhatsApp account could be banned.
 This is an open source project, you are responsible for everything you do. 
-DrkBot executives do not accept responsibility.
-By use the DrkBot, you are deemed to have accepted these responsibilities.
+DarkBox executives do not accept responsibility.
+By use the DarkBox, you are deemed to have accepted these responsibilities.
 ```
 
 ## Developers

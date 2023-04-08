@@ -1,4 +1,4 @@
-const hxz = require('hxz-api');
+const dbot = require('dbot-api');
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['play2'],
@@ -23,7 +23,7 @@ module.exports = {
       let url = 'https://www.youtube.com/watch?v=' + id
       var cvr
       try {
-        cvr = await hxz.youtube(url)
+        cvr = await dbot.youtube(url)
       } catch (e) {
         m.reply("[ err api ]");
       }
