@@ -2,9 +2,9 @@ const hxz = require('hxz-api');
 let { BOT_NAME } = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
-  cmd: ['play'],
+  cmd: ['playdoc'],
   category: 'downloader',
-  desc: 'descarga audio de YouTube.',
+  desc: 'descarga video de YouTube formato documento.',
   register: true,
   check: { pts: 0 },
   async handler(m, {myBot, text, myLang, prefix, command, User}) {
@@ -21,14 +21,15 @@ module.exports = {
       } catch (e) {
         m.reply("[ err api ]");
       }
-      var sce = cvr.mp3
+      var sce = cvr.link
       var tmb = thumbnail
       var mycapt = await myBot.sendMessage(m.chat, {
-        text: `Download Music by:\n${BOT_NAME}`,
+        text: `Download VideoDoc by:\n${BOT_NAME}`,
       })
       myBot.sendMessage(m.chat, {
-        audio: { url: sce },
-        mimetype: 'audio/mpeg',
+        document: { url: sce },
+        mimetype: "video/mp4",
+        fileName: `${id}.mp4`,
         contextInfo: {
           externalAdReply: {
             title: title,

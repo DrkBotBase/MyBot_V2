@@ -7,19 +7,18 @@ module.exports = {
   check: { pts: 0 },
   async handler(m, {myBot, myLang, text, prefix, command, User}) {
     if (!text) return m.reply(myLang("yts").msg.replace("{}", prefix + command));
-    myBot.sendReact(m.chat, "🕒", m.key);
+    const yts = (await fetchJson(`https://api.lolhuman.xyz/api/ytsearch?apikey=${restKey}&query=${text}`)).result
+    if(!yts) return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
     try {
-      const yts = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
-      let teks = text + "\n\n";
-      yts.result.map((i) => {
+      myBot.sendReact(m.chat, "🕒", m.key);
+      let teks = `🔍 *Busqueda:*\n${text}\n\n`;
+      yts.map((i) => {
         teks += `
-╭━━━━━━━━━━⬣
+╭━━━━━━━━⬣
 *${i.title}*
-📌 *Link:* ${i.url}
-🕒 *Duracion:* ${i.timestamp}
-📈 *Vistas:* ${i.views}
-╰━━━━━━━━━━⬣`}).join("\n")
-      myBot.sendImage(m.chat, yts.result[0].thumbnail, teks);
+📌 *Link:* https://www.youtube.com/watch?v=${i.videoId}
+╰━━━━━━━━⬣`}).join("\n")
+      myBot.sendImage(m.chat, yts[0].thumbnail, teks);
       User.counter(m.sender, { usage: 1 });
     } catch (e) {
       throw e;

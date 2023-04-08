@@ -6,8 +6,8 @@
 */
 
 require('./config')
-//const { default: myBotConnect, DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
-const { DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
+const { default: myBotConnect, DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
+//const { DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
 const { useSingleFileAuthState } = require('./lib/s-auth-state')
 const Config = require('./config');
 const { state, saveState } = useSingleFileAuthState(`./${Config.SESSION}.json`)
@@ -47,7 +47,7 @@ try {
 }
 
 
-global.component = new (require('@neoxr/neoxr-js'))
+//global.component = new (require('@neoxr/neoxr-js'))
 
 global.attr = {};
 attr.commands = new Map();
@@ -79,11 +79,17 @@ fs.watch(folderPath, (eventType, filename) => {
 
 
 async function startMybot() {
-    const myBot = component.Extra.Socket({
+    /*const myBot = component.Extra.Socket({
         logger: pino({ level: 'silent' }),
         printQRInTerminal: true,
         browser: ["DrkBot", "Safari", "13.0.0"],
         auth: state
+    })*/
+    const myBot = myBotConnect({
+      logger: pino({ level: 'silent' }),
+      printQRInTerminal: true,
+      browser: ["DrkBot", "Safari", "13.0.0"],
+      auth: state
     })
 
     store.bind(myBot.ev)
