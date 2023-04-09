@@ -1,4 +1,4 @@
-const dbot = require('dbot-api');
+const hxz = require('hxz-api');
 let { BOT_NAME } = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
@@ -15,19 +15,13 @@ module.exports = {
     try {
       myBot.sendReact(m.chat, "🕒", m.key);
       let url = 'https://www.youtube.com/watch?v=' + id
-      var cvr
-      try {
-        cvr = await dbot.youtube(url)
-      } catch (e) {
-        m.reply("[ err api ]");
-      }
-      var sce = cvr.link
+      let cvr = await dbot.youtube(url)
       var tmb = thumbnail
       var mycapt = await myBot.sendMessage(m.chat, {
         text: `Download VideoDoc by:\n${BOT_NAME}`,
       })
       myBot.sendMessage(m.chat, {
-        document: { url: sce },
+        document: { url: cvr.link },
         mimetype: "video/mp4",
         fileName: `${id}.mp4`,
         contextInfo: {

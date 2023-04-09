@@ -1,4 +1,4 @@
-const dbot = require('dbot-api');
+const hxz = require('hxz-api');
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['play2'],
@@ -21,15 +21,9 @@ module.exports = {
 📈 *Vistas:* ${view.toLocaleString('es-ES')}
 ╰━━━━━━━━━━⬣`.trim()
       let url = 'https://www.youtube.com/watch?v=' + id
-      var cvr
-      try {
-        cvr = await dbot.youtube(url)
-      } catch (e) {
-        m.reply("[ err api ]");
-      }
-      var sce = cvr.link
+      var cvr = await hxz.youtube(url)
       myBot.sendMessage(m.chat, {
-        video: { url: sce },
+        video: { url: cvr.link },
         mimetype: "video/mp4",
         caption: info
       }, { quoted: m });
