@@ -8,9 +8,9 @@ module.exports = {
   check: { pts: 0 },
   async handler(m, {myBot, text, myLang, prefix, command, User}) {
     if (!text) return m.reply(myLang("play").msg.replace("{}", prefix + command));
-    vid = (await fetchJson(`https://api.lolhuman.xyz/api/ytplay?apikey=${restKey}&query=${text}`)).result
+    vid = (await fetchJson(`https://ian.onrender.com/api/ytplay?apikey=DarBox&query=${text}`)).result
     if(!vid) return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
-    let { id, title, duration, view } = vid
+    let { id, title, duration, view, video } = vid
     try {
       myBot.sendReact(m.chat, "🕒", m.key);
       if(durationToSeconds(duration) > 600) return m.reply(`Video sobrepasa los 10 minutos.\nUtiliza el comando ${prefix}playdoc para descargar.`)
@@ -21,9 +21,8 @@ module.exports = {
 📈 *Vistas:* ${view.toLocaleString('es-ES')}
 ╰━━━━━━━━━━⬣`.trim()
       let url = 'https://www.youtube.com/watch?v=' + id
-      var cvr = await hxz.youtube(url)
       myBot.sendMessage(m.chat, {
-        video: { url: cvr.link },
+        video: { url: video.link },
         mimetype: "video/mp4",
         caption: info
       }, { quoted: m });

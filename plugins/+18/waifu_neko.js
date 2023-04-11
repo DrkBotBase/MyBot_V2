@@ -1,4 +1,4 @@
-let Config = require("../../config");
+let { BOT_NAME } = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['waifu', 'neko'],
@@ -10,11 +10,11 @@ module.exports = {
     myBot.sendReact(m.chat, "🕒", m.key);
     try {
       res = await fetchJson(`https://api.waifu.pics/nsfw/${command}`);
-      myBot.sendImage(m.chat, res.url, Config.BOT_NAME)
-      /*let buttons = [
+      //myBot.sendImage(m.chat, res.url, Config.BOT_NAME)
+      let buttons = [
         { buttonId: command, buttonText: { displayText: "➡️" }, type: 1 },
       ];
-      myBot.sendButImage(m.chat, res.url, myLang("global").by.replace("{}", botName), Config.BOT_NAME, buttons);*/
+      myBot.sendButImage(m.chat, res.url, myLang("global").by.replace("{}", BOT_NAME), BOT_NAME, buttons);
       User.counter(m.sender, { usage: 1 });
     } catch {
       m.reply(myLang("global").err);

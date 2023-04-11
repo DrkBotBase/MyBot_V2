@@ -579,7 +579,7 @@ const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includ
     await cmd.handler(m, {
       myLang,
       myBot,
-      body,
+      budy,
       isCmd,
       args,
       pushname,
