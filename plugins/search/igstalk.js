@@ -71,6 +71,7 @@ async function igstalk2(user) {
       followers: $('div.profile__header > div.profile__header-right > ul.profile__stats > li.profile__stats-item > span.profile__stats-followers').text(),
       following: $('div.profile__header > div.profile__header-right > ul.profile__stats > li.profile__stats-item > span.profile__stats-follows').text()
     }
+    console.log(result)
     return ({status: true, ...result})
   } catch (e) {
     return ({status: false, message: 'internal error, try again'})

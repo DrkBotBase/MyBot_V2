@@ -10,19 +10,19 @@ module.exports = {
     if (!text) return m.reply(myLang("play").msg.replace("{}", prefix + command));
     vid = (await fetchJson(`https://ian.onrender.com/api/ytplay?apikey=DarBox&query=${text}`)).result
     if(!vid) return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
-    let { id, title, duration, view, video } = vid
+    let { id, title, duration, view } = vid
     try {
       myBot.sendReact(m.chat, "🕒", m.key);
       if(durationToSeconds(duration) > 600) return m.reply(`Video sobrepasa los 10 minutos.\nUtiliza el comando ${prefix}playdoc para descargar.`)
+      let link = `https://ytdl.tiodevhost.my.id/${id}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
       let info = `
 ╭━━━━━━━━━━⬣
 *${title}*
 🕒 *Duracion:* ${duration}
 📈 *Vistas:* ${view.toLocaleString('es-ES')}
 ╰━━━━━━━━━━⬣`.trim()
-      let url = 'https://www.youtube.com/watch?v=' + id
       myBot.sendMessage(m.chat, {
-        video: { url: video.link },
+        video: { url: link },
         mimetype: "video/mp4",
         caption: info
       }, { quoted: m });

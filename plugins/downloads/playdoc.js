@@ -11,16 +11,16 @@ module.exports = {
     if (!text) return m.reply(myLang("play").msg.replace("{}", prefix + command));
     vid = (await fetchJson(`https://ian.onrender.com/api/ytplay?apikey=DarBox&query=${text}`)).result
     if(!vid) return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
-    let { id, title, thumbnail, video } = vid
+    let { id, title, thumbnail } = vid
     try {
       myBot.sendReact(m.chat, "🕒", m.key);
-      let url = 'https://www.youtube.com/watch?v=' + id
+      let link = `https://ytdl.tiodevhost.my.id/${id}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
       var tmb = thumbnail
       var mycapt = await myBot.sendMessage(m.chat, {
         text: `Download VideoDoc by:\n${BOT_NAME}`,
       })
       myBot.sendMessage(m.chat, {
-        document: { url: video.link },
+        document: { url: link },
         mimetype: "video/mp4",
         fileName: `${id}.mp4`,
         contextInfo: {
@@ -28,7 +28,7 @@ module.exports = {
             title: title,
             body: "",
             thumbnailUrl: tmb,
-            sourceUrl: url,
+            sourceUrl: `https://www.youtube.com/watch?v=${id}`,
             mediaType: 1,
             showAdAttribution: true,
             renderLargerThumbnail: true
