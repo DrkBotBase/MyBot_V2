@@ -15,9 +15,9 @@ module.exports = {
       search = yts.result[0]
     } else search = yts.result[1]
     try {
-      let { videoId, title, duration, view } = search;
+      let { videoId, title, seconds, view } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
-      if(durationToSeconds(duration) > 600) return m.reply(`Video sobrepasa los 10 minutos.\nUtiliza el comando ${prefix}playdoc para descargar.`)
+      if(seconds > 360) return m.reply(`Video sobrepasa los 6 minutos.\nUtiliza el comando ${prefix}playdoc para descargar.`)
       let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
       let info = `
 ╭━━━━━━━━━━⬣
@@ -37,11 +37,3 @@ module.exports = {
     }
   }
 };
-
-function durationToSeconds(duration) {
-  const timeParts = duration.split(':');
-  const hours = parseInt(timeParts[0], 10) || 0;
-  const minutes = parseInt(timeParts[1], 10) || 0;
-  const seconds = parseInt(timeParts[2], 10) || 0;
-  return (hours * 3600) + (minutes * 60) + seconds;
-}
