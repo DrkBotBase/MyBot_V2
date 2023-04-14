@@ -15,15 +15,15 @@ module.exports = {
       search = yts.result[0]
     } else search = yts.result[1]
     try {
-      let { videoId, title, seconds, view } = search;
+      let { videoId, title, seconds, timestamp, views } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
       if(seconds > 360) return m.reply(`Video sobrepasa los 6 minutos.\nUtiliza el comando ${prefix}playdoc para descargar.`)
       let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
       let info = `
 ╭━━━━━━━━━━⬣
 *${title}*
-🕒 *Duracion:* ${duration}
-📈 *Vistas:* ${view.toLocaleString('es-ES')}
+🕒 *Duracion:* ${timestamp}
+📈 *Vistas:* ${views.toLocaleString('es-ES')}
 ╰━━━━━━━━━━⬣`.trim()
       myBot.sendMessage(m.chat, {
         video: { url: link },
