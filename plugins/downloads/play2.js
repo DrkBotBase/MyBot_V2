@@ -8,13 +8,17 @@ module.exports = {
   check: { pts: 0 },
   async handler(m, {myBot, text, myLang, prefix, command, User}) {
     if (!text) return m.reply(myLang("play").msg.replace("{}", prefix + command));
-    vid = (await fetchJson(`https://ian.onrender.com/api/ytplay?apikey=DarBox&query=${text}`)).result
-    if(!vid) return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
-    let { id, title, duration, view } = vid
+    const yts = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
+    if(yts.status !== 'success') return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
+    let search = '';
+    if(yts.result[0].type !== "channel") {
+      search = yts.result[0]
+    } else search = yts.result[1]
     try {
+      let { videoId, title, duration, view } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
       if(durationToSeconds(duration) > 600) return m.reply(`Video sobrepasa los 10 minutos.\nUtiliza el comando ${prefix}playdoc para descargar.`)
-      let link = `https://ytdl.tiodevhost.my.id/${id}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
+      let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
       let info = `
 ╭━━━━━━━━━━⬣
 *${title}*

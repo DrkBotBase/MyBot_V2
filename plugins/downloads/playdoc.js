@@ -9,12 +9,16 @@ module.exports = {
   check: { pts: 0 },
   async handler(m, {myBot, text, myLang, prefix, command, User}) {
     if (!text) return m.reply(myLang("play").msg.replace("{}", prefix + command));
-    vid = (await fetchJson(`https://ian.onrender.com/api/ytplay?apikey=DarBox&query=${text}`)).result
-    if(!vid) return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
-    let { id, title, thumbnail } = vid
+    const yts = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
+    if(yts.status !== 'success') return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
+    let search = '';
+    if(yts.result[0].type !== "channel") {
+      search = yts.result[0]
+    } else search = yts.result[1]
     try {
+      let { videoId, title, thumbnail } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
-      let link = `https://ytdl.tiodevhost.my.id/${id}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
+      let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
       var tmb = thumbnail
       var mycapt = await myBot.sendMessage(m.chat, {
         text: `Download VideoDoc by:\n${BOT_NAME}`,
@@ -22,13 +26,13 @@ module.exports = {
       myBot.sendMessage(m.chat, {
         document: { url: link },
         mimetype: "video/mp4",
-        fileName: `${id}.mp4`,
+        fileName: `${videoId}.mp4`,
         contextInfo: {
           externalAdReply: {
             title: title,
             body: "",
             thumbnailUrl: tmb,
-            sourceUrl: `https://www.youtube.com/watch?v=${id}`,
+            sourceUrl: `https://www.youtube.com/watch?v=${videoId}`,
             mediaType: 1,
             showAdAttribution: true,
             renderLargerThumbnail: true

@@ -8,12 +8,16 @@ module.exports = {
   check: { pts: 0 },
   async handler(m, {myBot, text, myLang, prefix, command, User}) {
     if (!text) return m.reply(myLang("play").msg.replace("{}", prefix + command));
-    vid = (await fetchJson(`https://api.lolhuman.xyz/api/ytplay?apikey=${restKey}&query=${text}`)).result
-    if(!vid) return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
-    let { id, title, thumbnail } = vid
+    const yts = await fetchJson(`https://api.dhamzxploit.my.id/api/ytsearch?q=${text}`)
+    if(yts.status !== 'success') return myBot.sendError(m.chat, "🤖 No encuentro tu busqueda :(")
+    let search = '';
+    if(yts.result[0].type !== "channel") {
+      search = yts.result[0]
+    } else search = yts.result[1]
     try {
+      let { videoId, title, thumbnail } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
-      let link = `https://ytdl.tiodevhost.my.id/${id}.mpeg?filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
+      let link = `https://ytdl.tiodevhost.my.id/${videoId}.mpeg?filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
       var tmb = thumbnail
       var mycapt = await myBot.sendMessage(m.chat, {
         text: `Download Music by:\n${BOT_NAME}`,
@@ -26,7 +30,7 @@ module.exports = {
             title: title,
             body: "",
             thumbnailUrl: tmb,
-            sourceUrl: `https://www.youtube.com/watch?v=${id}`,
+            sourceUrl: `https://www.youtube.com/watch?v=${videoId}`,
             mediaType: 1,
             showAdAttribution: true,
             renderLargerThumbnail: true

@@ -25,9 +25,9 @@ module.exports = {
       if(!text) return m.reply(myLang("xnxx").q_dl)
       if(!text.includes('www.xnxx.com/video')) return m.reply(myLang("xnxx").dl_invalid)
       myBot.sendReact(m.chat, "🕒", m.key);
-      let { result } = await xnxxdownload(text)
-      if(!result.files.high) return res = result.files.low
-      res = result.files.high
+      let { result } = await xnxxdownload(text);
+      if(!result.files.high) return res = result.files.low;
+      res = result.files.high;
       myBot.sendMessage(m.chat, {
         document: { url: res },
         mimetype: 'video/mp4',

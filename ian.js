@@ -96,6 +96,12 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
         );
       }
     }
+    
+    if (budy) {
+      if (regUser === false) {
+        new User(m.sender, pushname);
+      }
+    }
 
 try {
   let id = m.chat;
