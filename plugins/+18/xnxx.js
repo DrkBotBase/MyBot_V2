@@ -9,9 +9,9 @@ module.exports = {
   register: true,
   isPrivate: true,
   check: { pts: 0 },
-  async handler(m, {myBot, myLang, command, text}) {
+  async handler(m, {myBot, myLang, text, prefix, command, User}) {
     if(command == "xnxx") {
-      if(!text) return m.reply(myLang("xnxx").q_s)
+      if(!text) return m.reply(myLang("xnxx").q_s.replace("{}", prefix + command))
       myBot.sendReact(m.chat, "🕒", m.key);
       let { result } = await xnxxsearch(text) 
       let res = text+"\n\n"
@@ -21,6 +21,7 @@ module.exports = {
         res += `*Link:* ${i.link}\n\n`
       })
       myBot.sendText(m.chat, res, m)
+      User.counter(m.sender, { usage: 1 });
     } else if(command == "xnxxdl") {
       if(!text) return m.reply(myLang("xnxx").q_dl)
       if(!text.includes('www.xnxx.com/video')) return m.reply(myLang("xnxx").dl_invalid)
@@ -34,6 +35,7 @@ module.exports = {
         fileName: result.title,
         caption: `${BOT_NAME}`
       }, { quoted: m })
+      User.counter(m.sender, { usage: 1 });
     }
   }
 };
