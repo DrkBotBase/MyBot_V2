@@ -4,6 +4,10 @@ config.env
 # Dependency directories
 node_modules/
 
+# Others
+plugins/others/
+temp/jadibot/
+
 # data-auth
 src/database.json
 package-lock.json

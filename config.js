@@ -24,6 +24,7 @@ global.groupBot = "https://chat.whatsapp.com/GxjXaj3SxNDAWh8oMQ5bkg";
 global.newFont = "on";
 global.botFont = "Math monospace";
 global.plugins = {};
+global.conns = {};
 global.restKey = "IanVanh"
 
 let d = new Date(new Date() + 3600000);

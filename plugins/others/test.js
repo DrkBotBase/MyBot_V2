@@ -1,6 +1,7 @@
+const fs = require("fs");
 let { log, pint } = require("../../lib/colores");
 //let Config = require("../../config");
-//let { fetchJson } = require("../../lib/myfunc");
+let { jsonformat } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['test'],
   ignored: true,
@@ -10,11 +11,7 @@ module.exports = {
   //admin: true,
   //botAdmin: true,
   check: { pts: null },
-  async handler(m, {myBot, args}) {
-    if(args == "on") {
-      await myBot.sendMessage(m.chat, {
-        text: JSON.stringify(m.quoted, null, 2)
-      }
-    } else log(pint(m.quoted, '.'))
+  async handler(m, {myBot, args, text, quoted}) {
+    log(conns);
   }
 };

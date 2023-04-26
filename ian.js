@@ -47,7 +47,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     const command = body.replace(prefix, "").trim().split(/ +/).shift().toLowerCase();
     const args = body.trim().split(/ +/).slice(1);
     const pushname = m.pushName || "No Name";
-    const botNumber = await myBot.decodeJid(myBot.user.id);
+    const botNumber = '573046793853'//await myBot.decodeJid(myBot.user.id);
     const isCreator = [botNumber, ...global.owner].map((v) => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net").includes(m.sender);
     const itsMe = m.sender == botNumber ? true : false;
     const text = (q = args.join(" "));
@@ -228,15 +228,15 @@ Escriba *rendirse* para admitir la derrota.`.trim();
 
 const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includes(command) && !cmn.disabled)
   if(!cmd) return
-  if (cmd.owner && !isCreator) return myBot.sendError(m.chat, myLang("global").owner);
-  else if (cmd.register && !regUser) return myBot.sendError(m.chat, myLang("global").noReg.replace("{}", prefix));
-  else if(checkUser.block == true) return myBot.sendError(m.chat, "Estas Bloqueado.");
+  if (cmd.owner && !isCreator) return myBot.sendText(m.chat, myLang("global").owner);
+  else if (cmd.register && !regUser) return myBot.sendText(m.chat, myLang("global").noReg.replace("{}", prefix));
+  else if(checkUser.block == true) return myBot.sendText(m.chat, "Estas Bloqueado.");
   else if (checkUser.points < cmd.check.pts ) {
-    if(!isCreator) return myBot.sendError(m.chat, myLang('ia').gpt_no_points.replace("{}", cmd.check.pts - checkUser.points)) }
-  else if(cmd.group && !m.isGroup) return myBot.sendError(m.chat, myLang("global").group)
-  else if(cmd.isPrivate && m.isGroup) return myBot.sendError(m.chat, myLang("global").private);
-  else if(cmd.admin && !isAdmins) return myBot.sendError(m.chat, myLang("global").admin);
-  else if(cmd.botAdmin && !isBotAdmins) return myBot.sendError(m.chat, myLang("global").botAdmin);
+    if(!isCreator) return myBot.sendText(m.chat, myLang('ia').gpt_no_points.replace("{}", cmd.check.pts - checkUser.points)) }
+  else if(cmd.group && !m.isGroup) return myBot.sendText(m.chat, myLang("global").group)
+  else if(cmd.isPrivate && m.isGroup) return myBot.sendText(m.chat, myLang("global").private);
+  else if(cmd.admin && !isAdmins) return myBot.sendText(m.chat, myLang("global").admin);
+  else if(cmd.botAdmin && !isBotAdmins) return myBot.sendText(m.chat, myLang("global").botAdmin);
 
     // reset users every 12 hours
     let cron = require("node-cron");
@@ -583,8 +583,8 @@ const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includ
     }*/
 
     await cmd.handler(m, {
-      myLang,
       myBot,
+      myLang,
       budy,
       isCmd,
       args,
@@ -597,7 +597,9 @@ const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includ
       mime,
       User,
       participants,
-      regUser
+      regUser,
+      //
+      quoted
     });
   } catch (err) {
     if (Config.LOG == "false") return;
