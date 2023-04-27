@@ -47,7 +47,7 @@ module.exports = myBot = async (myBot, m, chatUpdate, store) => {
     const command = body.replace(prefix, "").trim().split(/ +/).shift().toLowerCase();
     const args = body.trim().split(/ +/).slice(1);
     const pushname = m.pushName || "No Name";
-    const botNumber = '573046793853'//await myBot.decodeJid(myBot.user.id);
+    const botNumber = await myBot.decodeJid(myBot.user.id);
     const isCreator = [botNumber, ...global.owner].map((v) => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net").includes(m.sender);
     const itsMe = m.sender == botNumber ? true : false;
     const text = (q = args.join(" "));
