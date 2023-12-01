@@ -3,6 +3,8 @@ let Config = require("../../config");
 let { getBuffer } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['dalle'],
+  ignored: true,
+  owner: true,
   category: 'ia',
   desc: 'inteligencia artificial para descargar imagenes.',
   register: true,

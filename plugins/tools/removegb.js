@@ -3,6 +3,8 @@ const { removeBackgroundFromImageFile } = require("remove.bg");
 let { getRandom } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['removebg'],
+  owner: true,
+  ignored: true,
   category: 'tools',
   desc: 'remueve fondo a imagenes.',
   register: true,

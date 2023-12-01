@@ -227,9 +227,9 @@ Escriba *rendirse* para admitir la derrota.`.trim();
 
 
 const cmd = Object.values(attr.commands).find((cmn) => cmn.cmd && cmn.cmd.includes(command) && !cmn.disabled)
-  if(!cmd) return
+  if(!cmd) return;
   if (cmd.owner && !isCreator) return myBot.sendText(m.chat, myLang("global").owner);
-  else if (cmd.register && !regUser) return myBot.sendText(m.chat, myLang("global").noReg.replace("{}", prefix));
+  else if (cmd.register && !regUser) return myBot.sendText(m.chat, myLang("global").noReg.replace("{}", pushname));
   else if(checkUser.block == true) return myBot.sendText(m.chat, "Estas Bloqueado.");
   else if (checkUser.points < cmd.check.pts ) {
     if(!isCreator) return myBot.sendText(m.chat, myLang('ia').gpt_no_points.replace("{}", cmd.check.pts - checkUser.points)) }

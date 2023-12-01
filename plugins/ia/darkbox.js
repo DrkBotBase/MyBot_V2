@@ -2,6 +2,8 @@ let Config = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['bot'],
+  ignored: true,
+  owner: true,
   category: 'ia',
   desc: 'chatbot para que te diviertas conversando.',
   register: true,

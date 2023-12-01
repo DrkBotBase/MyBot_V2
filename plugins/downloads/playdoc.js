@@ -1,4 +1,4 @@
-const hxz = require('hxz-api');
+const ytdl = require('ytdl-core');
 let { BOT_NAME } = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
@@ -18,13 +18,15 @@ module.exports = {
     try {
       let { videoId, title, thumbnail } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
-      let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
+      let info = await ytdl.getInfo('https://youtu.be/' + search.videoId)
+      let res = await ytdl.chooseFormat(info.formats, { filter: 'audioandvideo' })
+      //let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
       var tmb = thumbnail
       var mycapt = await myBot.sendMessage(m.chat, {
         text: `Download VideoDoc by:\n${BOT_NAME}`,
       })
       myBot.sendMessage(m.chat, {
-        document: { url: link },
+        document: { url: res.url },
         mimetype: "video/mp4",
         fileName: `${videoId}.mp4`,
         contextInfo: {

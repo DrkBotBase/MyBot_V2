@@ -7,10 +7,12 @@
 
 require('./config')
 const { default: myBotConnect, DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
-//const { DisconnectReason, generateWAMessageFromContent, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto, generateWAMessage, getContentType } = require("@adiwajshing/baileys")
 const { useSingleFileAuthState } = require('./lib/s-auth-state')
 const Config = require('./config');
-const { state, saveState } = useSingleFileAuthState(`./${Config.SESSION}.json`)
+//const { state, saveState } = useSingleFileAuthState(`./${Config.SESSION}.json`)
+const { state, saveState } = useSingleFileAuthState(
+  `../modules/session/creds.json`
+)
 const pino = require('pino')
 const { Boom } = require('@hapi/boom')
 const fs = require('fs')
@@ -27,10 +29,7 @@ const { toAudio } = require('./lib/converter')
 const { User, addUserKey} = require("./src/data");
 const { BOT_NAME } = require('./config');
 
-//language
 const myLang = require('./language').getString
-
-global.api = (name, path = '/', query = {}, apikeyqueryname) => (name in global.APIs ? global.APIs[name] : name) + path + (query || apikeyqueryname ? '?' + new URLSearchParams(Object.entries({ ...query, ...(apikeyqueryname ? { [apikeyqueryname]: global.APIKeys[name in global.APIs ? global.APIs[name] : name] } : {}) })) : '')
 
 const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) })
 
@@ -45,9 +44,6 @@ try {
   fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2));
   log(pint(bgPint("Base de datos creada con exito", "orange"), "white."))
 }
-
-
-//global.component = new (require('@neoxr/neoxr-js'))
 
 global.attr = {};
 attr.commands = new Map();
@@ -66,7 +62,6 @@ const readPlugins = () => {
 };
 readPlugins();
 
-
 const folderPath = './temp';
 fs.watch(folderPath, (eventType, filename) => {
   if (eventType === 'rename') {
@@ -77,14 +72,7 @@ fs.watch(folderPath, (eventType, filename) => {
   }
 });
 
-
 async function startMybot() {
-    /*const myBot = component.Extra.Socket({
-        logger: pino({ level: 'silent' }),
-        printQRInTerminal: true,
-        browser: ["DrkBot", "Safari", "13.0.0"],
-        auth: state
-    })*/
     const myBot = myBotConnect({
       logger: pino({ level: 'silent' }),
       printQRInTerminal: true,
@@ -94,8 +82,7 @@ async function startMybot() {
 
     store.bind(myBot.ev)
 
-    // anticall auto block
-    myBot.ws.on('CB:call', async (json) => {
+    /*myBot.ws.on('CB:call', async (json) => {
       const callerId = json.content[0].attrs['call-creator']
       if (json.content[0].tag == 'offer') {
         let owIan = await myBot.sendContact(callerId, global.owner)
@@ -103,7 +90,7 @@ async function startMybot() {
         await sleep(8000)
         await myBot.updateBlockStatus(callerId, "block")
       }
-    })
+    })*/
 
     myBot.ev.on('messages.upsert', async (chatUpdate) => {
       try {
@@ -131,7 +118,6 @@ async function startMybot() {
             let {subject} = await myBot.groupMetadata(room.id)
             let participants = room.participants
             for (let num of participants) {
-                // Get Profile Picture User
                 try {
                     ppuser = await myBot.profilePictureUrl(num, 'image')
                 } catch {
@@ -155,8 +141,7 @@ async function startMybot() {
           }
         }
     })
-	
-    // Setting
+
     myBot.decodeJid = (jid) => {
         if (!jid) return jid
         if (/:\d+@/gi.test(jid)) {
@@ -173,65 +158,62 @@ async function startMybot() {
     })
 
     myBot.getName = (jid, withoutContact = false) => {
-        id = myBot.decodeJid(jid)
-        withoutContact = myBot.withoutContact || withoutContact 
-        let v
-        if (id.endsWith("@g.us")) return new Promise(async (resolve) => {
-            v = store.contacts[id] || {}
-            if (!(v.name || v.subject)) v = myBot.groupMetadata(id) || {}
-            resolve(v.name || v.subject || PhoneNumber('+' + id.replace('@s.whatsapp.net', '')).getNumber('international'))
-        })
-        else v = id === '0@s.whatsapp.net' ? {
-            id,
-            name: 'WhatsApp'
-        } : id === myBot.decodeJid(myBot.user.id) ?
-            myBot.user :
-            (store.contacts[id] || {})
-            return (withoutContact ? '' : v.name) || v.subject || v.verifiedName || PhoneNumber('+' + jid.replace('@s.whatsapp.net', '')).getNumber('international')
+      id = myBot.decodeJid(jid)
+      withoutContact = myBot.withoutContact || withoutContact 
+      let v
+      if (id.endsWith("@g.us")) return new Promise(async (resolve) => {
+        v = store.contacts[id] || {}
+        if (!(v.name || v.subject)) v = myBot.groupMetadata(id) || {}
+        resolve(v.name || v.subject || PhoneNumber('+' + id.replace('@s.whatsapp.net', '')).getNumber('international'))
+      })
+      else v = id === '0@s.whatsapp.net' ? {
+        id, name: 'WhatsApp'
+      } : id === myBot.decodeJid(myBot.user.id)
+        ? myBot.user
+        : (store.contacts[id] || {})
+      return (withoutContact ? '' : v.name) || v.subject || v.verifiedName || PhoneNumber('+' + jid.replace('@s.whatsapp.net', '')).getNumber('international')
     }
-    
+
     myBot.sendContact = async (jid, kon, quoted = '', opts = {}) => {
-	let list = []
-	for (let i of kon) {
-	    list.push({
-	    	displayName: await myBot.getName(i + '@s.whatsapp.net'),
-	    	vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${await myBot.getName(i + '@s.whatsapp.net')}\nFN:${await myBot.getName(i + '@s.whatsapp.net')}\nitem1.TEL;waid=${i}:${i}\nitem1.X-ABLabel:Tel\nitem2.EMAIL;type=INTERNET:drkbot@gmail.com\nitem2.X-ABLabel:Email\nitem3.URL:https://instagram.com/iand_tv\nitem3.X-ABLabel:Instagram\nitem4.ADR:;;Colombia;;;;\nitem4.X-ABLabel:Region\nEND:VCARD`
-	    })
-	}
-	myBot.sendMessage(jid, { contacts: { displayName: `${list.length} Contact`, contacts: list }, ...opts }, { quoted })
-    }
-    
-    myBot.setStatus = (status) => {
-        myBot.query({
-            tag: 'iq',
-            attrs: {
-                to: '@s.whatsapp.net',
-                type: 'set',
-                xmlns: 'status',
-            },
-            content: [{
-                tag: 'status',
-                attrs: {},
-                content: Buffer.from(status, 'utf-8')
-            }]
+      let list = []
+      for (let i of kon) {
+        list.push({
+          displayName: await myBot.getName(i + '@s.whatsapp.net'),
+          vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${await myBot.getName(i + '@s.whatsapp.net')}\nFN:${await myBot.getName(i + '@s.whatsapp.net')}\nitem1.TEL;waid=${i}:${i}\nitem1.X-ABLabel:Tel\nitem2.EMAIL;type=INTERNET:drkbot@gmail.com\nitem2.X-ABLabel:Email\nitem3.URL:https://instagram.com/iand_tv\nitem3.X-ABLabel:Instagram\nitem4.ADR:;;Colombia;;;;\nitem4.X-ABLabel:Region\nEND:VCARD`
         })
-        return status
+      }
+      myBot.sendMessage(jid, { contacts: { displayName: `${list.length} Contact`, contacts: list }, ...opts }, { quoted })
     }
+
+    myBot.setStatus = (status) => {
+      myBot.query({
+        tag: 'iq',
+        attrs: {
+          to: '@s.whatsapp.net',
+          type: 'set',
+          xmlns: 'status',
+        }, content: [{
+          tag: 'status',
+          attrs: {},
+           content: Buffer.from(status, 'utf-8')
+        }]
+      })
+      return status
+    }
+
 	if (Config.WORKTYPE === 'private'){
     myBot.public = false
 	} else if (Config.WORKTYPE === 'public'){
     myBot.public = true
 	}
   global.wtMyBot = myBot.public == true ? ' Publico' : ' Privado'
-    //let work_type = myBot.public == true ? myLang('work_type').public : myLang('work_type').private
-    log(pint('🤖 DrkBot Modo' + wtMyBot, '.'));
-    log(pint(
-      '[copyright By: Ian]\n' + 
-      'Prohibida su venta\n' +
-      'Chatea con ©Ian\n' +
-      'Wats +573508770421\n\n', '#d30092'
-    ));
-
+  log(pint('🤖 DrkBot Modo' + wtMyBot, '.'));
+  log(pint(
+    '[copyright By: Ian]\n' + 
+    'Prohibida su venta\n' +
+    'Chatea con ©Ian\n' +
+    'Wats +573508770421\n\n', '#d30092'
+  ));
 
     myBot.serializeM = (m) => smsg(myBot, m, store)
 
@@ -268,19 +250,17 @@ async function startMybot() {
     })
 
     myBot.ev.on('creds.update', saveState)
-    
-    
+
     myBot.sendReact = async (jid, emoji, keys = {}) => {
       let reactionMessage = {
-         react: {
-            text: emoji,
-            key: keys
-         }
+        react: {
+          text: emoji,
+          key: keys
+        }
       }
       return await myBot.sendMessage(jid, reactionMessage)
     };
 
-    // Add Other
     /**
      *
      * @param {*} jid
@@ -310,7 +290,7 @@ async function startMybot() {
         return myBot.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options}, { quoted: quoted, ...options })
       }
     }
-    
+
     /**
      * Reply to a message
      * @param {String} jid
@@ -319,10 +299,9 @@ async function startMybot() {
      * @param {Object} options
      */
     myBot.reply = (jid, text = '', quoted, options) => {
-        return Buffer.isBuffer(text) ? myBot.sendFile(jid, text, 'file', '', quoted, false, options) : myBot.sendMessage(jid, { contextInfo: { mentionedJid: myBot.parseMention(text)}, ...options, text }, { quoted, ...options })
-        //return Buffer.isBuffer(text) ? myBot.sendFile(jid, text, 'file', '', quoted, false, options) : myBot.sendMessage(jid, { ...options, text }, { quoted, ...options })
+      return Buffer.isBuffer(text) ? myBot.sendFile(jid, text, 'file', '', quoted, false, options) : myBot.sendMessage(jid, { contextInfo: { mentionedJid: myBot.parseMention(text)}, ...options, text }, { quoted, ...options })
     }
-     
+
      /** Send List Messaage
       *
       *@param {*} jid
@@ -344,7 +323,7 @@ async function startMybot() {
         }
         myBot.sendMessage(jid, listMes, { quoted: quoted })
       }
-      
+
       /** Resize Image
       *
       * @param {Buffer} Buffer (Only Image)
@@ -357,172 +336,30 @@ async function startMybot() {
         var kiyomasa = await oyy.resize(width, height).getBufferAsync(jimp.MIME_JPEG)
         return kiyomasa
       }
-      
+
       myBot.sendMsg = async (jid, message = {}, options = {}) => {
 				return await myBot.sendMessage(jid, message, { ...options, ...ephemeral })
 			}
-      
-    /** Send Button 5 Message
-     * 
-     * @param {*} jid
-     * @param {*} text
-     * @param {*} footer
-     * @param {*} button
-     * @returns 
-     */
-      myBot.send5ButMsg = (jid, text = '' , footer = '', but = []) =>{
-        let templateButtons = but
-        var templateMessage = {
-          text: text,
-          footer: footer,
-          templateButtons: templateButtons
-        }
-        myBot.sendMessage(jid, templateMessage)
-      }
-        
-    /** Send Button 5 Image
-     *
-     * @param {*} jid
-     * @param {*} text
-     * @param {*} footer
-     * @param {*} image
-     * @param [*] button
-     * @param {*} options
-     * @returns
-     */
-    myBot.send5ButImg = async (jid , text = '' , footer = '', img, but = [], buff, options = {}) =>{
-      myBot.sendMessage(jid, { image: img, caption: text, footer: footer, templateButtons: but, ...options })
-    }
-    
-    /** Send Button 5 Video
-     *
-     * @param {*} jid
-     * @param {*} text
-     * @param {*} footer
-     * @param {*} Video
-     * @param [*] button
-     * @param {*} options
-     * @returns
-     */
-    myBot.send5ButVid = async (jid , text = '' , footer = '', vid, but = [], buff, options = {}) =>{
-      let lol = await myBot.reSize(buf, 300, 150)
-      myBot.sendMessage(jid, { video: vid, jpegThumbnail: lol, caption: text, footer: footer, templateButtons: but, ...options })
-    }
-    
-    /** Send Button 5 Gif
-     *
-     * @param {*} jid
-     * @param {*} text
-     * @param {*} footer
-     * @param {*} Gif
-     * @param [*] button
-     * @param {*} options
-     * @returns
-     */
-    myBot.send5ButGif = async (jid , text = '' , footer = '', gif, but = [], buff, options = {}) =>{
-      let ahh = await myBot.reSize(buf, 300, 150)
-      let a = [1,2]
-      let b = a[Math.floor(Math.random() * a.length)]
-      myBot.sendMessage(jid, { video: gif, gifPlayback: true, gifAttribution: b, caption: text, footer: footer, jpegThumbnail: ahh, templateButtons: but, ...options })
-    }
-    
-    myBot.sendButton = async (jid, text = '', footer = '', buffer, buttons, quoted, options) => {
-      let type
-      if (Array.isArray(buffer)) (options = quoted, quoted = buttons, buttons = buffer, buffer = null)
-      else if (buffer) try { (type = await myBot.getFile(buffer), buffer = type.data) } catch { buffer = null }
-      if (!Array.isArray(buttons[0]) && typeof buttons[0] === 'string') buttons = [buttons]
-      if (!options) options = {}
-      let message = {
-        ...options,
-        [buffer ? 'caption' : 'text']: text || '',
-        footer,
-        buttons: buttons.map(btn => ({
-          buttonId: btn[1] || btn[0] || '',
-          buttonText: {
-            displayText: btn[0] || btn[1] || ''
-          }
-        })),
-        ...(buffer ?
-          options.asLocation && /image/.test(type.mime) ? {
-            location: {
-              ...options,
-              jpegThumbnail: buffer
-            }
-          } : {
-            [/video/.test(type.mime) ? 'video' : /image/.test(type.mime) ? 'image' : 'document']: buffer
-          } : {})
-      }
-      return await myBot.sendMessage(jid, message, {
-        quoted,
-        upload: myBot.waUploadToServer,
-        ...options
-      })
-  }
 
-    /**
-     * 
-     * @param {*} jid 
-     * @param {*} buttons 
-     * @param {*} caption 
-     * @param {*} footer 
-     * @param {*} quoted 
-     * @param {*} options 
-     */
-    myBot.sendButtonText = (jid, buttons = [], text, footer, quoted = '', options = {}) => {
-        let buttonMessage = {
-            text,
-            footer,
-            buttons,
-            headerType: 2,
-            ...options
-        }
-        myBot.sendMessage(jid, buttonMessage, { quoted, ...options })
-    }
-      
     myBot.sendButtonLoc = async (jid, path, content, footer, butname, rowname, quoted, options = {}) => {
-		  let buffer = await myBot.reSize(path, 300, 150)
-		  let buttons = [
-		    {buttonId: rowname, buttonText: {displayText: butname}, type: 1}
-		  ]
-		  let buttonMessage = {
-		    location: { jpegThumbnail: buffer },
+      let buffer = await myBot.reSize(path, 300, 150)
+      let buttons = [{
+        buttonId: rowname, buttonText: {displayText: butname}, type: 1
+      }]
+      let buttonMessage = {
+        location: { jpegThumbnail: buffer },
         caption: content,
         footer: footer,
         buttons: buttons,
         headerType: 6
-		  }
+      }
       return await myBot.sendMessage(jid, buttonMessage, {
         quoted,
         upload: myBot.waUploadToServer,
         ...options
       })
     }
-    
-    myBot.sendButtonImg = async (jid, buffer, contentText, footerText, button1, id1, quoted, options) => {
-        let type = await myBot.getFile(buffer)
-        let { res, data: file } = type
-        if (res && res.status !== 200 || file.length <= 65536) {
-        try { throw { json: JSON.parse(file.toString()) } }
-        catch (e) { if (e.json) throw e.json }
-        }
-        const buttons = [
-        { buttonId: id1, buttonText: { displayText: button1 }, type: 1 }
-        ]
 
-        const buttonMessage = {
-            image: file,
-            fileLength: 887890909999999,
-            caption: contentText,
-            footer: footerText,
-            mentions: await myBot.parseMention(contentText + footerText),
-            ...options,
-            buttons: buttons,
-            headerType: 4
-        }
-
-        return await myBot.sendMessage(jid, buttonMessage, { quoted, ephemeralExpiration: 86400, contextInfo: { mentionedJid: myBot.parseMention(contentText + footerText) }, ...options })
-    }
-    
     myBot.sendError = async (jid, text) => {
       let aa = { quoted: m, userJid: myBot.user.id };
       let prep = await generateWAMessageFromContent(jid, {
@@ -541,28 +378,6 @@ async function startMybot() {
       return myBot.relayMessage(jid, prep.message, {
         messageId: prep.key.id,
       });
-    }
-
-    /**
-     * 
-     * @param {*} jid 
-     * @param {*} path 
-     * @param {*} buttons 
-     * @param {*} options 
-     * @returns 
-     */
-    myBot.sendButImage = async (jid, path, text = '', foot = '', but = [], quoted = '', options = {}) => {
-      let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-      let buttonMessage = {
-        image: buffer,
-        fileLength: 8000000000,
-        caption: text,
-        footer: foot,
-        mentions: await myBot.parseMention(text + foot),
-        buttons: but,
-        headerType: 4
-      }
-        return await myBot.sendMessage(jid, buttonMessage, { quoted, ephemeralExpiration: 86400,contextInfo: { mentionedJid: myBot.parseMention(text + foot) }, ...options })
     }
 
     /**
@@ -599,8 +414,8 @@ async function startMybot() {
      * @returns 
      */
     myBot.sendVideo = async (jid, path, caption = '', quoted = '', gif = false, options) => {
-        let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-        return await myBot.sendMessage(jid, { video: buffer, caption: caption, gifPlayback: gif, ...options }, { quoted })
+      let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
+      return await myBot.sendMessage(jid, { video: buffer, caption: caption, gifPlayback: gif, ...options }, { quoted })
     }
 
     /**
@@ -613,8 +428,8 @@ async function startMybot() {
      * @returns 
      */
     myBot.sendAudio = async (jid, path, quoted = '', ptt = false, options) => {
-        let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-        return await myBot.sendMessage(jid, { audio: buffer, ptt: ptt, ...options }, { quoted })
+      let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
+      return await myBot.sendMessage(jid, { audio: buffer, ptt: ptt, ...options }, { quoted })
     }
 
     /**
@@ -636,16 +451,15 @@ async function startMybot() {
      * @returns 
      */
     myBot.sendImageAsSticker = async (jid, path, quoted, options = {}) => {
-        let buff = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-        let buffer
-        if (options && (options.packname || options.author)) {
-            buffer = await writeExifImg(buff, options)
-        } else {
-            buffer = await imageToWebp(buff)
-        }
-
-        await myBot.sendMessage(jid, { sticker: { url: buffer }, ...options }, { quoted })
-        return buffer
+      let buff = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
+      let buffer
+      if (options && (options.packname || options.author)) {
+        buffer = await writeExifImg(buff, options)
+      } else {
+        buffer = await imageToWebp(buff)
+      }
+      await myBot.sendMessage(jid, { sticker: { url: buffer }, ...options }, { quoted })
+      return buffer
     }
 
     /**
@@ -657,18 +471,17 @@ async function startMybot() {
      * @returns 
      */
     myBot.sendVideoAsSticker = async (jid, path, quoted, options = {}) => {
-        let buff = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-        let buffer
-        if (options && (options.packname || options.author)) {
-            buffer = await writeExifVid(buff, options)
-        } else {
-            buffer = await videoToWebp(buff)
-        }
-
-        await myBot.sendMessage(jid, { sticker: { url: buffer }, ...options }, { quoted })
-        return buffer
+      let buff = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
+      let buffer
+      if (options && (options.packname || options.author)) {
+        buffer = await writeExifVid(buff, options)
+      } else {
+        buffer = await videoToWebp(buff)
+      }
+      await myBot.sendMessage(jid, { sticker: { url: buffer }, ...options }, { quoted })
+      return buffer
     }
-	
+
     /**
      * 
      * @param {*} message 
@@ -677,33 +490,31 @@ async function startMybot() {
      * @returns 
      */
     myBot.downloadAndSaveMediaMessage = async (message, filename, attachExtension = true) => {
-        let quoted = message.msg ? message.msg : message
-        let mime = (message.msg || message).mimetype || ''
-        let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0]
-        const stream = await downloadContentFromMessage(quoted, messageType)
-        let buffer = Buffer.from([])
-        for await(const chunk of stream) {
-            buffer = Buffer.concat([buffer, chunk])
-        }
-	let type = await FileType.fromBuffer(buffer)
-        trueFileName = attachExtension ? (filename + '.' + type.ext) : filename
-        // save to file
-        await fs.writeFileSync(trueFileName, buffer)
-        return trueFileName
+      let quoted = message.msg ? message.msg : message
+      let mime = (message.msg || message).mimetype || ''
+      let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0]
+      const stream = await downloadContentFromMessage(quoted, messageType)
+      let buffer = Buffer.from([])
+      for await(const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk])
+      }
+      let type = await FileType.fromBuffer(buffer)
+      trueFileName = attachExtension ? (filename + '.' + type.ext) : filename
+      await fs.writeFileSync(trueFileName, buffer)
+      return trueFileName
     }
 
     myBot.downloadMediaMessage = async (message) => {
-        let mime = (message.msg || message).mimetype || ''
-        let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0]
-        const stream = await downloadContentFromMessage(message, messageType)
-        let buffer = Buffer.from([])
-        for await(const chunk of stream) {
-            buffer = Buffer.concat([buffer, chunk])
-	}
-        
-	return buffer
-     } 
-    
+      let mime = (message.msg || message).mimetype || ''
+      let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0]
+      const stream = await downloadContentFromMessage(message, messageType)
+      let buffer = Buffer.from([])
+      for await(const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk])
+      }
+      return buffer
+    } 
+
     /**
      * 
      * @param {*} jid 
@@ -715,29 +526,29 @@ async function startMybot() {
      * @returns 
      */
     myBot.sendMedia = async (jid, path, fileName = '', caption = '', quoted = '', options = {}) => {
-        let types = await myBot.getFile(path, true)
-           let { mime, ext, res, data, filename } = types
-           if (res && res.status !== 200 || file.length <= 65536) {
-               try { throw { json: JSON.parse(file.toString()) } }
-               catch (e) { if (e.json) throw e.json }
-           }
-       let type = '', mimetype = mime, pathFile = filename
-       if (options.asDocument) type = 'document'
-       if (options.asSticker || /webp/.test(mime)) {
+      let types = await myBot.getFile(path, true)
+      let { mime, ext, res, data, filename } = types
+      if (res && res.status !== 200 || file.length <= 65536) {
+        try { throw { json: JSON.parse(file.toString()) } }
+        catch (e) { if (e.json) throw e.json }
+      }
+      let type = '', mimetype = mime, pathFile = filename
+      if (options.asDocument) type = 'document'
+      if (options.asSticker || /webp/.test(mime)) {
         let { writeExif } = require('./lib/exif')
         let media = { mimetype: mime, data }
         pathFile = await writeExif(media, { packname: options.packname ? options.packname : global.packname, author: options.author ? options.author : Config.BOT_NAME, categories: options.categories ? options.categories : [] })
         await fs.promises.unlink(filename)
         type = 'sticker'
         mimetype = 'image/webp'
-        }
-       else if (/image/.test(mime)) type = 'image'
-       else if (/video/.test(mime)) type = 'video'
-       else if (/audio/.test(mime)) type = 'audio'
-       else type = 'document'
-       await myBot.sendMessage(jid, { [type]: { url: pathFile }, caption, mimetype, fileName, ...options }, { quoted, ...options })
-       return fs.promises.unlink(pathFile)
-       }
+      }
+      else if (/image/.test(mime)) type = 'image'
+      else if (/video/.test(mime)) type = 'video'
+      else if (/audio/.test(mime)) type = 'audio'
+      else type = 'document'
+      await myBot.sendMessage(jid, { [type]: { url: pathFile }, caption, mimetype, fileName, ...options }, { quoted, ...options })
+      return fs.promises.unlink(pathFile)
+    }
 
     /**
      * 
@@ -748,66 +559,61 @@ async function startMybot() {
      * @returns 
      */
     myBot.copyNForward = async (jid, message, forceForward = false, options = {}) => {
-        let vtype
-		if (options.readViewOnce) {
-			message.message = message.message && message.message.ephemeralMessage && message.message.ephemeralMessage.message ? message.message.ephemeralMessage.message : (message.message || undefined)
-			vtype = Object.keys(message.message.viewOnceMessage.message)[0]
-			delete(message.message && message.message.ignore ? message.message.ignore : (message.message || undefined))
-			delete message.message.viewOnceMessage.message[vtype].viewOnce
-			message.message = {
-				...message.message.viewOnceMessage.message
-			}
-		}
-
-        let mtype = Object.keys(message.message)[0]
-        let content = await generateForwardMessageContent(message, forceForward)
-        let ctype = Object.keys(content)[0]
-		let context = {}
-        if (mtype != "conversation") context = message.message[mtype].contextInfo
-        content[ctype].contextInfo = {
-            ...context,
-            ...content[ctype].contextInfo
+      let vtype
+      if (options.readViewOnce) {
+        message.message = message.message && message.message.ephemeralMessage && message.message.ephemeralMessage.message ? message.message.ephemeralMessage.message : (message.message || undefined)
+        vtype = Object.keys(message.message.viewOnceMessage.message)[0]
+        delete(message.message && message.message.ignore ? message.message.ignore : (message.message || undefined))
+        delete message.message.viewOnceMessage.message[vtype].viewOnce
+        message.message = {
+          ...message.message.viewOnceMessage.message
         }
-        const waMessage = await generateWAMessageFromContent(jid, content, options ? {
-            ...content[ctype],
-            ...options,
-            ...(options.contextInfo ? {
-                contextInfo: {
-                    ...content[ctype].contextInfo,
-                    ...options.contextInfo
-                }
-            } : {})
+      }
+      let mtype = Object.keys(message.message)[0]
+      let content = await generateForwardMessageContent(message, forceForward)
+      let ctype = Object.keys(content)[0]
+      let context = {}
+      if (mtype != "conversation") context = message.message[mtype].contextInfo
+      content[ctype].contextInfo = {
+        ...context,
+        ...content[ctype].contextInfo
+      }
+      const waMessage = await generateWAMessageFromContent(jid, content, options ? {
+        ...content[ctype],
+        ...options,
+        ...(options.contextInfo ? {
+          contextInfo: {
+            ...content[ctype].contextInfo,
+            ...options.contextInfo
+          }
         } : {})
-        await myBot.relayMessage(jid, waMessage.message, { messageId:  waMessage.key.id })
-        return waMessage
+      } : {})
+      await myBot.relayMessage(jid, waMessage.message, { messageId:  waMessage.key.id })
+      return waMessage
     }
 
     myBot.cMod = (jid, copy, text = '', sender = myBot.user.id, options = {}) => {
-        //let copy = message.toJSON()
-		let mtype = Object.keys(copy.message)[0]
-		let isEphemeral = mtype === 'ephemeralMessage'
-        if (isEphemeral) {
-            mtype = Object.keys(copy.message.ephemeralMessage.message)[0]
-        }
-        let msg = isEphemeral ? copy.message.ephemeralMessage.message : copy.message
-		let content = msg[mtype]
-        if (typeof content === 'string') msg[mtype] = text || content
-		else if (content.caption) content.caption = text || content.caption
-		else if (content.text) content.text = text || content.text
-		if (typeof content !== 'string') msg[mtype] = {
-			...content,
-			...options
-        }
-        if (copy.key.participant) sender = copy.key.participant = sender || copy.key.participant
-		else if (copy.key.participant) sender = copy.key.participant = sender || copy.key.participant
-		if (copy.key.remoteJid.includes('@s.whatsapp.net')) sender = sender || copy.key.remoteJid
-		else if (copy.key.remoteJid.includes('@broadcast')) sender = sender || copy.key.remoteJid
-		copy.key.remoteJid = jid
-		copy.key.fromMe = sender === myBot.user.id
-
-        return proto.WebMessageInfo.fromObject(copy)
+  		let mtype = Object.keys(copy.message)[0]
+  		let isEphemeral = mtype === 'ephemeralMessage'
+      if (isEphemeral) {
+        mtype = Object.keys(copy.message.ephemeralMessage.message)[0]
+      }
+      let msg = isEphemeral ? copy.message.ephemeralMessage.message : copy.message
+		  let content = msg[mtype]
+      if (typeof content === 'string') msg[mtype] = text || content
+      else if (content.caption) content.caption = text || content.caption
+      else if (content.text) content.text = text || content.text
+      if (typeof content !== 'string') msg[mtype] = {
+        ...content, ...options
+      }
+      if (copy.key.participant) sender = copy.key.participant = sender || copy.key.participant
+      else if (copy.key.participant) sender = copy.key.participant = sender || copy.key.participant
+      if (copy.key.remoteJid.includes('@s.whatsapp.net')) sender = sender || copy.key.remoteJid
+      else if (copy.key.remoteJid.includes('@broadcast')) sender = sender || copy.key.remoteJid
+      copy.key.remoteJid = jid
+      copy.key.fromMe = sender === myBot.user.id
+      return proto.WebMessageInfo.fromObject(copy)
     }
-
 
     /**
      * 
@@ -815,93 +621,82 @@ async function startMybot() {
      * @returns 
      */
     myBot.getFile = async (PATH, save) => {
-        let res
-        let data = Buffer.isBuffer(PATH) ? PATH : /^data:.*?\/.*?;base64,/i.test(PATH) ? Buffer.from(PATH.split`,`[1], 'base64') : /^https?:\/\//.test(PATH) ? await (res = await getBuffer(PATH)) : fs.existsSync(PATH) ? (filename = PATH, fs.readFileSync(PATH)) : typeof PATH === 'string' ? PATH : Buffer.alloc(0)
-        //if (!Buffer.isBuffer(data)) throw new TypeError('Result is not a buffer')
-        let type = await FileType.fromBuffer(data) || {
-            mime: 'application/octet-stream',
-            ext: '.bin'
-        }
-        filename = path.join(__filename, '../temp/' + new Date * 1 + '.' + type.ext)
-        if (data && save) fs.promises.writeFile(filename, data)
-        return {
-            res,
-            filename,
-	    size: await getSizeMedia(data),
-            ...type,
-            data
-        }
+      let res
+      let data = Buffer.isBuffer(PATH) ? PATH : /^data:.*?\/.*?;base64,/i.test(PATH) ? Buffer.from(PATH.split`,`[1], 'base64') : /^https?:\/\//.test(PATH) ? await (res = await getBuffer(PATH)) : fs.existsSync(PATH) ? (filename = PATH, fs.readFileSync(PATH)) : typeof PATH === 'string' ? PATH : Buffer.alloc(0)
+      let type = await FileType.fromBuffer(data) || {
+        mime: 'application/octet-stream',
+        ext: '.bin'
+      }
+      filename = path.join(__filename, '../temp/' + new Date * 1 + '.' + type.ext)
+      if (data && save) fs.promises.writeFile(filename, data)
+      return {
+        res,
+        filename,
+        size: await getSizeMedia(data),
+        ...type,
+        data
+      }
     }
-    
+
     myBot.sendFile = async (jid, path, filename = '', caption = '', quoted, ptt = false, options = {}) => {
-                let type = await myBot.getFile(path, true)
-                let { res, data: file, filename: pathFile } = type
-                if (res && res.status !== 200 || file.length <= 65536) {
-                    try { throw { json: JSON.parse(file.toString()) } }
-                    catch (e) { if (e.json) throw e.json }
-                }
-                //const fileSize = fs.statSync(pathFile).size / 1024 / 1024
-                //if (fileSize >= 100) throw new Error('File size is too big!')
-                let opt = {}
-                if (quoted) opt.quoted = quoted
-                if (!type) options.asDocument = true
-                let mtype = '', mimetype = options.mimetype || type.mime, convert
-                if (/webp/.test(type.mime) || (/image/.test(type.mime) && options.asSticker)) mtype = 'sticker'
-                else if (/image/.test(type.mime) || (/webp/.test(type.mime) && options.asImage)) mtype = 'image'
-                else if (/video/.test(type.mime)) mtype = 'video'
-                else if (/audio/.test(type.mime)) (
-                    convert = await toAudio(file, type.ext),
-                    file = convert.data,
-                    pathFile = convert.filename,
-                    mtype = 'audio',
-                    mimetype = options.mimetype || 'audio/ogg; codecs=opus'
-                )
-                else mtype = 'document'
-                if (options.asDocument) mtype = 'document'
+      let type = await myBot.getFile(path, true)
+      let { res, data: file, filename: pathFile } = type
+      if (res && res.status !== 200 || file.length <= 65536) {
+        try { throw { json: JSON.parse(file.toString()) } }
+        catch (e) { if (e.json) throw e.json }
+      }
+      let opt = {}
+      if (quoted) opt.quoted = quoted
+      if (!type) options.asDocument = true
+      let mtype = '', mimetype = options.mimetype || type.mime, convert
+      if (/webp/.test(type.mime) || (/image/.test(type.mime) && options.asSticker)) mtype = 'sticker'
+      else if (/image/.test(type.mime) || (/webp/.test(type.mime) && options.asImage)) mtype = 'image'
+      else if (/video/.test(type.mime)) mtype = 'video'
+      else if (/audio/.test(type.mime)) (
+        convert = await toAudio(file, type.ext),
+        file = convert.data,
+        pathFile = convert.filename,
+        mtype = 'audio',
+        mimetype = options.mimetype || 'audio/ogg; codecs=opus'
+      )
+      else mtype = 'document'
+      if (options.asDocument) mtype = 'document'
+      delete options.asSticker
+      delete options.asLocation
+      delete options.asVideo
+      delete options.asDocument
+      delete options.asImage
+      let message = {
+        ...options,
+        caption,
+        ptt,
+        [mtype]: { url: pathFile },
+        mimetype,
+        fileName: filename || pathFile.split('/').pop()
+      }
+      let m
+      try {
+        m = await myBot.sendMessage(jid, message, { ...opt, ...options })
+      } catch (e) {
+        console.error(e)
+      } finally {
+        if (!m) m = await myBot.sendMessage(jid, { ...message, [mtype]: file }, { ...opt, ...options })
+        file = null
+        return m
+      }
+    }
 
-                delete options.asSticker
-                delete options.asLocation
-                delete options.asVideo
-                delete options.asDocument
-                delete options.asImage
-
-                let message = {
-                    ...options,
-                    caption,
-                    ptt,
-                    [mtype]: { url: pathFile },
-                    mimetype,
-                    fileName: filename || pathFile.split('/').pop()
-                }
-                /**
-                 * @type {import('@adiwajshing/baileys').proto.WebMessageInfo}
-                 */
-                let m
-                try {
-                    m = await myBot.sendMessage(jid, message, { ...opt, ...options })
-                } catch (e) {
-                    console.error(e)
-                    m = null
-                } finally {
-                    if (!m) m = await myBot.sendMessage(jid, { ...message, [mtype]: file }, { ...opt, ...options })
-                    file = null // releasing the memory
-                    return m
-                }
-            }
-    
     /**
      * Parses string into mentionedJid(s)
      * @param {String} text
      */
     myBot.parseMention = (text = '') => {
-        return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
+      return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
     }
-
-    return myBot
+  return myBot
 }
 
 startMybot()
-
 
 let file = require.resolve(__filename);
 Object.freeze(global.reload)

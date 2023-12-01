@@ -3,6 +3,8 @@ let Config = require("../../config");
 let { webp2mp4File } = require("../../lib/uploader");
 module.exports = {
   cmd: ['tovideo'],
+  owner: true,
+  ignored: true,
   category: 'converter',
   desc: 'convierte sticker en movimiento a videos.',
   register: true,

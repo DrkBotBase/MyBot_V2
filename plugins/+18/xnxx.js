@@ -4,6 +4,8 @@ const fetch = require('node-fetch');
 let { BOT_NAME } = require("../../config");
 module.exports = {
   cmd: ['xnxx', 'xnxxdl'],
+  ignored: true,
+  owner: true,
   category: '+18',
   desc: 'busqueda y descarga videos de xnxx.',
   register: true,

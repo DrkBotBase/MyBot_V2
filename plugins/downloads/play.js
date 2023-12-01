@@ -1,3 +1,4 @@
+const ytdl = require('ytdl-core');
 let { BOT_NAME } = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
@@ -17,13 +18,15 @@ module.exports = {
     try {
       let { videoId, title, thumbnail } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
-      let link = `https://ytdl.tiodevhost.my.id/${videoId}.mpeg?filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
+      let info = await ytdl.getInfo('https://youtu.be/' + search.videoId)
+      let res = await ytdl.chooseFormat(info.formats, { filter: 'audioonly' })
+      //let link = `https://ytdl.tiodevhost.my.id/${videoId}.mpeg?filter=audioonly&quality=highestaudio&contenttype=audio/mpeg`
       var tmb = thumbnail
       var mycapt = await myBot.sendMessage(m.chat, {
         text: `Download Music by:\n${BOT_NAME}`,
       })
       myBot.sendMessage(m.chat, {
-        audio: { url: link },
+        audio: { url: res.url },
         mimetype: 'audio/mpeg',
         contextInfo: {
           externalAdReply: {

@@ -1,4 +1,4 @@
-const hxz = require('hxz-api');
+const ytdl = require('ytdl-core');
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['play2'],
@@ -18,17 +18,19 @@ module.exports = {
       let { videoId, title, seconds, timestamp, views } = search;
       myBot.sendReact(m.chat, "🕒", m.key);
       if(seconds > 360) return m.reply(`Video sobrepasa los 6 minutos.\nUtiliza el comando ${prefix}playdoc para descargar.`)
-      let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
-      let info = `
+      let info = await ytdl.getInfo('https://youtu.be/' + search.videoId)
+      let res = await ytdl.chooseFormat(info.formats, { filter: 'audioandvideo' })
+      //let link = `https://ytdl.tiodevhost.my.id/${videoId}.mp4?filter=audioandvideo&quality=highestvideo&contenttype=video/mp4`
+      let teks = `
 ╭━━━━━━━━━━⬣
 *${title}*
 🕒 *Duracion:* ${timestamp}
 📈 *Vistas:* ${views.toLocaleString('es-ES')}
 ╰━━━━━━━━━━⬣`.trim()
       myBot.sendMessage(m.chat, {
-        video: { url: link },
+        video: { url: res.url },
         mimetype: "video/mp4",
-        caption: info
+        caption: teks
       }, { quoted: m });
       User.counter(m.sender, { usage: 1 });
     } catch (e) {

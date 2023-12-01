@@ -1,7 +1,10 @@
+const { Configuration, OpenAIApi } = require("openai");
 let Config = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['gpt'],
+  ignored: true,
+  owner: true,
   category: 'ia',
   desc: 'inteligencia artificial que te puede ayudar con cualquier tema.',
   register: true,
@@ -21,23 +24,20 @@ module.exports = {
       if (!text) return m.reply(myLang("ia").gpt_msg);
       myBot.sendReact(m.chat, "🕒", m.key);
 
-      const { Configuration, OpenAIApi } = require("openai");
       const configuration = new Configuration({
         apiKey: Config.OPEN_AI_KEY || console.log('Err ApikEy'),
       });
       const openai = new OpenAIApi(configuration);
-      const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: text,
-        temperature: 0.5,
-        max_tokens: 500,
-        top_p: 1.0,
-        frequency_penalty: 0.5,
-        presence_penalty: 0.0,
-        stop: ["AI:"],
+      
+      const response = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{
+          role: "assistant", 
+          content: `Eres un asistente experto en todas las materias, profundiza y da respuestas claras y concretas de cada pregunta que te hagan. ${text}`
+        }],
       });
       myBot.sendMessage(m.chat, {
-        text: response.data.choices[0].text.trim()
+        text: response.data.choices[0].message.content.trim()
       }, { quoted: m });
       User.counter(m.sender, { usage: 1 });
   }

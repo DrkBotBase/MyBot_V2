@@ -2,6 +2,8 @@ let { BOT_NAME } = require("../../config");
 let { fetchJson } = require("../../lib/myfunc");
 module.exports = {
   cmd: ['waifu', 'neko'],
+  ignored: true,
+  owner: true,
   category: '+18',
   desc: 'descarga imagenes hentai.',
   register: true,

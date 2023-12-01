@@ -19,7 +19,7 @@
   "author": "IanVanh.",
   "license": "MIT",
   "dependencies": {
-    "@adiwajshing/baileys": "^4.4.0",
+    "@adiwajshing/baileys": "npm:baileys@^6.0.7",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@bochilteam/scraper": "^3.0.0",
     "@neoxr/neoxr-js": "^1.2.9",
@@ -28,6 +28,7 @@
     "async-g-i-s": "^1.2.0",
     "awesome-phonenumber": "^2.64.0",
     "axios": "^0.24.0",
+    "baileys": "^6.0.9",
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.10",
     "child_process": "^1.0.2",
@@ -38,6 +39,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs": "0.0.1-security",
     "google-it": "^1.6.2",
+    "google-translate-tts": "^0.4.0-dev",
     "got": "^11.8.3",
     "human-readable": "^0.2.1",
     "hxz-api": "^1.0.1",
@@ -50,7 +52,7 @@
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1",
     "node-webpmux": "^3.1.0",
-    "openai": "^3.1.0",
+    "openai": "^3.3.0",
     "os": "^0.1.2",
     "path": "^0.12.7",
     "perf_hooks": "0.0.1",
@@ -64,7 +66,8 @@
     "simple-git": "2.37.0",
     "supervisor": "^0.12.0",
     "util": "^0.12.4",
-    "yargs": "^17.2.1"
+    "yargs": "^17.2.1",
+    "ytdl-core": "4.11.5"
   },
   "directories": {
     "lang": "lang",

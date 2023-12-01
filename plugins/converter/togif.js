@@ -3,6 +3,8 @@ let Config = require("../../config");
 let { webp2mp4File } = require("../../lib/uploader");
 module.exports = {
   cmd: ['togif'],
+  owner: true,
+  ignored: true,
   category: 'converter',
   desc: 'convierte videos cortos a gif.',
   register: true,
